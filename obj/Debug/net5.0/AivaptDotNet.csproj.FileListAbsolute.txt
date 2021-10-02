@@ -1,0 +1,16 @@
+/home/jan/Coding/Csharp/AivaptDotNet/bin/Debug/net5.0/AivaptDotNet
+/home/jan/Coding/Csharp/AivaptDotNet/bin/Debug/net5.0/AivaptDotNet.deps.json
+/home/jan/Coding/Csharp/AivaptDotNet/bin/Debug/net5.0/AivaptDotNet.runtimeconfig.json
+/home/jan/Coding/Csharp/AivaptDotNet/bin/Debug/net5.0/AivaptDotNet.runtimeconfig.dev.json
+/home/jan/Coding/Csharp/AivaptDotNet/bin/Debug/net5.0/AivaptDotNet.dll
+/home/jan/Coding/Csharp/AivaptDotNet/bin/Debug/net5.0/ref/AivaptDotNet.dll
+/home/jan/Coding/Csharp/AivaptDotNet/bin/Debug/net5.0/AivaptDotNet.pdb
+/home/jan/Coding/Csharp/AivaptDotNet/obj/Debug/net5.0/AivaptDotNet.csprojAssemblyReference.cache
+/home/jan/Coding/Csharp/AivaptDotNet/obj/Debug/net5.0/AivaptDotNet.GeneratedMSBuildEditorConfig.editorconfig
+/home/jan/Coding/Csharp/AivaptDotNet/obj/Debug/net5.0/AivaptDotNet.AssemblyInfoInputs.cache
+/home/jan/Coding/Csharp/AivaptDotNet/obj/Debug/net5.0/AivaptDotNet.AssemblyInfo.cs
+/home/jan/Coding/Csharp/AivaptDotNet/obj/Debug/net5.0/AivaptDotNet.csproj.CoreCompileInputs.cache
+/home/jan/Coding/Csharp/AivaptDotNet/obj/Debug/net5.0/AivaptDotNet.dll
+/home/jan/Coding/Csharp/AivaptDotNet/obj/Debug/net5.0/ref/AivaptDotNet.dll
+/home/jan/Coding/Csharp/AivaptDotNet/obj/Debug/net5.0/AivaptDotNet.pdb
+/home/jan/Coding/Csharp/AivaptDotNet/obj/Debug/net5.0/AivaptDotNet.genruntimeconfig.cache
