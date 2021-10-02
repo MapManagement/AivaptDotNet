@@ -14,3 +14,13 @@
 /home/jan/Coding/Csharp/AivaptDotNet/obj/Debug/net5.0/ref/AivaptDotNet.dll
 /home/jan/Coding/Csharp/AivaptDotNet/obj/Debug/net5.0/AivaptDotNet.pdb
 /home/jan/Coding/Csharp/AivaptDotNet/obj/Debug/net5.0/AivaptDotNet.genruntimeconfig.cache
+/home/jan/Coding/Csharp/AivaptDotNet/bin/Debug/net5.0/Discord.Net.Commands.dll
+/home/jan/Coding/Csharp/AivaptDotNet/bin/Debug/net5.0/Discord.Net.Core.dll
+/home/jan/Coding/Csharp/AivaptDotNet/bin/Debug/net5.0/Discord.Net.Rest.dll
+/home/jan/Coding/Csharp/AivaptDotNet/bin/Debug/net5.0/Discord.Net.Webhook.dll
+/home/jan/Coding/Csharp/AivaptDotNet/bin/Debug/net5.0/Discord.Net.WebSocket.dll
+/home/jan/Coding/Csharp/AivaptDotNet/bin/Debug/net5.0/Microsoft.Extensions.DependencyInjection.dll
+/home/jan/Coding/Csharp/AivaptDotNet/bin/Debug/net5.0/Microsoft.Extensions.DependencyInjection.Abstractions.dll
+/home/jan/Coding/Csharp/AivaptDotNet/bin/Debug/net5.0/Newtonsoft.Json.dll
+/home/jan/Coding/Csharp/AivaptDotNet/bin/Debug/net5.0/System.Interactive.Async.dll
+/home/jan/Coding/Csharp/AivaptDotNet/obj/Debug/net5.0/AivaptDotNet.csproj.CopyComplete
