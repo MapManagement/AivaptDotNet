@@ -19,7 +19,7 @@ namespace AivaptDotNet.Handlers
             _commandService = commandService;
         }
 
-        private async Task InitializeCommands()
+        public async Task InitializeCommands()
         {
             _botClient.MessageReceived += HandleCommand;
             await _commandService.AddModulesAsync(Assembly.GetEntryAssembly(), services: null);

@@ -34,6 +34,9 @@ namespace AivaptDotNet
 
             string token = File.ReadAllText("token.txt");
 
+            var commandHandler = new CommandHandler(_botClient, _commands);
+            await commandHandler.InitializeCommands();
+
             await _botClient.LoginAsync(TokenType.Bot, token);
             await _botClient.StartAsync();
 
