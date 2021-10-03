@@ -18,10 +18,12 @@ namespace AivaptDotNet
         private CommandService _commands;
 
 	    public static void Main(string[] args)
-		    => new Program().MainAsync().GetAwaiter().GetResult();
+        {
+            new Program().MainAsync().GetAwaiter().GetResult();
+        }
 
-	    public async Task MainAsync()
-	    {
+        public Program()
+        {
             _botClient = new DiscordSocketClient();
             _botClient.Log += Logging;
 
@@ -31,7 +33,10 @@ namespace AivaptDotNet
                 CaseSensitiveCommands = false,
             });
             _commands.Log += Logging;
+        }
 
+	    public async Task MainAsync()
+	    {
             string token = File.ReadAllText("token.txt");
 
             var commandHandler = new CommandHandler(_botClient, _commands);
