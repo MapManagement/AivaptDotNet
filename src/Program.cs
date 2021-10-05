@@ -14,7 +14,7 @@ namespace AivaptDotNet
     public class Program
     {
         //Source: https://docs.stillu.cc/guides/getting_started/first-bot.html
-        private DiscordSocketClient _botClient;
+        private AivaptClient _botClient;
         private CommandService _commands;
 
 	    public static void Main(string[] args)
@@ -24,7 +24,7 @@ namespace AivaptDotNet
 
         public Program()
         {
-            _botClient = new DiscordSocketClient();
+            _botClient = new AivaptClient();
             _botClient.Log += Logging;
 
             _commands = new CommandService(new CommandServiceConfig

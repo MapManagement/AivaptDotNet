@@ -9,7 +9,7 @@ using Discord.Commands;
 
 namespace AivaptDotNet.Modules 
 {
-    public class VoiceModules : ModuleBase<SocketCommandContext>
+    public class VoiceModules : ModuleBase<AivaptCommandContext>
     {
         [Command("join", RunMode = RunMode.Async)]
         [Summary("Bot joins the voice channel")]

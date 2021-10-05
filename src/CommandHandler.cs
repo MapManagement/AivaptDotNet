@@ -10,10 +10,10 @@ using Discord.WebSocket;
 namespace AivaptDotNet.Handlers 
 {
     public class CommandHandler {
-        private readonly DiscordSocketClient _botClient;
+        private readonly AivaptClient _botClient;
         private readonly CommandService _commandService;
 
-        public CommandHandler(DiscordSocketClient botClient, CommandService commandService)
+        public CommandHandler(AivaptClient botClient, CommandService commandService)
         {
             _botClient = botClient;
             _commandService = commandService;
@@ -34,7 +34,7 @@ namespace AivaptDotNet.Handlers
 
             if(!(message.HasCharPrefix('!', ref argPos) || message.HasMentionPrefix(_botClient.CurrentUser, ref argPos)) || message.Author.IsBot) return;
 
-            var context = new SocketCommandContext(_botClient, message);
+            var context = new AivaptCommandContext(_botClient, message);
 
             await _commandService.ExecuteAsync(
                 context: context,

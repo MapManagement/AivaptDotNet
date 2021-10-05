@@ -3,17 +3,38 @@ using System.Threading.Tasks;
 using System.IO;
 
 using Discord.Commands;
+using Discord;
 
 
 namespace AivaptDotNet.Modules 
 {
-    public class GeneralModule : ModuleBase<SocketCommandContext>
+    public class GeneralModule : ModuleBase<AivaptCommandContext>
     {
         [Command("test")]
         [Summary("Simple Test-Command")]
         public async Task TestCommand()
         {
             await ReplyAsync("Test succeeded!");
+        }
+
+        [Command("info")]
+        [Summary("Information about the bot")]
+        public async Task InfoCommand()
+        {
+            OperatingSystem os = Environment.OSVersion;
+
+            var botUser = Context.Client.GetUser(476002638169767936);
+
+            EmbedBuilder builder = new EmbedBuilder();
+
+            builder.WithTitle($"Information - {botUser.Username}");
+            builder.AddField("Server OS", os.VersionString.ToString(), false);
+            builder.AddField("Created at", botUser.CreatedAt.ToString("HH:mm | dd.MM.yyyy"), false);
+            builder.AddField("User ID", botUser.Id, false);
+            builder.WithThumbnailUrl(botUser.GetAvatarUrl());
+
+            builder.WithColor(Color.Teal);
+            await Context.Channel.SendMessageAsync("", false, builder.Build());
         }
     }
 }
