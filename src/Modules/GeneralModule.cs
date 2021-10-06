@@ -24,7 +24,6 @@ namespace AivaptDotNet.Modules
             OperatingSystem os = Environment.OSVersion;
 
             var botUser = Context.Client.GetUser(476002638169767936);
-
             EmbedBuilder builder = new EmbedBuilder();
 
             builder.WithTitle($"Information - {botUser.Username}");
