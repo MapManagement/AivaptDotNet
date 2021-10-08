@@ -1,6 +1,7 @@
 using Discord;
 using Discord.WebSocket;
 using Discord.Commands;
+using Discord.Audio;
 
 
 namespace AivaptDotNet
@@ -8,6 +9,7 @@ namespace AivaptDotNet
     public class AivaptClient : DiscordSocketClient
     {
         public IVoiceChannel CurrentVoiceChannel;
+        public IAudioClient CurrentAudioClient;
 
         public AivaptClient()
         {
