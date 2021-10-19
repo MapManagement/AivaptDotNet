@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Threading.Tasks;
 using System.IO;
+using System.Collections.Generic;
 
 using Discord;
 using Discord.WebSocket;
 using Discord.Commands;
 
 using AivaptDotNet.Handlers;
+using AivaptDotNet.Helpers;
 
 
 namespace AivaptDotNet
@@ -16,6 +18,7 @@ namespace AivaptDotNet
         //Source: https://docs.stillu.cc/guides/getting_started/first-bot.html
         private AivaptClient _botClient;
         private CommandService _commands;
+        private DbConnector _dbConnection;
 
 	    public static void Main(string[] args)
         {
@@ -26,6 +29,7 @@ namespace AivaptDotNet
         {
             _botClient = new AivaptClient();
             _botClient.Log += Logging;
+            _botClient.MessageReceived += OnMessage;
 
             _commands = new CommandService(new CommandServiceConfig
             {
@@ -52,6 +56,36 @@ namespace AivaptDotNet
         {
             Console.WriteLine(msg.ToString());
             return Task.CompletedTask;
+        }
+
+        private async Task OnMessage(SocketMessage message)
+        {
+            //TODO: add blacklist for other commands
+            var msg = message.ToString();
+            if(msg.StartsWith("!"))
+            {
+                if(CheckCommandExistence(msg.Remove(0,1)))
+                {
+                    //TODO: check database for command
+                }
+            }
+        }
+
+        private bool CheckCommandExistence(string name)
+        {
+            string sql = "select 1 from simple_commands where name = @COMMAND_NAME";
+            var param = new Dictionary<string, object>();
+            param.Add("@COMMAND_NAME", name);
+
+            var result = _dbConnection.ExecuteSelect(sql, param);
+            if(result.HasRows)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
     }   
 }
