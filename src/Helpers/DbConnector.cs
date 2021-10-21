@@ -13,6 +13,7 @@ namespace AivaptDotNet.Helpers
         public DbConnector(MySqlConnection connection)
         {
             Connection = connection;
+            Connection.Open();
         }
 
         public MySqlDataReader ExecuteSelect(string commandString, Dictionary<string, object> commandParameters)
@@ -25,7 +26,6 @@ namespace AivaptDotNet.Helpers
                 command.Parameters.AddWithValue(parameter.Key, parameter.Value);
             }
 
-            command.Connection.Open();
             command.Prepare();
             var data = command.ExecuteReader();
             return data;
@@ -56,10 +56,8 @@ namespace AivaptDotNet.Helpers
                 command.Parameters.AddWithValue(parameter.Key, parameter.Value);
             }
 
-            command.Connection.Open();
             command.Prepare();
             command.ExecuteNonQuery();
-            command.Connection.Close();
         }
     }
 

@@ -19,7 +19,8 @@ namespace AivaptDotNet
         //Source: https://docs.stillu.cc/guides/getting_started/first-bot.html
         private AivaptClient _botClient;
         private CommandService _commands;
-        private DbConnector _dbConnection; //TODO: store connection here
+        private DbConnector _dbConnection;
+        private List<string> _blacklist;
 
 	    public static void Main(string[] args)
         {
@@ -34,6 +35,11 @@ namespace AivaptDotNet
 
             string connectionString = File.ReadAllText("src/sql_connection_string.txt");
             _dbConnection = new DbConnector(new MySqlConnection(connectionString));
+
+            _blacklist = new List<string>() 
+            {
+                "!test", "!join", "!info", "!leave", "!play", "!radio"
+            };
 
             _commands = new CommandService(new CommandServiceConfig
             {
@@ -64,14 +70,28 @@ namespace AivaptDotNet
 
         private async Task OnMessage(SocketMessage message)
         {
-            //TODO: add blacklist for other commands
             var msg = message.ToString();
             if(msg.StartsWith("!"))
             {
-                if(CheckCommandExistence(msg.Remove(0,1)))
+                if(CheckCommandExistence(msg.Remove(0,1)) && !_blacklist.Contains(msg))
                 {
-                    await message.Channel.SendMessageAsync("Test");
-                    //TODO: check database for command
+                    string sql = "select * from simple_command where name = @COMMAND_NAME";
+                    var param = new Dictionary<string, object>();
+                    param.Add("@COMMAND_NAME", msg.Remove(0,1));
+
+                    using var result = _dbConnection.ExecuteSelect(sql, param);
+
+                    if(!result.HasRows) await message.Channel.SendMessageAsync("Error");
+                    result.Read();
+
+                    EmbedBuilder builder = new EmbedBuilder();
+                    
+                    builder.WithTitle(result.GetString("title"));
+                    var text = result.GetString("command_text");
+                    builder.AddField("Text", text); //TODO: find solution for field name
+
+                    builder.WithColor(Color.Teal); //TODO: adding color from database
+                    await message.Channel.SendMessageAsync("", false, builder.Build());
                 }
             }
         }
@@ -82,15 +102,13 @@ namespace AivaptDotNet
             var param = new Dictionary<string, object>();
             param.Add("@COMMAND_NAME", name);
 
-            var result = _dbConnection.ExecuteSelect(sql, param);
+            using var result = _dbConnection.ExecuteSelect(sql, param);
             if(result.HasRows)
             {
-                result.Close();
                 return true;
             }
             else
             {
-                result.Close();
                 return false;
             }
         }
