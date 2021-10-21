@@ -3,6 +3,8 @@ using Discord.WebSocket;
 using Discord.Commands;
 using Discord.Audio;
 
+using AivaptDotNet.Helpers;
+
 
 namespace AivaptDotNet
 {
@@ -22,10 +24,12 @@ namespace AivaptDotNet
     {
         public AivaptClient Client;
         public SocketUserMessage Message;
-        public AivaptCommandContext(DiscordSocketClient client, SocketUserMessage message) : base(client, message)
+        public DbConnector _dbConnector;
+        public AivaptCommandContext(DiscordSocketClient client, SocketUserMessage message, DbConnector dbConnector) : base(client, message)
         {
             Client = client as AivaptClient;
             Message = message;
+            _dbConnector = dbConnector;
         }
     }
 }

@@ -6,17 +6,22 @@ using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 
+using AivaptDotNet.Helpers;
+
 
 namespace AivaptDotNet.Handlers 
 {
     public class CommandHandler {
         private readonly AivaptClient _botClient;
         private readonly CommandService _commandService;
+        private readonly DbConnector _dbConnector;
 
-        public CommandHandler(AivaptClient botClient, CommandService commandService)
+
+        public CommandHandler(AivaptClient botClient, CommandService commandService, DbConnector dbConnector)
         {
             _botClient = botClient;
             _commandService = commandService;
+            _dbConnector = dbConnector;
         }
 
         public async Task InitializeCommands()
@@ -34,7 +39,7 @@ namespace AivaptDotNet.Handlers
 
             if(!(message.HasCharPrefix('!', ref argPos) || message.HasMentionPrefix(_botClient.CurrentUser, ref argPos)) || message.Author.IsBot) return;
 
-            var context = new AivaptCommandContext(_botClient, message);
+            var context = new AivaptCommandContext(_botClient, message, _dbConnector);
 
             await _commandService.ExecuteAsync(
                 context: context,

@@ -1,54 +1,65 @@
 using System;
 using System.Data;
-using System.Data.SqlClient;
+using MySql.Data.MySqlClient;
 using System.Collections.Generic;
 
 
 namespace AivaptDotNet.Helpers
 {
-    class DbConnector
+    //TODO: reconfigure connections
+    public class DbConnector
     {
-        SqlConnection Connection;
-        public DbConnector(SqlConnection connection)
+        MySqlConnection Connection;
+        public DbConnector(MySqlConnection connection)
         {
             Connection = connection;
         }
 
-        public SqlDataReader ExecuteSelect(string commandString, Dictionary<string, object> commandParameters)
+        public MySqlDataReader ExecuteSelect(string commandString, Dictionary<string, object> commandParameters)
         {
-            SqlCommand command = new SqlCommand(commandString, Connection);
+            MySqlCommand command = new MySqlCommand(commandString, Connection);
 
             foreach(var parameter in commandParameters)
             {
-                SqlDbType dbType = GetDbDataType(parameter.Value);
-                command.Parameters.Add(parameter.Key, dbType);
+                MySqlDbType dbType = GetDbDataType(parameter.Value);
+                command.Parameters.AddWithValue(parameter.Key, parameter.Value);
             }
 
             command.Connection.Open();
+            command.Prepare();
             var data = command.ExecuteReader();
             return data;
         }
 
-        private SqlDbType GetDbDataType(object value)
+        private MySqlDbType GetDbDataType(object value)
         {
             switch(Type.GetTypeCode(value.GetType()))
             {
                 case TypeCode.String:
-                    return SqlDbType.VarChar;
+                    return MySqlDbType.VarChar;
                 case TypeCode.Decimal:
-                    return SqlDbType.Decimal;
+                    return MySqlDbType.Decimal;
                 case TypeCode.DateTime:
-                    return SqlDbType.DateTime;
+                    return MySqlDbType.DateTime;
                 default:
-                    return SqlDbType.VarChar;
+                    return MySqlDbType.VarChar;
             }
         }
 
-        public void ExecuteDML(string commandString)
+        public void ExecuteDML(string commandString, Dictionary<string, object> commandParameters)
         {
-            SqlCommand command = new SqlCommand(commandString, Connection);
+            MySqlCommand command = new MySqlCommand(commandString, Connection);
+
+            foreach(var parameter in commandParameters)
+            {
+                MySqlDbType dbType = GetDbDataType(parameter.Value);
+                command.Parameters.AddWithValue(parameter.Key, parameter.Value);
+            }
+
             command.Connection.Open();
+            command.Prepare();
             command.ExecuteNonQuery();
+            command.Connection.Close();
         }
     }
 
