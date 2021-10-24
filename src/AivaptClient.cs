@@ -22,13 +22,11 @@ namespace AivaptDotNet
 
     public class AivaptCommandContext : SocketCommandContext
     {
-        public AivaptClient Client;
-        public SocketUserMessage Message;
+        public new AivaptClient Client;
         public DbConnector _dbConnector;
         public AivaptCommandContext(DiscordSocketClient client, SocketUserMessage message, DbConnector dbConnector) : base(client, message)
         {
             Client = client as AivaptClient;
-            Message = message;
             _dbConnector = dbConnector;
         }
     }

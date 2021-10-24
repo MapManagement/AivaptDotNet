@@ -20,7 +20,6 @@ namespace AivaptDotNet
         private AivaptClient _botClient;
         private CommandService _commands;
         private DbConnector _dbConnection;
-        private List<string> _blacklist;
 
 	    public static void Main(string[] args)
         {
@@ -31,19 +30,14 @@ namespace AivaptDotNet
         {
             _botClient = new AivaptClient();
             _botClient.Log += Logging;
-            _botClient.MessageReceived += OnMessage;
+            //_botClient.MessageReceived += OnMessage;
 
             string connectionString = File.ReadAllText("src/sql_connection_string.txt");
             _dbConnection = new DbConnector(new MySqlConnection(connectionString));
 
-            _blacklist = new List<string>() 
-            {
-                "!test", "!join", "!info", "!leave", "!play", "!radio"
-            };
-
             _commands = new CommandService(new CommandServiceConfig
             {
-                LogLevel = LogSeverity.Info,
+                LogLevel = LogSeverity.Error,
                 CaseSensitiveCommands = false,
             });
             _commands.Log += Logging;
@@ -66,51 +60,6 @@ namespace AivaptDotNet
         {
             Console.WriteLine(msg.ToString());
             return Task.CompletedTask;
-        }
-
-        private async Task OnMessage(SocketMessage message)
-        {
-            var msg = message.ToString();
-            if(msg.StartsWith("!"))
-            {
-                if(CheckCommandExistence(msg.Remove(0,1)) && !_blacklist.Contains(msg))
-                {
-                    string sql = "select * from simple_command where name = @COMMAND_NAME";
-                    var param = new Dictionary<string, object>();
-                    param.Add("@COMMAND_NAME", msg.Remove(0,1));
-
-                    using var result = _dbConnection.ExecuteSelect(sql, param);
-
-                    if(!result.HasRows) await message.Channel.SendMessageAsync("Error");
-                    result.Read();
-
-                    EmbedBuilder builder = new EmbedBuilder();
-                    
-                    builder.WithTitle(result.GetString("title"));
-                    var text = result.GetString("command_text");
-                    builder.AddField("Text", text); //TODO: find solution for field name
-
-                    builder.WithColor(Color.Teal); //TODO: adding color from database
-                    await message.Channel.SendMessageAsync("", false, builder.Build());
-                }
-            }
-        }
-
-        private bool CheckCommandExistence(string name)
-        {   
-            string sql = "select 1 from simple_command where name = @COMMAND_NAME";
-            var param = new Dictionary<string, object>();
-            param.Add("@COMMAND_NAME", name);
-
-            using var result = _dbConnection.ExecuteSelect(sql, param);
-            if(result.HasRows)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
         }
     }   
 }
