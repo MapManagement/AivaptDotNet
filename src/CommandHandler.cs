@@ -86,7 +86,9 @@ namespace AivaptDotNet.Handlers
                 var text = result.GetString("command_text");
                 builder.AddField("Text", text); //TODO: find solution for field name
 
-                builder.WithColor(Color.Teal); //TODO: adding color from database
+                Color color = ConverterHelper.HexToColor(result.GetString("color"));
+                builder.WithColor(color);
+
                 await message.Channel.SendMessageAsync("", false, builder.Build());
             }
             
