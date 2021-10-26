@@ -8,15 +8,10 @@ using AivaptDotNet.Helpers;
 
 namespace AivaptDotNet
 {
-    public class AivaptClient : DiscordSocketClient //TODO: check the behavior when bot runs on multiple servers
+    public class AivaptClient : DiscordSocketClient
     {
         public IVoiceChannel CurrentVoiceChannel;
         public IAudioClient CurrentAudioClient;
-
-        public AivaptClient()
-        {
-
-        }
 
     }
 
