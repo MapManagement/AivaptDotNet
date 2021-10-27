@@ -80,13 +80,11 @@ namespace AivaptDotNet.Handlers
                 if(!result.HasRows) await message.Channel.SendMessageAsync("Error");
                 result.Read();
 
-                EmbedBuilder builder = new EmbedBuilder();
-                
-                builder.WithTitle(result.GetString("title"));
-                var text = result.GetString("command_text");
-                builder.AddField("Text", text); //TODO: find solution for field name
-
+                string title = result.GetString("title");
+                string text = result.GetString("command_text");
                 Color color = ConverterHelper.HexToColor(result.GetString("color"));
+
+                EmbedBuilder builder = SimpleEmbed.MinimalEmbed(title, text);
                 builder.WithColor(color);
 
                 await message.Channel.SendMessageAsync("", false, builder.Build());
