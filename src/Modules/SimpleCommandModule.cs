@@ -64,34 +64,56 @@ namespace AivaptDotNet.Modules
 
             await confirmationMsg.AddReactionsAsync(new Emoji[] {greenCircle, redCircle});
 
-            /*Context.Client.ReactionAdded += ReactionAdded_EventAsync;
-            await Task.Delay(10000);
-            Context.Client.ReactionAdded -= ReactionAdded_EventAsync;*/
+            Context.Client.ReactionAdded += ReactionAdded_EventAsync;
         }
 
-        /*public async Task ReactionAdded_EventAsync(Cacheable<IUserMessage, ulong> cachedMessage, ISocketMessageChannel originChannel, SocketReaction reaction)
+        public async Task ReactionAdded_EventAsync(Cacheable<IUserMessage, ulong> cachedMessage, ISocketMessageChannel originChannel, SocketReaction reaction)
         {
             Emoji greenCircle = new Emoji("🟢");
             Emoji redCircle = new Emoji("🔴");
+
+            var msg = cachedMessage.GetOrDownloadAsync();
             
-            if(cachedMessage.Id == confirmationMsg.Id && reaction.UserId == creatorId)
+            if(reaction.Emote.Name == redCircle.Name)
+            {
+                await Context.Channel.SendMessageAsync("Cancelled!");
+            }
+            /*else if(reaction.Emote.Name == greenCircle.Name)
+            {
+                string sql = @"delete from simple_command where name = @NAME and creator = @CREATOR"; //TODO: add specific users that can delete any commands
+                var param = new Dictionary<string, object>();
+                param.Add("@NAME", );
+                param.Add("@CREATOR", creatorId.ToString());
+
+                Context._dbConnector.ExecuteDML(sql, param);
+
+                await Context.Channel.SendMessageAsync("Command has been deleted!");
+            }*/
+        }
+
+        [Command("all")]
+        [Summary("Shows all simple commands")]
+        public async Task AllCmdsCommand()
+        {
+            string creator = Context.User.Id.ToString();
+
+            string sql = @"select name, creator from simple_command";
+
+            Dictionary<string,string> cmdDict = new Dictionary<string, string>();
+
+            using(var reader = Context._dbConnector.ExecuteSelect(sql, new Dictionary<string, object>()))
+            {
+                if(reader.HasRows)
+                {
+                    while(reader.Read())
                     {
-                        if(reaction.Emote.Name == redCircle.Name)
-                        {
-                            await Context.Channel.SendMessageAsync("Cancelled!");
-                        }
-                        else if(reaction.Emote.Name == greenCircle.Name)
-                        {
-                            string sql = @"delete from simple_command where name = @NAME and creator = @CREATOR"; //TODO: add specific users that can delete any commands
-                            var param = new Dictionary<string, object>();
-                            param.Add("@NAME", );
-                            param.Add("@CREATOR", creatorId.ToString());
-
-                            Context._dbConnector.ExecuteDML(sql, param);
-
-                            await Context.Channel.SendMessageAsync("Command has been deleted!");
-                        }
+                        SocketUser user = Context.Client.GetUser(ulong.Parse(reader.GetString("creator")));
+                        cmdDict.Add(reader.GetString("name"), user.Username);
                     }
-        }*/
+                }
+            }
+            EmbedBuilder builder = SimpleEmbed.FieldsEmbed("All User Commands", cmdDict);
+            await Context.Channel.SendMessageAsync("", false, builder.Build());
+        }
     }
 }

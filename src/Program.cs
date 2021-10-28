@@ -28,7 +28,12 @@ namespace AivaptDotNet
 
         public Program()
         {
-            _botClient = new AivaptClient();
+            DiscordSocketConfig clientConfig = new DiscordSocketConfig
+            {
+                MessageCacheSize = 50
+            };
+
+            _botClient = new AivaptClient(clientConfig);
             _botClient.Log += Logging;
             //_botClient.MessageReceived += OnMessage;
 

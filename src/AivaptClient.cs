@@ -13,6 +13,11 @@ namespace AivaptDotNet
         public IVoiceChannel CurrentVoiceChannel;
         public IAudioClient CurrentAudioClient;
 
+        public AivaptClient(DiscordSocketConfig config) : base(config)
+        {
+
+        }
+
     }
 
     public class AivaptCommandContext : SocketCommandContext
