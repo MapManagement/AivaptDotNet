@@ -3,6 +3,9 @@ using System.Threading.Tasks;
 using System.IO;
 using System.Diagnostics;
 
+using YoutubeDLSharp;
+using YoutubeDLSharp.Options;
+
 using Discord;
 using Discord.Audio;
 using Discord.Commands;
@@ -39,9 +42,27 @@ namespace AivaptDotNet.Modules
         [Summary("Bot plays given audio")]
         public async Task PlayCommand(string audioPath)
         {
-            if(Context.Client.CurrentAudioClient != null) return;
-            CreateStream(audioPath);
-            await SendAudio(Context.Client.CurrentAudioClient, audioPath);
+            if(Context.Client.CurrentAudioClient == null) return;
+
+            DownloadMp3(audioPath);
+
+            //CreateStream(audioPath);
+            //await SendAudio(Context.Client.CurrentAudioClient, audioPath);
+        }
+
+        private async void DownloadMp3(string url)
+        {
+            YoutubeDL ytdl = new YoutubeDL();
+            
+            string cwd = Directory.GetCurrentDirectory();
+            string resourcePath = "/src/Resources/Audio/";
+
+            ytdl.OutputFolder = cwd + resourcePath;
+            ytdl.FFmpegPath = "/usr/bin/ffmpeg";
+            ytdl.YoutubeDLPath = "/usr/local/bin/youtube-dl";
+            
+            var result = await ytdl.RunAudioDownload(url, AudioConversionFormat.Opus);
+            var path = result.Data;
         }
 
         /*
@@ -67,6 +88,7 @@ namespace AivaptDotNet.Modules
             */
              var testChannel = "https://f131.rndfnk.com/ard/swr/swr3/live/mp3/128/stream.mp3?aggregator=web&sid=1zBr53lqvLjDErRmfBbF9hVtDCa&token=lb7CkZ0b0_rDZ5Xz7LySildLTM-qYq9hF77n0L0UXzE&tvf=OPOBrmrnqxZmMTMxLnJuZGZuay5jb20";
              var stream = new InputStream();
+             //TODO: check this https://github.com/Rapptz/discord.py/blob/master/discord/player.py
         }
 
         private Process CreateStream(string audioPath) {
