@@ -44,13 +44,18 @@ namespace AivaptDotNet.Modules
         {
             if(Context.Client.CurrentAudioClient == null) return;
 
-            DownloadMp3(audioPath);
-
-            //CreateStream(audioPath);
-            //await SendAudio(Context.Client.CurrentAudioClient, audioPath);
+            string filePath = DownloadMp3(audioPath).Result;
+            if(filePath.Length > 0)
+            {
+            await SendAudio(Context.Client.CurrentAudioClient, filePath);
+            }
+            else
+            {
+                await Context.Channel.SendMessageAsync("The specified link didn't lead to any valid source.");
+            }
         }
 
-        private async void DownloadMp3(string url)
+        private async Task<string> DownloadMp3(string url)
         {
             YoutubeDL ytdl = new YoutubeDL();
             
@@ -60,9 +65,21 @@ namespace AivaptDotNet.Modules
             ytdl.OutputFolder = cwd + resourcePath;
             ytdl.FFmpegPath = "/usr/bin/ffmpeg";
             ytdl.YoutubeDLPath = "/usr/local/bin/youtube-dl";
-            
-            var result = await ytdl.RunAudioDownload(url, AudioConversionFormat.Opus);
-            var path = result.Data;
+
+            OptionSet options = new OptionSet()
+            {
+                AudioFormat = AudioConversionFormat.Mp3,
+                RestrictFilenames = true,
+            };
+            try
+            {
+            var result = await ytdl.RunAudioDownload(url, AudioConversionFormat.Mp3, overrideOptions: options);
+            return result.Data;
+            }
+            catch(Exception)
+            {
+                return "";
+            }
         }
 
         /*
@@ -70,26 +87,6 @@ namespace AivaptDotNet.Modules
         https://stackoverflow.com/questions/184683/play-audio-from-a-stream-using-c-sharp
         https://docs.stillu.cc/api/Discord.Audio.Streams.InputStream.html
         */
-        [Command("radio", RunMode = RunMode.Async)]
-        public async Task RadioCommand(string channel)
-        {
-            /* @commands.command(help="Radio: ding | swr3 | hits")
-                async def play_radio(self, ctx, sender: str):
-                    voice_client = ctx.guild.voice_client
-                    if voice_client.is_connected:
-                        if voice_client.is_playing:
-                            voice_client.stop()
-                        radio_player = discord.FFmpegPCMAudio(source=self.radio[sender.lower()])
-                        vol_radio = discord.PCMVolumeTransformer(radio_player, volume=0.1)
-                        voice_client.play(vol_radio)
-                        await ctx.send(f"Playing '{sender}'")
-                    else:
-                        await ctx.send("Not connected!")
-            */
-             var testChannel = "https://f131.rndfnk.com/ard/swr/swr3/live/mp3/128/stream.mp3?aggregator=web&sid=1zBr53lqvLjDErRmfBbF9hVtDCa&token=lb7CkZ0b0_rDZ5Xz7LySildLTM-qYq9hF77n0L0UXzE&tvf=OPOBrmrnqxZmMTMxLnJuZGZuay5jb20";
-             var stream = new InputStream();
-             //TODO: check this https://github.com/Rapptz/discord.py/blob/master/discord/player.py
-        }
 
         private Process CreateStream(string audioPath) {
             var process = Process.Start(new ProcessStartInfo
@@ -106,10 +103,10 @@ namespace AivaptDotNet.Modules
         {
             using(var ffmpeg = CreateStream(audioPath))
             using(var output = ffmpeg.StandardOutput.BaseStream)
-            using(var discord = audioClient.CreateDirectPCMStream(AudioApplication.Mixed))
+            using(var stream = audioClient.CreatePCMStream(AudioApplication.Music))
             {
-                try { await output.CopyToAsync(discord); }
-                finally { await discord.FlushAsync(); }
+                try { await output.CopyToAsync(stream); }
+                finally { await stream.FlushAsync(); }
             }
         }
     }
