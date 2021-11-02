@@ -5,6 +5,7 @@ using System.Diagnostics;
 
 using YoutubeDLSharp;
 using YoutubeDLSharp.Options;
+using YoutubeDLSharp.Metadata;
 
 using Discord;
 using Discord.Audio;
@@ -44,7 +45,22 @@ namespace AivaptDotNet.Modules
         {
             if(Context.Client.CurrentAudioClient == null) return;
 
-            string filePath = DownloadMp3(audioPath).Result;
+            VideoData audioData = GetAudioData(audioPath).Result.Data;
+            if(audioData == null)
+            {
+                await Context.Channel.SendMessageAsync("The specified link didn't lead to any valid source.");
+                return;
+            }
+            FormatData format = audioData.Formats[0];
+            string audioStreamUrl = format.Url;
+
+            if(audioStreamUrl != null && audioStreamUrl.Length > 1)
+            {
+                await SendAudio(Context.Client.CurrentAudioClient, audioStreamUrl);
+            }
+
+            /*string filePath = DownloadMp3(audioPath).Result;
+
             if(filePath.Length > 0)
             {
             await SendAudio(Context.Client.CurrentAudioClient, filePath);
@@ -52,7 +68,7 @@ namespace AivaptDotNet.Modules
             else
             {
                 await Context.Channel.SendMessageAsync("The specified link didn't lead to any valid source.");
-            }
+            }*/
         }
 
         private async Task<string> DownloadMp3(string url)
@@ -73,12 +89,39 @@ namespace AivaptDotNet.Modules
             };
             try
             {
-            var result = await ytdl.RunAudioDownload(url, AudioConversionFormat.Mp3, overrideOptions: options);
-            return result.Data;
+                var result = await ytdl.RunAudioDownload(url, AudioConversionFormat.Mp3, overrideOptions: options);
+                return result.Data;
             }
             catch(Exception)
             {
                 return "";
+            }
+        }
+
+        private async Task<RunResult<VideoData>> GetAudioData(string url)
+        {
+            YoutubeDL ytdl = new YoutubeDL();
+            
+            string cwd = Directory.GetCurrentDirectory();
+            string resourcePath = "/src/Resources/Audio/";
+
+            ytdl.OutputFolder = cwd + resourcePath;
+            ytdl.FFmpegPath = "/usr/bin/ffmpeg";
+            ytdl.YoutubeDLPath = "/usr/local/bin/youtube-dl";
+
+            OptionSet options = new OptionSet()
+            {
+                AudioFormat = AudioConversionFormat.Mp3,
+                RestrictFilenames = true,
+            };
+            try
+            {
+                var result = await ytdl.RunVideoDataFetch(url);
+                return result;
+            }
+            catch(Exception)
+            {
+                return null;
             }
         }
 
