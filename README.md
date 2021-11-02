@@ -17,5 +17,16 @@ Basic commands and information about the bot can be found here:
 
 ### Voice
 Contains anything that is related to oprations within a voice channel:
-- ``join`` - bot connects to the voice channel of the user that invoked the command
-- ``leave`` - bot disconnects from the voice channel
+- ``join`` - bot connects to current voice channel
+- ``leave`` - bot disconnects from current voice channel
+- ``play [songUrl]`` - bot uses the entered URL to play a song
+
+### Simple Command
+Users can also create their own commands which do only display a specific text given
+by the user. I called them **Simple Commands**. Once you created a command you can
+use it like a normal command:
+- ``cmd create [commandName] [title] [text]`` - create a new command
+- ``cmd edit [commandName] [newTitle] [newText]`` - edit an existing command
+- ``cmd del [commandName]`` - delete an existing command
+- ``cmd all`` - displays all available "Simple Commands"
+
