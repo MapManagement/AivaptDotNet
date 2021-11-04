@@ -1,3 +1,6 @@
+using System;
+using System.Threading.Tasks;
+
 using Discord;
 using Discord.WebSocket;
 using Discord.Commands;
@@ -12,10 +15,12 @@ namespace AivaptDotNet
     {
         public IVoiceChannel CurrentVoiceChannel;
         public IAudioClient CurrentAudioClient;
+        public AudioManager ClientAudioManager;
 
         public AivaptClient(DiscordSocketConfig config) : base(config)
         {
-
+            ClientAudioManager = new AudioManager(CurrentAudioClient);
+            //TODO: event when voice client updated
         }
 
     }
