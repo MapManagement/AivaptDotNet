@@ -4,8 +4,7 @@ using System.IO;
 using System.Diagnostics;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized ;
-using System.Collections.Generic;
-
+using System.Net;
 using YoutubeDLSharp;
 using YoutubeDLSharp.Options;
 using YoutubeDLSharp.Metadata;
@@ -13,6 +12,7 @@ using YoutubeDLSharp.Metadata;
 using Discord.Audio;
 
 
+//TODO: improve audio quality
 namespace AivaptDotNet.Helpers
 {
     public class AudioManager
@@ -31,46 +31,29 @@ namespace AivaptDotNet.Helpers
 
         }
 
-        private async void OnQueueChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private async void OnQueueChanged(object sender, NotifyCollectionChangedEventArgs e) 
         {
-            if(e.Action == NotifyCollectionChangedAction.Add && CurrentAudio == null)
+            if(e.Action == NotifyCollectionChangedAction.Add && CurrentAudio == null) // triggered whenever a song is added to the queue
             {
-                if(e.NewItems.Count < 1) return;
-                
-                OnQueueAdded();
-                AudioQueue.RemoveAt(AudioQueue.Count - 1);
-            }
-            else if(e.Action == NotifyCollectionChangedAction.Remove)
-            {
-                OnQueueRemoved();
-                await SendAudio(AudioClient, CurrentAudio.Url);
-                AudioQueue.RemoveAt(AudioQueue.Count - 1);
+                if(e.NewItems.Count < 1 || AudioQueue.Count > 1) return;
+                await OnQueueAdded();
             }
         }
 
-        private void OnQueueAdded()
+        private async Task OnQueueAdded()
         {
-            if(AudioQueue == null || AudioQueue.Count < 1) return;
-
-            FormatData format = AudioQueue[0];
-            string audioStreamUrl = format.Url;
-
-            if(audioStreamUrl != null && audioStreamUrl.Length > 1)
+            while(AudioQueue != null && AudioQueue.Count != 0) // as long as songs are in the queue, the background task will iterate over this list
             {
-                CurrentAudio = format;
-            }
-        }
+                FormatData format = AudioQueue[0];
+                string audioStreamUrl = format.Url;
 
-        private void OnQueueRemoved()
-        {
-            if(AudioQueue == null || AudioQueue.Count < 1) return;
-
-            FormatData format = AudioQueue[0];
-            string audioStreamUrl = format.Url;
-
-            if(audioStreamUrl != null && audioStreamUrl.Length > 1)
-            {
-                CurrentAudio = format;
+                if(audioStreamUrl != null && audioStreamUrl.Length > 1)
+                {
+                    CurrentAudio = format;
+                    AudioQueue.RemoveAt(AudioQueue.Count - 1);
+                    await SendAudio(AudioClient, CurrentAudio.Url);
+                    CurrentAudio = null;
+                }
             }
         }
 
@@ -89,6 +72,8 @@ namespace AivaptDotNet.Helpers
             {
                 AudioFormat = AudioConversionFormat.Mp3,
                 RestrictFilenames = true,
+                AudioQuality = 0,
+                Format = "bestaudio/best"
             };
             try
             {
@@ -116,10 +101,12 @@ namespace AivaptDotNet.Helpers
             {
                 AudioFormat = AudioConversionFormat.Mp3,
                 RestrictFilenames = true,
+                AudioQuality = 0,
+                Format = "bestaudio/best"
             };
             try
             {
-                var result = await ytdl.RunVideoDataFetch(url);
+                var result = await ytdl.RunVideoDataFetch(url, overrideOptions: options);
                 return result;
             }
             catch(Exception)
@@ -149,7 +136,7 @@ namespace AivaptDotNet.Helpers
         {
             using(var ffmpeg = CreateStream(audioPath))
             using(var output = ffmpeg.StandardOutput.BaseStream)
-            using(var stream = audioClient.CreatePCMStream(AudioApplication.Music))
+            using(var stream = audioClient.CreatePCMStream(AudioApplication.Music, bufferMillis: 10000))
             {
                 try { await output.CopyToAsync(stream); }
                 finally { await stream.FlushAsync(); }
