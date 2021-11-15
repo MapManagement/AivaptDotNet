@@ -1,10 +1,12 @@
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using System.IO;
 using System.Diagnostics;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized ;
 using System.Net;
+
 using YoutubeDLSharp;
 using YoutubeDLSharp.Options;
 using YoutubeDLSharp.Metadata;
@@ -20,6 +22,8 @@ namespace AivaptDotNet.Helpers
         public ObservableCollection<FormatData> AudioQueue;
         public FormatData CurrentAudio;
         public IAudioClient AudioClient;
+        private CancellationTokenSource CurrentCancellationTokenSource;
+        public CancellationToken CurrentCancellationToken;
 
 
         public AudioManager(IAudioClient audioClient)
@@ -51,7 +55,14 @@ namespace AivaptDotNet.Helpers
                 {
                     CurrentAudio = format;
                     AudioQueue.RemoveAt(AudioQueue.Count - 1);
-                    await SendAudio(AudioClient, CurrentAudio.Url);
+                    try
+                    {
+                        await SendAudio(AudioClient, CurrentAudio.Url);
+                    }
+                    catch(OperationCanceledException)
+                    {
+                        // send message to channel that song was skipped successfully
+                    }
                     CurrentAudio = null;
                 }
             }
@@ -121,7 +132,8 @@ namespace AivaptDotNet.Helpers
         https://docs.stillu.cc/api/Discord.Audio.Streams.InputStream.html
         */
 
-        public Process CreateStream(string audioPath) {
+        public Process CreateStream(string audioPath)
+        {
             var process = Process.Start(new ProcessStartInfo
             {
                 FileName="ffmpeg",
@@ -134,12 +146,28 @@ namespace AivaptDotNet.Helpers
 
         private async Task SendAudio(IAudioClient audioClient, string audioPath)
         {
+            CurrentCancellationTokenSource = new CancellationTokenSource();
+            CurrentCancellationToken = CurrentCancellationTokenSource.Token;
+
             using(var ffmpeg = CreateStream(audioPath))
             using(var output = ffmpeg.StandardOutput.BaseStream)
             using(var stream = audioClient.CreatePCMStream(AudioApplication.Music, bufferMillis: 10000))
             {
-                try { await output.CopyToAsync(stream); }
-                finally { await stream.FlushAsync(); }
+                try { await output.CopyToAsync(stream, 327680, CurrentCancellationToken); }
+                finally
+                {
+                    await stream.FlushAsync();
+                    CurrentCancellationTokenSource.Dispose();
+                    CurrentCancellationTokenSource = null;
+                }
+            }
+        }
+
+        public void SkipAudio()
+        {
+            if(CurrentAudio != null && CurrentCancellationTokenSource != null)
+            {
+                CurrentCancellationTokenSource.Cancel();
             }
         }
     }

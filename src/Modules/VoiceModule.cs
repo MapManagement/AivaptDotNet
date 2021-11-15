@@ -81,6 +81,13 @@ namespace AivaptDotNet.Modules
             }*/
         }
 
+         [Command("skip", RunMode = RunMode.Async)]
+        [Summary("Skips current song")]
+        public async Task SkipCommand()
+        {
+            Context.Client.ClientAudioManager.SkipAudio();
+        }
+
         #endregion
 
     }
