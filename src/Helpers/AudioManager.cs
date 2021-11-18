@@ -150,13 +150,19 @@ namespace AivaptDotNet.Helpers
             CurrentCancellationToken = CurrentCancellationTokenSource.Token;
 
             using(var ffmpeg = CreateStream(audioPath))
-            using(var output = ffmpeg.StandardOutput.BaseStream)
-            using(var stream = audioClient.CreatePCMStream(AudioApplication.Music, bufferMillis: 10000))
+            using(var outputSource = ffmpeg.StandardOutput.BaseStream)
+            using(var outStream = audioClient.CreatePCMStream(AudioApplication.Music, bufferMillis: 40960, packetLoss: 10))
             {
-                try { await output.CopyToAsync(stream, 327680, CurrentCancellationToken); }
+                try
+                {
+                    //TODO: own stream reader to interrupt copying and reading
+                    await outputSource.CopyToAsync(outStream, 40960, CurrentCancellationToken);
+
+                } 
                 finally
                 {
-                    await stream.FlushAsync();
+                    //TODO: end is always cut off
+                    await outStream.FlushAsync();
                     CurrentCancellationTokenSource.Dispose();
                     CurrentCancellationTokenSource = null;
                 }

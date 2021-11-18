@@ -81,11 +81,26 @@ namespace AivaptDotNet.Modules
             }*/
         }
 
-         [Command("skip", RunMode = RunMode.Async)]
-        [Summary("Skips current song")]
+        [Command("skip", RunMode = RunMode.Async)]
+        [Summary("Skips current audio")]
         public async Task SkipCommand()
         {
             Context.Client.ClientAudioManager.SkipAudio();
+            await Context.Channel.SendMessageAsync("Skipping audio...");
+        }
+
+        [Command("stop", RunMode = RunMode.Async)]
+        [Summary("Stops current audio")]
+        public async Task StopCommand()
+        {
+            await Context.Channel.SendMessageAsync("Stopping audio...");
+        }
+
+        [Command("continue", RunMode = RunMode.Async)]
+        [Summary("Continues playing audio")]
+        public async Task ContinueCommand()
+        {
+            await Context.Channel.SendMessageAsync("Continuing...");
         }
 
         #endregion

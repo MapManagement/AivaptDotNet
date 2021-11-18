@@ -19,7 +19,10 @@ Basic commands and information about the bot can be found here:
 Contains anything that is related to oprations within a voice channel:
 - ``join`` - bot connects to current voice channel
 - ``leave`` - bot disconnects from current voice channel
-- ``play [songUrl]`` - bot uses the entered URL to play a song
+- ``play [songUrl]`` - bot uses the entered URL to play audio
+- ``skip`` - bot skips current audio
+- ``stop`` - bot stops playing current audio
+- ``continue`` - bot continues playing audio
 
 ### Simple Command
 Users can also create their own commands which do only display a specific text given
