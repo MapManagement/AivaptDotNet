@@ -26,59 +26,30 @@ namespace AivaptDotNet.Modules
         [Summary("Bot joins the voice channel")]
         public async Task JoinCommand(IVoiceChannel channel = null)
         {
-
             channel = channel ?? (Context.User as IGuildUser)?.VoiceChannel;
             if (channel == null) { await Context.Channel.SendMessageAsync("ERROR"); return; }
 
-            Context.Client.CurrentVoiceChannel = channel;
-            var audioClient = await channel.ConnectAsync();
-            Context.Client.CurrentAudioClient = Context.Client.ClientAudioManager.AudioClient = audioClient;
+            Context.Client.ClientAudioManager.JoinVoiceChannel(channel);
         }
 
         [Command("leave", RunMode = RunMode.Async)]
         [Summary("Bot leaves the voice channel")]
         public async Task LeaveCommand()
         {
-            var currentChannel = Context.Client.CurrentVoiceChannel;
-            if(currentChannel == null) return;
-            await currentChannel.DisconnectAsync();
-            Context.Client.CurrentAudioClient = Context.Client.ClientAudioManager.AudioClient = null;
+            Context.Client.ClientAudioManager.LeaveVoiceChannel();
         }
 
         [Command("play", RunMode = RunMode.Async)]
         [Summary("Bot plays given audio")]
         public async Task PlayCommand(string audioPath)
         {
-            if(Context.Client.CurrentAudioClient == null) return;
+            if(Context.Client.ClientAudioManager.CurrentAudioClient == null) return;
 
-            VideoData audioData = Context.Client.ClientAudioManager.GetAudioData(audioPath).Result.Data;
-            if(audioData == null)
+            bool success = Context.Client.ClientAudioManager.PlayAudio(audioPath);
+            if(success)
             {
                 await Context.Channel.SendMessageAsync("The specified link didn't lead to any valid source.");
-                return;
             }
-            FormatData format = audioData.Formats[0];
-
-            Context.Client.ClientAudioManager.AudioQueue.Add(format);
-
-            /*string audioStreamUrl = format.Url;
-
-            if(audioStreamUrl != null && audioStreamUrl.Length > 1)
-            {
-                await SendAudio(Context.Client.CurrentAudioClient, audioStreamUrl);
-
-            }*/
-
-            /*string filePath = DownloadMp3(audioPath).Result;
-
-            if(filePath.Length > 0)
-            {
-            await SendAudio(Context.Client.CurrentAudioClient, filePath);
-            }
-            else
-            {
-                await Context.Channel.SendMessageAsync("The specified link didn't lead to any valid source.");
-            }*/
         }
 
         [Command("skip", RunMode = RunMode.Async)]
@@ -93,6 +64,7 @@ namespace AivaptDotNet.Modules
         [Summary("Stops current audio")]
         public async Task StopCommand()
         {
+            //TODO: add stop method
             await Context.Channel.SendMessageAsync("Stopping audio...");
         }
 
@@ -100,6 +72,7 @@ namespace AivaptDotNet.Modules
         [Summary("Continues playing audio")]
         public async Task ContinueCommand()
         {
+            //TODO: continue stop method
             await Context.Channel.SendMessageAsync("Continuing...");
         }
 

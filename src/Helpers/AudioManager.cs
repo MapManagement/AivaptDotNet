@@ -5,35 +5,42 @@ using System.IO;
 using System.Diagnostics;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized ;
-using System.Net;
 
 using YoutubeDLSharp;
 using YoutubeDLSharp.Options;
 using YoutubeDLSharp.Metadata;
 
+using Discord;
 using Discord.Audio;
 
 
-//TODO: improve audio quality
 namespace AivaptDotNet.Helpers
 {
     public class AudioManager
     {
-        public ObservableCollection<FormatData> AudioQueue;
-        public FormatData CurrentAudio;
-        public IAudioClient AudioClient;
-        private CancellationTokenSource CurrentCancellationTokenSource;
-        public CancellationToken CurrentCancellationToken;
-
-
-        public AudioManager(IAudioClient audioClient)
+        #region Constructors
+        public AudioManager()
         {
             AudioQueue = new ObservableCollection<FormatData>();
             AudioQueue.CollectionChanged += OnQueueChanged;
             CurrentAudio = null;
-            AudioClient = audioClient;
+            CurrentAudioClient = null;
 
         }
+
+        #endregion
+
+        #region Fields and Properties
+
+        private ObservableCollection<FormatData> AudioQueue;
+        public FormatData CurrentAudio;
+        public IAudioClient CurrentAudioClient;
+        public IVoiceChannel CurrentVoiceChannel;
+        private CancellationTokenSource CurrentCancellationTokenSource;
+
+        #endregion
+
+        #region Events
 
         private async void OnQueueChanged(object sender, NotifyCollectionChangedEventArgs e) 
         {
@@ -57,7 +64,7 @@ namespace AivaptDotNet.Helpers
                     AudioQueue.RemoveAt(AudioQueue.Count - 1);
                     try
                     {
-                        await SendAudio(AudioClient, CurrentAudio.Url);
+                        await SendAudio(CurrentAudioClient, CurrentAudio.Url);
                     }
                     catch(OperationCanceledException)
                     {
@@ -67,6 +74,10 @@ namespace AivaptDotNet.Helpers
                 }
             }
         }
+
+        #endregion
+
+        #region Private Methods
 
         private async Task<string> DownloadMp3(string url)
         {
@@ -97,7 +108,7 @@ namespace AivaptDotNet.Helpers
             }
         }
 
-        public async Task<RunResult<VideoData>> GetAudioData(string url)
+        private async Task<RunResult<VideoData>> GetAudioData(string url)
         {
             YoutubeDL ytdl = new YoutubeDL();
             
@@ -126,13 +137,7 @@ namespace AivaptDotNet.Helpers
             }
         }
 
-        /*
-        https://stackoverflow.com/questions/56026466/streaming-mp3-to-discord-net-2-0-audio-is-super-fast-chipmunk-ideas
-        https://stackoverflow.com/questions/184683/play-audio-from-a-stream-using-c-sharp
-        https://docs.stillu.cc/api/Discord.Audio.Streams.InputStream.html
-        */
-
-        public Process CreateStream(string audioPath)
+        private Process CreateStream(string audioPath)
         {
             var process = Process.Start(new ProcessStartInfo
             {
@@ -147,7 +152,7 @@ namespace AivaptDotNet.Helpers
         private async Task SendAudio(IAudioClient audioClient, string audioPath)
         {
             CurrentCancellationTokenSource = new CancellationTokenSource();
-            CurrentCancellationToken = CurrentCancellationTokenSource.Token;
+            CancellationToken currentCancellationToken = CurrentCancellationTokenSource.Token;
 
             using(var ffmpeg = CreateStream(audioPath))
             using(var outputSource = ffmpeg.StandardOutput.BaseStream)
@@ -156,7 +161,7 @@ namespace AivaptDotNet.Helpers
                 try
                 {
                     //TODO: own stream reader to interrupt copying and reading
-                    await outputSource.CopyToAsync(outStream, 40960, CurrentCancellationToken);
+                    await outputSource.CopyToAsync(outStream, 40960, currentCancellationToken);
 
                 } 
                 finally
@@ -169,6 +174,35 @@ namespace AivaptDotNet.Helpers
             }
         }
 
+        #endregion
+
+        #region Public Methods
+
+        public async void JoinVoiceChannel(IVoiceChannel channel)
+        {
+            CurrentAudioClient = await channel.ConnectAsync();
+            CurrentVoiceChannel = channel;
+        }
+
+        public async void LeaveVoiceChannel()
+        {
+            if(CurrentVoiceChannel == null) return;
+            await CurrentVoiceChannel.DisconnectAsync();
+            CurrentAudioClient = null;
+            CurrentVoiceChannel = null;
+        }
+
+        public bool PlayAudio(string url)
+        {
+            var result = GetAudioData(url).Result.Data;
+            if(result != null)
+            {
+                AudioQueue.Add(result.Formats[0]);
+                return true;
+            }
+            return false;
+        }
+
         public void SkipAudio()
         {
             if(CurrentAudio != null && CurrentCancellationTokenSource != null)
@@ -176,5 +210,8 @@ namespace AivaptDotNet.Helpers
                 CurrentCancellationTokenSource.Cancel();
             }
         }
+
+        #endregion
+
     }
 }
