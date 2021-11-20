@@ -7,6 +7,7 @@ using Discord.Commands;
 using Discord.Audio;
 
 using AivaptDotNet.Helpers;
+using AivaptDotNet.AivaptClases;
 
 
 namespace AivaptDotNet
@@ -21,6 +22,19 @@ namespace AivaptDotNet
         {
             ClientAudioManager = new AudioManager(CurrentAudioClient);
             //TODO: event when voice client updated
+        }
+
+        public AivaptClient(DiscordSocketConfig config, int statusString) : base(config)
+        {
+            ClientAudioManager = new AudioManager(CurrentAudioClient);;
+            this.SetStatusAsync(0); // 0-5
+        }
+
+        public AivaptClient(DiscordSocketConfig config, int status, IActivity activity) : base(config)
+        {
+            ClientAudioManager = new AudioManager(CurrentAudioClient);;
+            this.SetStatusAsync(0); // 0-5
+            this.SetActivityAsync(activity);
         }
 
     }

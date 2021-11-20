@@ -10,6 +10,7 @@ using Discord.Commands;
 
 using AivaptDotNet.Handlers;
 using AivaptDotNet.Helpers;
+using AivaptDotNet.AivaptClases;
 
 
 namespace AivaptDotNet
@@ -33,9 +34,10 @@ namespace AivaptDotNet
                 MessageCacheSize = 50
             };
 
-            _botClient = new AivaptClient(clientConfig);
+            IActivity botActivity = new GameActivity("Sudoku", "Almost finished...");
+
+            _botClient = new AivaptClient(clientConfig, 1, botActivity);
             _botClient.Log += Logging;
-            //_botClient.MessageReceived += OnMessage;
 
             string connectionString = File.ReadAllText("src/sql_connection_string.txt");
             _dbConnection = new DbConnector(new MySqlConnection(connectionString));
