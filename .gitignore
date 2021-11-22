@@ -3,6 +3,7 @@ src/obj/
 src/token.txt
 src/sql_connection_string.txt
 
+.vscode/
 vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json
