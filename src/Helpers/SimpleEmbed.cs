@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.IO;
 
 using Discord;
 
@@ -26,7 +27,7 @@ namespace AivaptDotNet.Helpers
         }
 
 
-        public static EmbedBuilder FieldsEmbed(string embedTitle, Dictionary<string, string> embedFields)
+        public static EmbedBuilder FieldsEmbed(string embedTitle, List<EmbedFieldBuilder> embedFields)
         {
             EmbedBuilder builder = new EmbedBuilder();
 
@@ -34,13 +35,13 @@ namespace AivaptDotNet.Helpers
 
             foreach (var item in embedFields)
             {
-                builder.AddField(item.Key, item.Value);
+                builder.AddField(item);
             }
 
             return builder;
         }
 
-        public static EmbedBuilder FieldsEmbed(string embedTitle, string embedDescription, Dictionary<string, string> embedFields)
+        public static EmbedBuilder FieldsEmbed(string embedTitle, string embedDescription, List<EmbedFieldBuilder> embedFields)
         {
             EmbedBuilder builder = new EmbedBuilder();
 
@@ -49,7 +50,7 @@ namespace AivaptDotNet.Helpers
 
             foreach (var item in embedFields)
             {
-                builder.AddField(item.Key, item.Value);
+                builder.AddField(item);
             }
 
             return builder;
@@ -57,13 +58,16 @@ namespace AivaptDotNet.Helpers
 
         public static Embed ErrorEmbed(string errorText)
         {
+            string cwd = Directory.GetCurrentDirectory();
+            string resourcePath = cwd + "/src/Resources/Images/error_1.png";
+
             EmbedBuilder builder = new EmbedBuilder();
 
             builder.WithTitle("Error");
             builder.WithDescription("An error occured.");
             builder.AddField("Details", errorText);
             builder.WithColor(Color.Red);
-            builder.WithThumbnailUrl(""); //TODO: add URL
+            builder.WithThumbnailUrl("file:/" + resourcePath); //TODO: fix URL
             
             return builder.Build();
         }

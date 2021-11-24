@@ -99,7 +99,7 @@ namespace AivaptDotNet.Modules
 
             string sql = @"select name, creator from simple_command";
 
-            Dictionary<string,string> cmdDict = new Dictionary<string, string>();
+            List<EmbedFieldBuilder> cmdDict = new List<EmbedFieldBuilder>();
 
             using(var reader = Context._dbConnector.ExecuteSelect(sql, new Dictionary<string, object>()))
             {
@@ -108,7 +108,7 @@ namespace AivaptDotNet.Modules
                     while(reader.Read())
                     {
                         SocketUser user = Context.Client.GetUser(ulong.Parse(reader.GetString("creator")));
-                        cmdDict.Add(reader.GetString("name"), user.Username);
+                        cmdDict.Add(new EmbedFieldBuilder{Name = reader.GetString("name"), Value = user.Username});
                     }
                 }
             }

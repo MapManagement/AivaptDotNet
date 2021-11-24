@@ -36,13 +36,18 @@ namespace AivaptDotNet.Modules
                 );
 
             Repository repo = JsonSerializer.Deserialize<Repository>(response);
-            Dictionary<string, string> fields = new Dictionary<string, string>();
-            fields.Add("ID", repo.ID.ToString());
-            fields.Add("Language", repo.Language);
-            fields.Add("Watchers", repo.Watchers.ToString());
-            fields.Add("Stars", repo.Stars.ToString());
-            fields.Add("Open Issues", repo.OpenIssues.ToString());
-            EmbedBuilder builder =  SimpleEmbed.FieldsEmbed("Development Information", repo.Name, fields);
+            List<EmbedFieldBuilder> fields = new List<EmbedFieldBuilder>();
+            fields.Add(new EmbedFieldBuilder{Name = "ID", Value = repo.ID ,IsInline = true});
+            fields.Add(new EmbedFieldBuilder{Name = "Created at", Value = repo.CreatedAt.ToString("HH:mm | dd.MM.yyyy") ,IsInline = true});
+            fields.Add(new EmbedFieldBuilder{Name = "Last updated", Value = repo.UpdatedAt.ToString("HH:mm | dd.MM.yyyy") ,IsInline = true});
+            fields.Add(new EmbedFieldBuilder{Name = "Languages", Value = repo.Language ,IsInline = true});
+            fields.Add(new EmbedFieldBuilder{Name = "Wacthers", Value = repo.Watchers ,IsInline = true});
+            fields.Add(new EmbedFieldBuilder{Name = "Stars", Value = repo.Stars ,IsInline = true});
+            fields.Add(new EmbedFieldBuilder{Name = "Open issues", Value = repo.OpenIssues ,IsInline = true});
+
+            EmbedBuilder builder =  SimpleEmbed.FieldsEmbed(repo.Name, "General Information", fields);
+            builder.WithUrl(repo.URL);
+            builder.WithColor(Color.Teal);
 
             await Context.Channel.SendMessageAsync("", false, builder.Build());
         }
