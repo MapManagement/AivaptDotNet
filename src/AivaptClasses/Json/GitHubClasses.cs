@@ -75,7 +75,7 @@ namespace AivaptDotNet.AivaptClases.Json
         public string AvatarUrl {get; set; }
 
         [JsonPropertyName("url")]
-        public DateTime URL {get; set; }
+        public string URL {get; set; }
 
         [JsonPropertyName("repos_url")]
         public string ReposUrl {get; set; }
