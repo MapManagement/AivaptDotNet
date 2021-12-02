@@ -50,14 +50,17 @@ namespace AivaptDotNet.AivaptClases.Json
     ///</summary>
     public class Commit
     {
-        [JsonPropertyName("url")]
-        public string URL {get; set; }
+        [JsonPropertyName("html_url")]
+        public string URL { get; set; }
 
         [JsonPropertyName("sha")]
-        public string SHA {get; set; }
+        public string SHA { get; set; }
 
         [JsonPropertyName("author")]
-        public GitHubUser Author {get; set; }
+        public GitHubUser Author { get; set; }
+
+        [JsonPropertyName("commit")]
+        public CommitDetails Details { get; set; }
     }
 
     ///<summary>
@@ -66,19 +69,19 @@ namespace AivaptDotNet.AivaptClases.Json
     public class GitHubUser
     {
         [JsonPropertyName("login")]
-        public string Login {get; set; }
+        public string Login { get; set; }
 
         [JsonPropertyName("id")]
-        public int ID {get; set; }
+        public int ID { get; set; }
 
         [JsonPropertyName("avater_url")]
-        public string AvatarUrl {get; set; }
+        public string AvatarUrl { get; set; }
 
-        [JsonPropertyName("url")]
+        [JsonPropertyName("html_url")]
         public string URL {get; set; }
 
         [JsonPropertyName("repos_url")]
-        public string ReposUrl {get; set; }
+        public string ReposUrl { get; set; }
     }
 
     ///<summary>
@@ -87,12 +90,13 @@ namespace AivaptDotNet.AivaptClases.Json
     public class CommitDetails
     {
         [JsonPropertyName("author")]
-        public GitUser Author {get; set; }
+        public GitUser Author { get; set; }
 
         [JsonPropertyName("committer")]
-        public GitUser Committer {get; set; }
+        public GitUser Committer { get; set; }
 
-
+        [JsonPropertyName("message")]
+        public string Message { get; set; }
     }
 
     ///<summary>
@@ -101,19 +105,13 @@ namespace AivaptDotNet.AivaptClases.Json
     public class GitUser
     {
         [JsonPropertyName("name")]
-        public string Name {get; set; }
+        public string Name { get; set; }
 
         [JsonPropertyName("email")]
-        public string MailAddress {get; set; }
+        public string MailAddress { get; set; }
 
         [JsonPropertyName("date")]
-        public DateTime Date {get; set; }
-
-        [JsonPropertyName("message")]
-        public string Message {get; set; }
-
-        [JsonPropertyName("comment_count")]
-        public int Comments {get; set; }
+        public DateTime Date { get; set; }
     }
 
     ///<summary>
@@ -122,28 +120,28 @@ namespace AivaptDotNet.AivaptClases.Json
     public class Issue
     {
         [JsonPropertyName("id")]
-        public int ID {get; set; }
+        public int ID { get; set; }
 
-        [JsonPropertyName("url")]
-        public string URL {get; set; }
+        [JsonPropertyName("htmL_url")]
+        public string URL { get; set; }
 
         [JsonPropertyName("number")]
-        public int Number {get; set; }
+        public int Number { get; set; }
 
         [JsonPropertyName("state")]
-        public string State {get; set; }
+        public string State { get; set; }
 
         [JsonPropertyName("title")]
-        public string Title {get; set; }
+        public string Title { get; set; }
 
         [JsonPropertyName("body")]
-        public string Body {get; set; }
+        public string Body { get; set; }
 
         [JsonPropertyName("user")]
-        public GitHubUser User {get; set; }
+        public GitHubUser User { get; set; }
 
         [JsonPropertyName("author_association")]
-        public string AuthorAssociation {get; set; }
+        public string AuthorAssociation { get; set; }
     }
 
     ///<summary>
@@ -151,28 +149,28 @@ namespace AivaptDotNet.AivaptClases.Json
     ///</summary>
     public class Release
     {
-        [JsonPropertyName("url")]
-        public string URL {get; set; }
+        [JsonPropertyName("html_url")]
+        public string URL { get; set; }
 
         [JsonPropertyName("id")]
-        public int ID {get; set; }
+        public int ID { get; set; }
 
         [JsonPropertyName("tag_name")]
-        public string TagName {get; set; }
+        public string TagName { get; set; }
 
         [JsonPropertyName("name")]
-        public string Name {get; set; }
+        public string Name { get; set; }
 
         [JsonPropertyName("body")]
-        public string Body {get; set; }
+        public string Body { get; set; }
 
         [JsonPropertyName("created_at")]
-        public DateTime CreatedAt {get; set; }
+        public DateTime CreatedAt { get; set; }
         
         [JsonPropertyName("published_at")]
-        public DateTime PublishedAt {get; set; }
+        public DateTime PublishedAt { get; set; }
 
         [JsonPropertyName("author")]
-        public GitHubUser Author {get; set; }
+        public GitHubUser Author { get; set; }
     }
 }

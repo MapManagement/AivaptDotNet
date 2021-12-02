@@ -22,7 +22,26 @@ namespace AivaptDotNet.Modules
         [Summary("Sends information about the latest commit.")]
         public async Task LatestCommand()
         {
-            return;
+            List<string> headersList = new List<string>() { "application/vnd.github.v3+json" };
+            string response = await HttpRequests.SimpleGetRequest(
+                "https://api.github.com/repos/mapmanagement/AivaptDotNet/commits?page=1&per_page=1",
+                headersList,
+                ".NET Foundation Repository Reporter"
+            );
+
+            List<Commit> commitList = JsonSerializer.Deserialize<List<Commit>>(response);
+            Commit commit = commitList[0];
+            List<EmbedFieldBuilder> fields = new List<EmbedFieldBuilder>();
+            fields.Add(new EmbedFieldBuilder{Name = "Author", Value = commit.Author.Login, IsInline = false});
+            fields.Add(new EmbedFieldBuilder{Name = "Message", Value = commit.Details.Message, IsInline = false});
+
+            EmbedBuilder builder =  SimpleEmbed.FieldsEmbed($"{commit.SHA.Substring(0,8)}", fields);
+            builder.WithUrl(commit.URL);
+            builder.WithThumbnailUrl(commit.Author.AvatarUrl);
+            builder.WithColor(Color.Teal);
+            builder.WithFooter("Latest Commit");
+
+            await Context.Channel.SendMessageAsync("", false, builder.Build());
         }
 
         [Command("info")]
@@ -42,13 +61,14 @@ namespace AivaptDotNet.Modules
             fields.Add(new EmbedFieldBuilder{Name = "Created at", Value = repo.CreatedAt.ToString("HH:mm | dd.MM.yyyy") ,IsInline = true});
             fields.Add(new EmbedFieldBuilder{Name = "Last updated", Value = repo.UpdatedAt.ToString("HH:mm | dd.MM.yyyy") ,IsInline = true});
             fields.Add(new EmbedFieldBuilder{Name = "Languages", Value = repo.Language ,IsInline = true});
-            fields.Add(new EmbedFieldBuilder{Name = "Wacthers", Value = repo.Watchers ,IsInline = true});
+            fields.Add(new EmbedFieldBuilder{Name = "Watchers", Value = repo.Watchers ,IsInline = true});
             fields.Add(new EmbedFieldBuilder{Name = "Stars", Value = repo.Stars ,IsInline = true});
             fields.Add(new EmbedFieldBuilder{Name = "Open issues", Value = repo.OpenIssues ,IsInline = true});
 
-            EmbedBuilder builder =  SimpleEmbed.FieldsEmbed(repo.Name, "General Information", fields);
+            EmbedBuilder builder =  SimpleEmbed.FieldsEmbed(repo.Name, fields);
             builder.WithUrl(repo.URL);
             builder.WithColor(Color.Teal);
+            builder.WithFooter("General Info");
 
             await Context.Channel.SendMessageAsync("", false, builder.Build());
         }
@@ -68,7 +88,7 @@ namespace AivaptDotNet.Modules
                 ".NET Foundation Repository Reporter"
             );
             }
-            catch(HttpRequestException e)
+            catch(HttpRequestException)
             {
                 EmbedBuilder errorBuilder =  SimpleEmbed.MinimalEmbed("Error", "Couldn't find any release!");
                 errorBuilder.WithFooter("Latest Release");
@@ -82,6 +102,7 @@ namespace AivaptDotNet.Modules
             fields.Add(new EmbedFieldBuilder{Name = "Created at", Value = rel.CreatedAt.ToString("HH:mm | dd.MM.yyyy") ,IsInline = true});
             fields.Add(new EmbedFieldBuilder{Name = "Pusblished at", Value = rel.PublishedAt.ToString("HH:mm | dd.MM.yyyy") ,IsInline = true});
             fields.Add(new EmbedFieldBuilder{Name = "Text", Value = rel.Body ,IsInline = false});
+
             EmbedBuilder builder =  SimpleEmbed.FieldsEmbed(rel.ID.ToString(), rel.Name, fields);
             builder.WithUrl(rel.URL);
             builder.WithColor(Color.Teal);
@@ -105,7 +126,7 @@ namespace AivaptDotNet.Modules
                 ".NET Foundation Repository Reporter"
             );
             }
-            catch(HttpRequestException e)
+            catch(HttpRequestException)
             {
                 EmbedBuilder errorBuilder = SimpleEmbed.MinimalEmbed("Error", $"Couldn't find any issue with the number {number}");
                 errorBuilder.WithFooter("Issue");
@@ -117,6 +138,7 @@ namespace AivaptDotNet.Modules
             List<EmbedFieldBuilder> fields = new List<EmbedFieldBuilder>();
             fields.Add(new EmbedFieldBuilder{Name = "State", Value = issue.State,IsInline = true});
             fields.Add(new EmbedFieldBuilder{Name = "Author", Value = issue.User.Login, IsInline = true});
+
             EmbedBuilder builder =  SimpleEmbed.FieldsEmbed($"{issue.Number} - {issue.Title}", issue.Body, fields);
             builder.WithUrl(issue.URL);
             builder.WithThumbnailUrl(issue.User.AvatarUrl);
