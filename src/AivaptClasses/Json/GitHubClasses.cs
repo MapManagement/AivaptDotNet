@@ -74,7 +74,7 @@ namespace AivaptDotNet.AivaptClases.Json
         [JsonPropertyName("id")]
         public int ID { get; set; }
 
-        [JsonPropertyName("avater_url")]
+        [JsonPropertyName("avatar_url")]
         public string AvatarUrl { get; set; }
 
         [JsonPropertyName("html_url")]
