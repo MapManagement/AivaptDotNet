@@ -1,24 +1,28 @@
 using System;
-using System.Data;
 using MySql.Data.MySqlClient;
 using System.Collections.Generic;
 
 
-namespace AivaptDotNet.Helpers
+namespace AivaptDotNet.Database
 {
-    //TODO: reconfigure connections
-    public class DbConnector
+    public class Connector : IDisposable
     {
-        MySqlConnection Connection;
-        public DbConnector(MySqlConnection connection)
+        private  MySqlConnection _connection;
+
+        public Connector(MySqlConnection connection)
         {
-            Connection = connection;
-            Connection.Open();
+            _connection = connection;
+            _connection.Open();
+        }
+
+        public void Dispose()
+        {
+            _connection.Close();
         }
 
         public MySqlDataReader ExecuteSelect(string commandString, Dictionary<string, object> commandParameters)
         {
-            MySqlCommand command = new MySqlCommand(commandString, Connection);
+            MySqlCommand command = new MySqlCommand(commandString, _connection);
 
             foreach(var parameter in commandParameters)
             {
@@ -29,6 +33,20 @@ namespace AivaptDotNet.Helpers
             command.Prepare();
             var data = command.ExecuteReader();
             return data;
+        }
+
+        public void ExecuteDML(string commandString, Dictionary<string, object> commandParameters)
+        {
+            MySqlCommand command = new MySqlCommand(commandString, _connection);
+
+            foreach(var parameter in commandParameters)
+            {
+                MySqlDbType dbType = GetDbDataType(parameter.Value);
+                command.Parameters.AddWithValue(parameter.Key, parameter.Value);
+            }
+
+            command.Prepare();
+            command.ExecuteNonQuery();
         }
 
         private MySqlDbType GetDbDataType(object value)
@@ -44,20 +62,6 @@ namespace AivaptDotNet.Helpers
                 default:
                     return MySqlDbType.VarChar;
             }
-        }
-
-        public void ExecuteDML(string commandString, Dictionary<string, object> commandParameters)
-        {
-            MySqlCommand command = new MySqlCommand(commandString, Connection);
-
-            foreach(var parameter in commandParameters)
-            {
-                MySqlDbType dbType = GetDbDataType(parameter.Value);
-                command.Parameters.AddWithValue(parameter.Key, parameter.Value);
-            }
-
-            command.Prepare();
-            command.ExecuteNonQuery();
         }
     }
 

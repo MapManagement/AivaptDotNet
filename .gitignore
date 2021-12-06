@@ -2,6 +2,7 @@ src/bin/Debug/net5.0/
 src/obj/
 src/token.txt
 src/sql_connection_string.txt
+src/bin
 
 .vscode/
 vscode/*

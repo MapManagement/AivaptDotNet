@@ -8,6 +8,7 @@ using Discord.Commands;
 using Discord.WebSocket;
 
 using AivaptDotNet.Helpers;
+using AivaptDotNet.Database;
 
 
 namespace AivaptDotNet.Handlers 
@@ -15,10 +16,10 @@ namespace AivaptDotNet.Handlers
     public class CommandHandler {
         private readonly AivaptClient _botClient;
         private readonly CommandService _commandService;
-        private readonly DbConnector _dbConnector;
+        private readonly Connector _dbConnector;
 
 
-        public CommandHandler(AivaptClient botClient, CommandService commandService, DbConnector dbConnector)
+        public CommandHandler(AivaptClient botClient, CommandService commandService, Connector dbConnector)
         {
             _botClient = botClient;
             _commandService = commandService;

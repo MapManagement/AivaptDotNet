@@ -7,6 +7,7 @@ using Discord.Commands;
 using Discord.Audio;
 
 using AivaptDotNet.Helpers;
+using AivaptDotNet.Database;
 using AivaptDotNet.AivaptClases;
 
 
@@ -60,7 +61,7 @@ namespace AivaptDotNet
     {
         #region Constructor
 
-        public AivaptCommandContext(AivaptClient client, SocketUserMessage message, DbConnector dbConnector) : base(client, message)
+        public AivaptCommandContext(AivaptClient client, SocketUserMessage message, Connector dbConnector) : base(client, message)
         {
             Client = client as AivaptClient;
             _dbConnector = dbConnector;
@@ -71,7 +72,7 @@ namespace AivaptDotNet
         #region Fields and Properties
 
         public new AivaptClient Client;
-        public DbConnector _dbConnector;
+        public Connector _dbConnector;
 
         #endregion
         

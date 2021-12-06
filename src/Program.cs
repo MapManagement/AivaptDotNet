@@ -9,7 +9,7 @@ using Discord.WebSocket;
 using Discord.Commands;
 
 using AivaptDotNet.Handlers;
-using AivaptDotNet.Helpers;
+using AivaptDotNet.Database;
 using AivaptDotNet.AivaptClases;
 
 
@@ -20,7 +20,7 @@ namespace AivaptDotNet
         //Source: https://docs.stillu.cc/guides/getting_started/first-bot.html
         private AivaptClient _botClient;
         private CommandService _commands;
-        private DbConnector _dbConnection;
+        private Connector _dbConnection;
 
 	    public static void Main(string[] args)
         {
@@ -40,7 +40,7 @@ namespace AivaptDotNet
             _botClient.Log += Logging;
 
             string connectionString = File.ReadAllText("sql_connection_string.txt");
-            _dbConnection = new DbConnector(new MySqlConnection(connectionString));
+            _dbConnection = new Connector(new MySqlConnection(connectionString));
 
             _commands = new CommandService(new CommandServiceConfig
             {
