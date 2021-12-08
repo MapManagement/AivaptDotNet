@@ -61,7 +61,7 @@ namespace AivaptDotNet.Handlers
             }
             catch(Exception e)
             {
-                Embed errorEmbed = SimpleEmbed.ErrorEmbed(e.InnerException.ToString()); //TODO: change error text
+                Embed errorEmbed = SimpleEmbed.ErrorEmbed(e.InnerException.ToString().Substring(0, 256));
                 await context.Channel.SendMessageAsync("", false, errorEmbed);
             }
            

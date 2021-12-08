@@ -5,6 +5,8 @@ using System.IO;
 using Discord.Commands;
 using Discord;
 
+using AivaptDotNet.Helpers;
+
 
 namespace AivaptDotNet.Modules 
 {
@@ -13,14 +15,16 @@ namespace AivaptDotNet.Modules
         [Command("test")]
         [Summary("Simple Test-Command")]
         public async Task TestCommand()
-        {
-            await ReplyAsync("Test succeeded!");
+        {   
+            await Context.Channel.SendMessageAsync("Test");
         }
 
         [Command("info")]
         [Summary("Information about the bot")]
         public async Task InfoCommand()
         {
+            //await Context.Channel.SendMessageAsync("", false, SimpleEmbed.ErrorEmbed("Text"));
+
             OperatingSystem os = Environment.OSVersion;
 
             var botUser = Context.Client.GetUser(476002638169767936);

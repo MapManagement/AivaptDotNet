@@ -59,7 +59,7 @@ namespace AivaptDotNet.Helpers
         public static Embed ErrorEmbed(string errorText)
         {
             string cwd = Directory.GetCurrentDirectory();
-            string resourcePath = cwd + "/src/Resources/Images/error_1.png";
+            string resourcePath = cwd + "/Resources/Images/error_1.png";
 
             EmbedBuilder builder = new EmbedBuilder();
 
@@ -67,7 +67,7 @@ namespace AivaptDotNet.Helpers
             builder.WithDescription("An error occured.");
             builder.AddField("Details", errorText);
             builder.WithColor(Color.Red);
-            builder.WithThumbnailUrl("file:/" + resourcePath); //TODO: fix URL
+            builder.WithThumbnailUrl("attachment://" + resourcePath); //TODO: iamge is not displayed
             
             return builder.Build();
         }
