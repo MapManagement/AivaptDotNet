@@ -24,6 +24,13 @@ Contains anything that is related to oprations within a voice channel:
 - ``stop`` - bot stops playing current audio
 - ``continue`` - bot continues playing audio
 
+### Development
+These commands return information about current development stages:
+- ``dev latest`` - returns the latest commit
+- ``dev info`` - returns general information about the repository
+- ``dev release`` - returns the latest release
+- ``dev issue [issue_number]`` - returns the specific issue
+
 ### Simple Command
 Users can also create their own commands which do only display a specific text given
 by the user. I called them **Simple Commands**. Once you created a command you can
