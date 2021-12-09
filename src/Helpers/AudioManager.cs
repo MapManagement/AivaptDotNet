@@ -4,7 +4,8 @@ using System.Threading.Tasks;
 using System.IO;
 using System.Diagnostics;
 using System.Collections.ObjectModel;
-using System.Collections.Specialized ;
+using System.Collections.Specialized;
+using System.Collections.Generic;
 
 using YoutubeDLSharp;
 using YoutubeDLSharp.Options;
@@ -12,7 +13,7 @@ using YoutubeDLSharp.Metadata;
 
 using Discord;
 using Discord.Audio;
-
+using Discord.WebSocket;
 
 namespace AivaptDotNet.Helpers
 {
@@ -174,14 +175,38 @@ namespace AivaptDotNet.Helpers
             }
         }
 
+        private SocketVoiceChannel GetUserVoiceChannel(IReadOnlyCollection<Discord.WebSocket.SocketVoiceChannel> channels, ulong userID)
+        {
+            foreach(var channel in channels)
+            {
+                foreach(var user in channel.Users)
+                {
+                    if(user.Id == userID)
+                    {
+                        return channel;
+                    }
+                }
+            }
+            return null;
+        }
+
         #endregion
 
         #region Public Methods
 
-        public async void JoinVoiceChannel(IVoiceChannel channel)
+        public async Task JoinVoiceChannel(IVoiceChannel channel)
         {
             CurrentAudioClient = await channel.ConnectAsync();
             CurrentVoiceChannel = channel;
+        }
+
+        public async Task JoinVoiceChannel(SocketGuild guild, ulong userUD)
+        {
+            SocketVoiceChannel userChannel = GetUserVoiceChannel(guild.VoiceChannels, userUD);
+            if(userChannel == null) return;
+
+            CurrentAudioClient = await userChannel.ConnectAsync();
+            CurrentVoiceChannel = userChannel;
         }
 
         public async void LeaveVoiceChannel()

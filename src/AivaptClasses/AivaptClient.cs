@@ -8,7 +8,6 @@ using Discord.Audio;
 
 using AivaptDotNet.Helpers;
 using AivaptDotNet.Database;
-using AivaptDotNet.AivaptClases;
 
 
 namespace AivaptDotNet
@@ -21,18 +20,19 @@ namespace AivaptDotNet
         {
             ClientAudioManager = new AudioManager();
             VoiceServerUpdated += OnVoiceServerUpdated;
-            //TODO: event when voice client updated
         }
 
         public AivaptClient(DiscordSocketConfig config, int statusString) : base(config)
         {
             ClientAudioManager = new AudioManager();
+            VoiceServerUpdated += OnVoiceServerUpdated;
             this.SetStatusAsync(0); // 0-5
         }
 
         public AivaptClient(DiscordSocketConfig config, int status, IActivity activity) : base(config)
         {
             ClientAudioManager = new AudioManager();
+            VoiceServerUpdated += OnVoiceServerUpdated;
             this.SetStatusAsync(0); // 0-5
             this.SetActivityAsync(activity);
         }
@@ -47,6 +47,7 @@ namespace AivaptDotNet
 
         #region Events
 
+        //TODO: only fire when bot connects -> own events are needed
         private Task OnVoiceServerUpdated(SocketVoiceServer voiceServer)
         {
             return Task.CompletedTask;

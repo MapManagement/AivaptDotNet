@@ -43,10 +43,11 @@ namespace AivaptDotNet.Modules
         [Summary("Bot plays given audio")]
         public async Task PlayCommand(string audioPath)
         {
+            await Context.Client.ClientAudioManager.JoinVoiceChannel(Context.Guild, Context.User.Id);
             if(Context.Client.ClientAudioManager.CurrentAudioClient == null) return;
 
             bool success = Context.Client.ClientAudioManager.PlayAudio(audioPath);
-            if(success)
+            if(!success)
             {
                 await Context.Channel.SendMessageAsync("The specified link didn't lead to any valid source.");
             }
