@@ -43,6 +43,8 @@ namespace AivaptDotNet
 
         public AudioManager ClientAudioManager;
 
+        public ulong AdminUserId; //TODO: read from file/environment/...
+
         #endregion
 
         #region Events

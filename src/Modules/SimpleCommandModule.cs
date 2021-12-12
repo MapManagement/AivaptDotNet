@@ -57,6 +57,7 @@ namespace AivaptDotNet.Modules
 
             Emoji greenCircle = new Emoji("🟢");
             Emoji redCircle = new Emoji("🔴");
+            Emoji check = new Emoji("☑️");
 
             EmbedBuilder confirmationEmbed = SimpleEmbed.MinimalEmbed("Delete Command?");
             confirmationEmbed.WithDescription("Do you really want to delete this command?");
@@ -64,7 +65,30 @@ namespace AivaptDotNet.Modules
 
             await confirmationMsg.AddReactionsAsync(new Emoji[] {greenCircle, redCircle});
 
-            Context.Client.ReactionAdded += ReactionAdded_EventAsync;
+            var reactionDelegate = async delegate(Cacheable<IUserMessage, ulong> m, ISocketMessageChannel c, SocketReaction r)
+            {
+                if(m.Id == confirmationMsg.Id && (r.UserId == creatorId || r.UserId == Context.Client.AdminUserId))
+                {
+                    if(r.Emote.Name == greenCircle.Name)
+                    {
+                        string sql = @"delete from simple_command where name = @NAME and creator = @CREATOR"; //TODO: add specific users that can delete any commands
+                        var param = new Dictionary<string, object>();
+                        param.Add("@NAME", name);
+                        param.Add("@CREATOR", creatorId.ToString());
+
+                        Context._dbConnector.ExecuteDML(sql, param);
+
+                        await confirmationMsg.AddReactionAsync(check);
+                    }
+                    else if(r.Emote.Name == redCircle.Name)
+                    {
+                       await confirmationMsg.AddReactionAsync(check);
+                    }
+                }
+            };
+
+            Context.Client.ReactionAdded += reactionDelegate; //TODO: remove that specific event -> write own event?
+
         }
 
         public async Task ReactionAdded_EventAsync(Cacheable<IUserMessage, ulong> cachedMessage, ISocketMessageChannel originChannel, SocketReaction reaction)

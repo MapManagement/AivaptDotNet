@@ -67,7 +67,7 @@ namespace AivaptDotNet.Helpers
             builder.WithDescription("An error occured.");
             builder.AddField("Details", errorText);
             builder.WithColor(Color.Red);
-            builder.WithThumbnailUrl("attachment://" + resourcePath); //TODO: iamge is not displayed
+            builder.WithThumbnailUrl("attachment://" + resourcePath); //TODO: image is not displayed
             
             return builder.Build();
         }
