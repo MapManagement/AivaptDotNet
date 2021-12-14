@@ -9,12 +9,17 @@ using Discord.WebSocket;
 using Discord.Rest;
 
 using AivaptDotNet.Helpers;
+using AivaptDotNet.AivaptClases;
 
 namespace AivaptDotNet.Modules 
 {
     [Group("cmd")]
     public class SimpleCommandModule : ModuleBase<AivaptCommandContext>
     {
+
+        private List<ReactionKeywords> ReactionEvents = new List<ReactionKeywords>(); //TODO: background process needed
+
+        #region Modules
 
         [Command("create")]
         [Summary("Creates new simple command")]
@@ -49,70 +54,54 @@ namespace AivaptDotNet.Modules
             await Context.Channel.SendMessageAsync("Success!");
         }
 
+        #endregion
+
         [Command("del")]
         [Summary("Deletes a simple command")]
         public async Task DeleteCmdCommand(string name)
         {
             ulong creatorId = Context.User.Id;
 
-            Emoji greenCircle = new Emoji("🟢");
-            Emoji redCircle = new Emoji("🔴");
-            Emoji check = new Emoji("☑️");
-
             EmbedBuilder confirmationEmbed = SimpleEmbed.MinimalEmbed("Delete Command?");
             confirmationEmbed.WithDescription("Do you really want to delete this command?");
             RestUserMessage confirmationMsg = await Context.Channel.SendMessageAsync("", false, confirmationEmbed.Build());
 
-            await confirmationMsg.AddReactionsAsync(new Emoji[] {greenCircle, redCircle});
+            await confirmationMsg.AddReactionsAsync(new Emoji[] {ResourceManager.GreenCircleEmoji, ResourceManager.RedCircleEmoji});
 
-            var reactionDelegate = async delegate(Cacheable<IUserMessage, ulong> m, ISocketMessageChannel c, SocketReaction r)
-            {
-                if(m.Id == confirmationMsg.Id && (r.UserId == creatorId || r.UserId == Context.Client.AdminUserId))
-                {
-                    if(r.Emote.Name == greenCircle.Name)
-                    {
-                        string sql = @"delete from simple_command where name = @NAME and creator = @CREATOR"; //TODO: add specific users that can delete any commands
-                        var param = new Dictionary<string, object>();
-                        param.Add("@NAME", name);
-                        param.Add("@CREATOR", creatorId.ToString());
+            var parameters = new Dictionary<string, object>() { {"name", name} };
+            ReactionKeywords keywords = new ReactionKeywords(confirmationMsg.Id, creatorId, parameters);
+            ReactionEvents.Add(keywords);
 
-                        Context._dbConnector.ExecuteDML(sql, param);
-
-                        await confirmationMsg.AddReactionAsync(check);
-                    }
-                    else if(r.Emote.Name == redCircle.Name)
-                    {
-                       await confirmationMsg.AddReactionAsync(check);
-                    }
-                }
-            };
-
-            Context.Client.ReactionAdded += reactionDelegate; //TODO: remove that specific event -> write own event?
-
+            Context.Client.ReactionAdded += ReactionAdded_EventAsync;
         }
 
         public async Task ReactionAdded_EventAsync(Cacheable<IUserMessage, ulong> cachedMessage, ISocketMessageChannel originChannel, SocketReaction reaction)
         {
-            Emoji greenCircle = new Emoji("🟢");
-            Emoji redCircle = new Emoji("🔴");
+            ReactionKeywords keywords = ReactionEvents.Find(e => e.OriginMessageId == cachedMessage.Id);
+            if(keywords == null) return;
 
-            var msg = cachedMessage.GetOrDownloadAsync();
-            
-            if(reaction.Emote.Name == redCircle.Name)
-            {
-                await Context.Channel.SendMessageAsync("Cancelled!");
-            }
-            /*else if(reaction.Emote.Name == greenCircle.Name)
-            {
-                string sql = @"delete from simple_command where name = @NAME and creator = @CREATOR"; //TODO: add specific users that can delete any commands
-                var param = new Dictionary<string, object>();
-                param.Add("@NAME", );
-                param.Add("@CREATOR", creatorId.ToString());
+            string commandName = keywords.Parameters["name"] as string;
 
-                Context._dbConnector.ExecuteDML(sql, param);
+            if(cachedMessage.Id == keywords.OriginMessageId  && (reaction.UserId == keywords.AuthorId || reaction.UserId == Context.Client.AdminUserId))
+                {
+                    if(reaction.Emote.Name == ResourceManager.GreenCircleEmoji.Name)
+                    {
+                        string sql = @"delete from simple_command where name = @NAME and creator = @CREATOR"; //TODO: add specific users that can delete any commands
+                        var param = new Dictionary<string, object>();
+                        param.Add("@NAME", commandName);
+                        param.Add("@CREATOR", keywords.AuthorId.ToString());
 
-                await Context.Channel.SendMessageAsync("Command has been deleted!");
-            }*/
+                        Context._dbConnector.ExecuteDML(sql, param);
+
+                        //await confirmationMsg.AddReactionAsync(ResourceManager.CheckEmoji);
+                        Context.Client.ReactionAdded -= ReactionAdded_EventAsync;
+                    }
+                    else if(reaction.Emote.Name == ResourceManager.RedCircleEmoji.Name)
+                    {
+                       //await confirmationMsg.AddReactionAsync(ResourceManager.CheckEmoji);
+                       Context.Client.ReactionAdded -= ReactionAdded_EventAsync;
+                    }
+                }
         }
 
         [Command("all")]
