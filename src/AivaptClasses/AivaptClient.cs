@@ -10,7 +10,7 @@ using AivaptDotNet.Helpers;
 using AivaptDotNet.Database;
 
 
-namespace AivaptDotNet
+namespace AivaptDotNet.AivaptClases
 {
     public class AivaptClient : DiscordSocketClient
     {
@@ -20,6 +20,7 @@ namespace AivaptDotNet
         {
             ClientAudioManager = new AudioManager();
             VoiceServerUpdated += OnVoiceServerUpdated;
+            AdminUserId = Credentials.GetAdminId();
         }
 
         public AivaptClient(DiscordSocketConfig config, int statusString) : base(config)
@@ -27,6 +28,7 @@ namespace AivaptDotNet
             ClientAudioManager = new AudioManager();
             VoiceServerUpdated += OnVoiceServerUpdated;
             this.SetStatusAsync(0); // 0-5
+            AdminUserId = Credentials.GetAdminId();
         }
 
         public AivaptClient(DiscordSocketConfig config, int status, IActivity activity) : base(config)
@@ -35,6 +37,7 @@ namespace AivaptDotNet
             VoiceServerUpdated += OnVoiceServerUpdated;
             this.SetStatusAsync(0); // 0-5
             this.SetActivityAsync(activity);
+            AdminUserId = Credentials.GetAdminId();
         }
 
         #endregion
@@ -43,7 +46,7 @@ namespace AivaptDotNet
 
         public AudioManager ClientAudioManager;
 
-        public ulong AdminUserId; //TODO: read from file/environment/...
+        public ulong AdminUserId;
 
         #endregion
 

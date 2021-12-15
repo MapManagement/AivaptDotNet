@@ -6,6 +6,7 @@ using Discord.Commands;
 using Discord;
 
 using AivaptDotNet.Helpers;
+using AivaptDotNet.AivaptClases;
 
 
 namespace AivaptDotNet.Modules 

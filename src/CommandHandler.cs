@@ -9,6 +9,7 @@ using Discord.WebSocket;
 
 using AivaptDotNet.Helpers;
 using AivaptDotNet.Database;
+using AivaptDotNet.AivaptClases;
 
 
 namespace AivaptDotNet.Handlers 

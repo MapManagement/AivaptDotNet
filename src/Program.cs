@@ -39,8 +39,7 @@ namespace AivaptDotNet
             _botClient = new AivaptClient(clientConfig, 1, botActivity);
             _botClient.Log += Logging;
 
-            string connectionString = File.ReadAllText("sql_connection_string.txt");
-            _dbConnection = new Connector(new MySqlConnection(connectionString));
+            _dbConnection = new Connector(new MySqlConnection(Credentials.GetDbConnection()));
 
             _commands = new CommandService(new CommandServiceConfig
             {
@@ -52,12 +51,10 @@ namespace AivaptDotNet
 
 	    public async Task MainAsync()
 	    {
-            string token = File.ReadAllText("token.txt");
-
             var commandHandler = new CommandHandler(_botClient, _commands, _dbConnection);
             await commandHandler.InitializeCommands();
 
-            await _botClient.LoginAsync(TokenType.Bot, token);
+            await _botClient.LoginAsync(TokenType.Bot, Credentials.GetBotToken());
             await _botClient.StartAsync();
 
             await Task.Delay(-1);

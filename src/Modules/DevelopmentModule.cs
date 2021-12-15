@@ -10,6 +10,7 @@ using Discord.WebSocket;
 using Discord.Rest;
 
 using AivaptDotNet.Helpers;
+using AivaptDotNet.AivaptClases;
 using AivaptDotNet.AivaptClases.Json;
 
 namespace AivaptDotNet.Modules 

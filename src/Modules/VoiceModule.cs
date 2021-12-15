@@ -15,6 +15,8 @@ using Discord.Audio;
 using Discord.Commands;
 using Discord.Audio.Streams;
 
+using AivaptDotNet.AivaptClases;
+
 namespace AivaptDotNet.Modules 
 {
     public class VoiceModules : ModuleBase<AivaptCommandContext>
