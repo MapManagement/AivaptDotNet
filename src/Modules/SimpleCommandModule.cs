@@ -11,6 +11,8 @@ using Discord.Rest;
 using AivaptDotNet.Helpers;
 using AivaptDotNet.AivaptClases;
 
+using MySql.Data.MySqlClient;
+
 namespace AivaptDotNet.Modules 
 {
     [Group("cmd")]
@@ -54,12 +56,17 @@ namespace AivaptDotNet.Modules
             await Context.Channel.SendMessageAsync("Success!");
         }
 
-        #endregion
-
         [Command("del")]
         [Summary("Deletes a simple command")]
         public async Task DeleteCmdCommand(string name)
         {
+            SocketGuildUser guildUser =  Context.Guild.GetUser(Context.User.Id);
+            if(!IsUserIsMod(guildUser.Roles) && guildUser.Id != Context.Client.AdminUserId)
+            {
+                await Context.Channel.SendMessageAsync("You do not have the permissions to delete a command!");
+                return;
+            }
+
             ulong creatorId = Context.User.Id;
 
             EmbedBuilder confirmationEmbed = SimpleEmbed.MinimalEmbed("Delete Command?");
@@ -74,6 +81,62 @@ namespace AivaptDotNet.Modules
 
             Context.Client.ReactionAdded += ReactionAdded_EventAsync;
         }
+
+        
+
+        [Command("all")]
+        [Summary("Shows all simple commands")]
+        public async Task AllCmdsCommand()
+        {
+            string creator = Context.User.Id.ToString();
+
+            string sql = @"select name, creator from simple_command";
+
+            List<EmbedFieldBuilder> cmdDict = new List<EmbedFieldBuilder>();
+
+            using(var reader = Context._dbConnector.ExecuteSelect(sql, new Dictionary<string, object>()))
+            {
+                if(reader.HasRows)
+                {
+                    while(reader.Read())
+                    {
+                        SocketUser user = Context.Client.GetUser(ulong.Parse(reader.GetString("creator")));
+                        cmdDict.Add(new EmbedFieldBuilder{Name = reader.GetString("name"), Value = user.Username});
+                    }
+                }
+            }
+            EmbedBuilder builder = SimpleEmbed.FieldsEmbed("All User Commands", cmdDict);
+            await Context.Channel.SendMessageAsync("", false, builder.Build());
+        }
+
+        #endregion
+
+        #region Methods
+
+        private bool IsUserIsMod(IReadOnlyCollection<SocketRole> roles)
+        {
+            var sqlParam = new Dictionary<string, object> { {"GUILD", Context.Guild.Id} };
+            string sql = "select role_id from roles where guild_id = :GUILD and mod_permissions = 1";
+            using (MySqlDataReader dbRoles =  Context._dbConnector.ExecuteSelect(sql, sqlParam))
+            {
+                while(dbRoles.Read())
+                {
+                    foreach(var role in roles)
+                    {
+                        if(role.Id == dbRoles.GetUInt64(0))
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
+            
+        }
+
+        #endregion
+
+        #region Events
 
         public async Task ReactionAdded_EventAsync(Cacheable<IUserMessage, ulong> cachedMessage, ISocketMessageChannel originChannel, SocketReaction reaction)
         {
@@ -104,29 +167,6 @@ namespace AivaptDotNet.Modules
                 }
         }
 
-        [Command("all")]
-        [Summary("Shows all simple commands")]
-        public async Task AllCmdsCommand()
-        {
-            string creator = Context.User.Id.ToString();
-
-            string sql = @"select name, creator from simple_command";
-
-            List<EmbedFieldBuilder> cmdDict = new List<EmbedFieldBuilder>();
-
-            using(var reader = Context._dbConnector.ExecuteSelect(sql, new Dictionary<string, object>()))
-            {
-                if(reader.HasRows)
-                {
-                    while(reader.Read())
-                    {
-                        SocketUser user = Context.Client.GetUser(ulong.Parse(reader.GetString("creator")));
-                        cmdDict.Add(new EmbedFieldBuilder{Name = reader.GetString("name"), Value = user.Username});
-                    }
-                }
-            }
-            EmbedBuilder builder = SimpleEmbed.FieldsEmbed("All User Commands", cmdDict);
-            await Context.Channel.SendMessageAsync("", false, builder.Build());
-        }
+        #endregion
     }
 }

@@ -9,7 +9,6 @@ using Discord.Audio;
 using AivaptDotNet.Helpers;
 using AivaptDotNet.Database;
 
-
 namespace AivaptDotNet.AivaptClases
 {
     public class AivaptClient : DiscordSocketClient
@@ -19,7 +18,7 @@ namespace AivaptDotNet.AivaptClases
         public AivaptClient(DiscordSocketConfig config) : base(config)
         {
             ClientAudioManager = new AudioManager();
-            VoiceServerUpdated += OnVoiceServerUpdated;
+            VoiceServerUpdated += OnVoiceServerUpdated; 
             AdminUserId = Credentials.GetAdminId();
         }
 

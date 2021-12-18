@@ -49,7 +49,8 @@ namespace AivaptDotNet
             _commands.Log += Logging;
         }
 
-	    public async Task MainAsync()
+
+        public async Task MainAsync()
 	    {
             var commandHandler = new CommandHandler(_botClient, _commands, _dbConnection);
             await commandHandler.InitializeCommands();
