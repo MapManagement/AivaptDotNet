@@ -131,7 +131,6 @@ namespace AivaptDotNet.Modules
                 }
             }
             return false;
-            
         }
 
         #endregion
@@ -149,7 +148,7 @@ namespace AivaptDotNet.Modules
                 {
                     if(reaction.Emote.Name == ResourceManager.GreenCircleEmoji.Name)
                     {
-                        string sql = @"delete from simple_command where name = @NAME and creator = @CREATOR"; //TODO: add specific users that can delete any commands
+                        string sql = @"delete from simple_command where name = @NAME and creator = @CREATOR";
                         var param = new Dictionary<string, object>();
                         param.Add("@NAME", commandName);
                         param.Add("@CREATOR", keywords.AuthorId.ToString());
