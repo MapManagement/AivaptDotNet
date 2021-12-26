@@ -31,7 +31,7 @@ namespace AivaptDotNet.Modules
             channel = channel ?? (Context.User as IGuildUser)?.VoiceChannel;
             if (channel == null) { await Context.Channel.SendMessageAsync("ERROR"); return; }
 
-            Context.Client.ClientAudioManager.JoinVoiceChannel(channel);
+            await Context.Client.ClientAudioManager.JoinVoiceChannel(channel);
         }
 
         [Command("leave", RunMode = RunMode.Async)]

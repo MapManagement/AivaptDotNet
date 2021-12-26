@@ -1,19 +1,31 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace AivaptDotNet.Helpers
 {
-    class MemoryCache
+    public class MemoryCache
     {
         public readonly int Id;
         public readonly string Description;
+        public readonly int Cycle;
         public List<CacheKeyValue> Cache;
+        private Task ClearTask;
+        private CancellationTokenSource CTokenSource;
 
-        public MemoryCache(int id, string description)
+        public MemoryCache(int id, string description, int cycle) //cycle in seconds
         {
             Id = id;
             Description = description;
-            //TODO: start cleaning process
+            Cycle = cycle;
+            Cache = new List<CacheKeyValue>();
+
+            CTokenSource = new CancellationTokenSource();
+            var cToken = CTokenSource.Token; 
+
+            ClearTask = new Task(ClearProcess, cToken);
+            ClearTask.Start();
         }
 
         public void AddKeyValue(CacheKeyValue keyValue)
@@ -21,7 +33,7 @@ namespace AivaptDotNet.Helpers
             Cache.Add(keyValue);
         }
 
-        public void RemoveKeyValue(object key)
+        public void RemoveKeyValue(string key)
         {
             CacheKeyValue result = Cache.Find(x => x.Key == key);
             if(result != null)
@@ -30,7 +42,7 @@ namespace AivaptDotNet.Helpers
             }
         }
 
-        public void UpdateKeyValue(object key, CacheKeyValue newValue)
+        public void UpdateKeyValue(string key, CacheKeyValue newValue)
         {
             CacheKeyValue result = Cache.Find(x => x.Key == key);
             if(result != null)
@@ -40,21 +52,40 @@ namespace AivaptDotNet.Helpers
             }
         }
 
-        public CacheKeyValue GetKeyValue(object key)
+        public CacheKeyValue GetKeyValue(string key)
         {
-            CacheKeyValue result = Cache.Find(x => x.Key == key);
+            CacheKeyValue result = Cache.Find(x => x.Key == key); //compares strings
             return result;
         }
 
+        public void StopClearProcess()
+        {
+            CTokenSource.Cancel();
+        }
 
+        private void ClearProcess()
+        {
+            while(!CTokenSource.Token.IsCancellationRequested)
+            {
+                Thread.Sleep(Cycle * 1000);
+                foreach(var keyValue in Cache)
+                {
+                    if(DateTime.Now >= keyValue.DestroyAt)
+                    {
+                        Cache.Remove(keyValue); //TODO: corresponding events?
+                    }
+                }
+            }
+            CTokenSource.Dispose();
+        }
     }
 
-    class CacheKeyValue
+    public class CacheKeyValue
     {
-        public object Key;
+        public string Key;
         public object Value;
         public DateTime DestroyAt;
-        public CacheKeyValue(object key, object value, DateTime destroyAt)
+        public CacheKeyValue(string key, object value, DateTime destroyAt)
         {
             Key = key;
             Value = value;

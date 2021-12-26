@@ -18,8 +18,7 @@ namespace AivaptDotNet.Modules
     [Group("cmd")]
     public class SimpleCommandModule : ModuleBase<AivaptCommandContext>
     {
-
-        private List<ReactionKeywords> ReactionEvents = new List<ReactionKeywords>(); //TODO: background process needed
+        private MemoryCache Cache = new MemoryCache(0, "SimpleCommandModule", 120);
 
         #region Modules
 
@@ -77,7 +76,8 @@ namespace AivaptDotNet.Modules
 
             var parameters = new Dictionary<string, object>() { {"name", name} };
             ReactionKeywords keywords = new ReactionKeywords(confirmationMsg.Id, creatorId, parameters);
-            ReactionEvents.Add(keywords);
+            var item = new CacheKeyValue(confirmationMsg.Id.ToString(), keywords, DateTime.Now.AddMinutes(2));
+            Cache.AddKeyValue(item);
 
             Context.Client.ReactionAdded += ReactionAdded_EventAsync;
         }
@@ -116,7 +116,7 @@ namespace AivaptDotNet.Modules
         private bool IsUserIsMod(IReadOnlyCollection<SocketRole> roles)
         {
             var sqlParam = new Dictionary<string, object> { {"GUILD", Context.Guild.Id} };
-            string sql = "select role_id from roles where guild_id = :GUILD and mod_permissions = 1";
+            string sql = "select role_id from roles where guild_id = @GUILD and mod_permissions = 1";
             using (MySqlDataReader dbRoles =  Context._dbConnector.ExecuteSelect(sql, sqlParam))
             {
                 while(dbRoles.Read())
@@ -139,7 +139,8 @@ namespace AivaptDotNet.Modules
 
         public async Task ReactionAdded_EventAsync(Cacheable<IUserMessage, ulong> cachedMessage, ISocketMessageChannel originChannel, SocketReaction reaction)
         {
-            ReactionKeywords keywords = ReactionEvents.Find(e => e.OriginMessageId == cachedMessage.Id);
+            var keyValue = Cache.GetKeyValue(reaction.MessageId.ToString()) as CacheKeyValue;
+            var keywords = keyValue?.Value as ReactionKeywords;
             if(keywords == null) return;
 
             string commandName = keywords.Parameters["name"] as string;
