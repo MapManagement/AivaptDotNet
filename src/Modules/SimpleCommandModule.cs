@@ -13,7 +13,7 @@ using AivaptDotNet.AivaptClases;
 
 using MySql.Data.MySqlClient;
 
-namespace AivaptDotNet.Modules 
+namespace AivaptDotNet.Modules
 {
     [Group("cmd")]
     public class SimpleCommandModule : ModuleBase<AivaptCommandContext>
@@ -24,7 +24,7 @@ namespace AivaptDotNet.Modules
 
         [Command("create")]
         [Summary("Creates new simple command")]
-        public async Task CreateCmdCommand(string name, string title, [Remainder]string text)
+        public async Task CreateCmdCommand(string name, string title, [Remainder] string text)
         {
             string creator = Context.User.Id.ToString();
 
@@ -42,7 +42,7 @@ namespace AivaptDotNet.Modules
 
         [Command("edit")]
         [Summary("Edits a simple command")]
-        public async Task EditCmdCommand(string name, string title, [Remainder]string text)
+        public async Task EditCmdCommand(string name, string title, [Remainder] string text)
         {
             string sql = @"update simple_command set title = @TITLE, command_text = @TEXT where name = @NAME";
             var param = new Dictionary<string, object>();
@@ -59,30 +59,38 @@ namespace AivaptDotNet.Modules
         [Summary("Deletes a simple command")]
         public async Task DeleteCmdCommand(string name)
         {
-            SocketGuildUser guildUser =  Context.Guild.GetUser(Context.User.Id);
-            if(!IsUserIsMod(guildUser.Roles) && guildUser.Id != Context.Client.AdminUserId)
+            ulong userMsgId = Context.Message.Id;
+            ulong? authorId = GetCommandAuthor(name);
+
+            SocketGuildUser guildUser = Context.Guild.GetUser(Context.User.Id);
+            if (!IsUserIsMod(guildUser.Roles) && guildUser.Id != Context.Client.AdminUserId && authorId != guildUser.Id)
             {
                 await Context.Channel.SendMessageAsync("You do not have the permissions to delete a command!");
                 return;
             }
 
+            var buttons = new List<ButtonBuilder>()
+            {
+                { new ButtonBuilder("Delete", $"del-{userMsgId}", ButtonStyle.Danger) },
+                { new ButtonBuilder("Cancel", $"cancel-{userMsgId}", ButtonStyle.Secondary) }
+            };
+            var buttonComponent = SimpleComponents.MultipleButtons(buttons);
+
+            EmbedBuilder confirmationEmbed = SimpleEmbed.MinimalEmbed("Confirmation");
+            confirmationEmbed.WithDescription("Do you want to delete this command?");
+
+            var confirmationMsg = await ReplyAsync(components: buttonComponent.Build(), embed: confirmationEmbed.Build());
+
             ulong creatorId = Context.User.Id;
 
-            EmbedBuilder confirmationEmbed = SimpleEmbed.MinimalEmbed("Delete Command?");
-            confirmationEmbed.WithDescription("Do you really want to delete this command?");
-            RestUserMessage confirmationMsg = await Context.Channel.SendMessageAsync("", false, confirmationEmbed.Build());
-
-            await confirmationMsg.AddReactionsAsync(new Emoji[] {ResourceManager.GreenCircleEmoji, ResourceManager.RedCircleEmoji});
-
-            var parameters = new Dictionary<string, object>() { {"name", name} };
-            ReactionKeywords keywords = new ReactionKeywords(confirmationMsg.Id, creatorId, parameters);
+            var parameters = new Dictionary<string, object>() { { "name", name } };
+            ReactionKeywords keywords = new ReactionKeywords(userMsgId, confirmationMsg.Id, creatorId, parameters);
             var item = new CacheKeyValue(confirmationMsg.Id.ToString(), keywords, DateTime.Now.AddMinutes(2));
             Cache.AddKeyValue(item);
 
-            Context.Client.ReactionAdded += ReactionAdded_EventAsync;
-        }
 
-        
+            Context.Client.ButtonExecuted += ButtonExecuted_EventAsync;
+        }
 
         [Command("all")]
         [Summary("Shows all simple commands")]
@@ -94,14 +102,15 @@ namespace AivaptDotNet.Modules
 
             List<EmbedFieldBuilder> cmdDict = new List<EmbedFieldBuilder>();
 
-            using(var reader = Context._dbConnector.ExecuteSelect(sql, new Dictionary<string, object>()))
+            using (var reader = Context._dbConnector.ExecuteSelect(sql, new Dictionary<string, object>()))
             {
-                if(reader.HasRows)
+                if (reader.HasRows)
                 {
-                    while(reader.Read())
+                    while (reader.Read())
                     {
-                        SocketUser user = Context.Client.GetUser(ulong.Parse(reader.GetString("creator")));
-                        cmdDict.Add(new EmbedFieldBuilder{Name = reader.GetString("name"), Value = user.Username});
+                        var userId = ulong.Parse(reader.GetString("creator"));
+                        IUser user = await Context.Client.GetUserAsync(userId);
+                        cmdDict.Add(new EmbedFieldBuilder { Name = reader.GetString("name"), Value = user.Username });
                     }
                 }
             }
@@ -115,15 +124,15 @@ namespace AivaptDotNet.Modules
 
         private bool IsUserIsMod(IReadOnlyCollection<SocketRole> roles)
         {
-            var sqlParam = new Dictionary<string, object> { {"GUILD", Context.Guild.Id} };
+            var sqlParam = new Dictionary<string, object> { { "GUILD", Context.Guild.Id } };
             string sql = "select role_id from roles where guild_id = @GUILD and mod_permissions = 1";
-            using (MySqlDataReader dbRoles =  Context._dbConnector.ExecuteSelect(sql, sqlParam))
+            using (MySqlDataReader dbRoles = Context._dbConnector.ExecuteSelect(sql, sqlParam))
             {
-                while(dbRoles.Read())
+                while (dbRoles.Read())
                 {
-                    foreach(var role in roles)
+                    foreach (var role in roles)
                     {
-                        if(role.Id == dbRoles.GetUInt64(0))
+                        if (role.Id == dbRoles.GetUInt64(0))
                         {
                             return true;
                         }
@@ -133,40 +142,68 @@ namespace AivaptDotNet.Modules
             return false;
         }
 
+        private ulong? GetCommandAuthor(string commandName)
+        {
+            string sql = "select creator from simple_command where name = @COMMAND";
+            var param = new Dictionary<string, object>();
+            param.Add("@COMMAND", commandName);
+
+            using (MySqlDataReader reader = Context._dbConnector.ExecuteSelect(sql, param))
+            {
+                if (reader.HasRows)
+                {
+                    while (reader.Read())
+                    {
+                        var idString = reader.GetString(0);
+                        return ulong.Parse(idString);
+                    }
+                }
+            }
+
+            return null;
+        }
+
         #endregion
 
         #region Events
 
-        public async Task ReactionAdded_EventAsync(Cacheable<IUserMessage, ulong> cachedMessage, ISocketMessageChannel originChannel, SocketReaction reaction)
+        private async Task ButtonExecuted_EventAsync(SocketMessageComponent arg)
         {
-            var keyValue = Cache.GetKeyValue(reaction.MessageId.ToString()) as CacheKeyValue;
+            ulong userId = arg.User.Id;
+            ulong messageId = arg.Message.Id;
+            var buttonId = arg.Data.CustomId;
+
+            var keyValue = Cache.GetKeyValue(messageId.ToString()) as CacheKeyValue;
             var keywords = keyValue?.Value as ReactionKeywords;
-            if(keywords == null) return;
+            if (keywords == null) return;
 
             string commandName = keywords.Parameters["name"] as string;
 
-            if(cachedMessage.Id == keywords.OriginMessageId  && (reaction.UserId == keywords.AuthorId || reaction.UserId == Context.Client.AdminUserId))
+            if (messageId == keywords.BotMessageId && (userId == keywords.AuthorId || userId == Context.Client.AdminUserId))
+            {
+                if (buttonId == $"del-{keywords.UserMessageId}")
                 {
-                    if(reaction.Emote.Name == ResourceManager.GreenCircleEmoji.Name)
-                    {
-                        string sql = @"delete from simple_command where name = @NAME and creator = @CREATOR";
-                        var param = new Dictionary<string, object>();
-                        param.Add("@NAME", commandName);
-                        param.Add("@CREATOR", keywords.AuthorId.ToString());
+                    string sql = @"delete from simple_command where name = @NAME and creator = @CREATOR";
+                    var param = new Dictionary<string, object>();
+                    param.Add("@NAME", commandName);
+                    param.Add("@CREATOR", keywords.AuthorId.ToString());
 
-                        Context._dbConnector.ExecuteDML(sql, param);
-
-                        //await confirmationMsg.AddReactionAsync(ResourceManager.CheckEmoji);
-                        Context.Client.ReactionAdded -= ReactionAdded_EventAsync;
-                    }
-                    else if(reaction.Emote.Name == ResourceManager.RedCircleEmoji.Name)
-                    {
-                       //await confirmationMsg.AddReactionAsync(ResourceManager.CheckEmoji);
-                       Context.Client.ReactionAdded -= ReactionAdded_EventAsync;
-                    }
+                    Context._dbConnector.ExecuteDML(sql, param);
+                    //TODO: edit button message
+                    await arg.RespondAsync("Command has beed deleted!");
+                    var components = arg.Message.Components;
+                    SimpleComponents.DisableMessageComponents(components);
+                    Context.Client.ButtonExecuted -= ButtonExecuted_EventAsync;
                 }
+                else if (buttonId == $"cancel-{keywords.UserMessageId}")
+                {
+                    await arg.RespondAsync("Cancelled!");
+                    var components = arg.Message.Components;
+                    SimpleComponents.DisableMessageComponents(components);
+                    Context.Client.ButtonExecuted -= ButtonExecuted_EventAsync;
+                }
+            }
         }
-
         #endregion
     }
 }

@@ -31,7 +31,8 @@ namespace AivaptDotNet
         {
             DiscordSocketConfig clientConfig = new DiscordSocketConfig
             {
-                MessageCacheSize = 50
+                MessageCacheSize = 50,
+                AlwaysDownloadUsers = true
             };
 
             IActivity botActivity = new GameActivity("Sudoku", "Almost finished...");

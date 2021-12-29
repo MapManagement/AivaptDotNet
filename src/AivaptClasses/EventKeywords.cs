@@ -6,9 +6,10 @@ namespace AivaptDotNet.AivaptClases
     public class ReactionKeywords
     {
 
-        public ReactionKeywords(ulong originMessageId, ulong authorId, Dictionary<string, object> parameters)
-        {
-            OriginMessageId = originMessageId;
+        public ReactionKeywords(ulong userMessageId, ulong botMessageId, ulong authorId, Dictionary<string, object> parameters)
+        {   
+            UserMessageId = userMessageId;
+            BotMessageId = botMessageId;
             AuthorId = authorId;
             Parameters = parameters;
             _raisedAt = DateTime.Now;
@@ -20,7 +21,8 @@ namespace AivaptDotNet.AivaptClases
             get { return _raisedAt; }
         }
 
-        public ulong OriginMessageId;
+        public ulong UserMessageId;
+        public ulong BotMessageId;
         public ulong AuthorId;
         public Dictionary<string, object> Parameters;
     }
