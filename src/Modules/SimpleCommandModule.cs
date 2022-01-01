@@ -60,12 +60,12 @@ namespace AivaptDotNet.Modules
         public async Task DeleteCmdCommand(string name)
         {
             ulong userMsgId = Context.Message.Id;
-            ulong? authorId = GetCommandAuthor(name);
+            ulong? cmdAuthorId = GetCommandAuthor(name);
 
             SocketGuildUser guildUser = Context.Guild.GetUser(Context.User.Id);
-            if (!IsUserIsMod(guildUser.Roles) && guildUser.Id != Context.Client.AdminUserId && authorId != guildUser.Id)
+            if (!IsUserMod(guildUser.Roles) && guildUser.Id != Context.Client.AdminUserId && cmdAuthorId != guildUser.Id)
             {
-                await Context.Channel.SendMessageAsync("You do not have the permissions to delete a command!");
+                await Context.Message.ReplyAsync("You do not have the permissions to delete this command!");
                 return;
             }
 
@@ -81,10 +81,8 @@ namespace AivaptDotNet.Modules
 
             var confirmationMsg = await ReplyAsync(components: buttonComponent.Build(), embed: confirmationEmbed.Build());
 
-            ulong creatorId = Context.User.Id;
-
             var parameters = new Dictionary<string, object>() { { "name", name } };
-            ReactionKeywords keywords = new ReactionKeywords(userMsgId, confirmationMsg.Id, creatorId, parameters);
+            ReactionKeywords keywords = new ReactionKeywords(userMsgId, confirmationMsg.Id, guildUser.Id, ButtonExecuted_EventAsync, AivaptClases.EventType.ButtonClick, parameters);
             var item = new CacheKeyValue(confirmationMsg.Id.ToString(), keywords, DateTime.Now.AddMinutes(2));
             Cache.AddKeyValue(item);
 
@@ -122,7 +120,7 @@ namespace AivaptDotNet.Modules
 
         #region Methods
 
-        private bool IsUserIsMod(IReadOnlyCollection<SocketRole> roles)
+        private bool IsUserMod(IReadOnlyCollection<SocketRole> roles)
         {
             var sqlParam = new Dictionary<string, object> { { "GUILD", Context.Guild.Id } };
             string sql = "select role_id from roles where guild_id = @GUILD and mod_permissions = 1";
@@ -179,7 +177,7 @@ namespace AivaptDotNet.Modules
 
             string commandName = keywords.Parameters["name"] as string;
 
-            if (messageId == keywords.BotMessageId && (userId == keywords.AuthorId || userId == Context.Client.AdminUserId))
+            if (messageId == keywords.BotMessageId && (userId == keywords.AuthorId))
             {
                 if (buttonId == $"del-{keywords.UserMessageId}")
                 {
@@ -189,21 +187,50 @@ namespace AivaptDotNet.Modules
                     param.Add("@CREATOR", keywords.AuthorId.ToString());
 
                     Context._dbConnector.ExecuteDML(sql, param);
-                    //TODO: edit button message
+
+                    await arg.UpdateAsync(x =>
+                    {
+                        x.Embed = SimpleEmbed.MinimalEmbed("Confirmation")
+                            .WithDescription("Command has been deleted!")
+                            .WithFooter(arg.User.Username, arg.User.GetAvatarUrl())
+                            .Build();
+
+                        var buttons = new List<ButtonBuilder>()
+                        {
+                            { new ButtonBuilder("Delete", $"del-dis", ButtonStyle.Danger, isDisabled: true) },
+                            { new ButtonBuilder("Cancel", $"cancel-dis", ButtonStyle.Secondary, isDisabled: true) }
+                        };
+                        var buttonComponent = SimpleComponents.MultipleButtons(buttons);
+                        x.Components = buttonComponent.Build();
+                    });
+
                     await arg.RespondAsync("Command has beed deleted!");
-                    var components = arg.Message.Components;
-                    SimpleComponents.DisableMessageComponents(components);
+
                     Context.Client.ButtonExecuted -= ButtonExecuted_EventAsync;
                 }
                 else if (buttonId == $"cancel-{keywords.UserMessageId}")
                 {
-                    await arg.RespondAsync("Cancelled!");
-                    var components = arg.Message.Components;
-                    SimpleComponents.DisableMessageComponents(components);
+                    await arg.UpdateAsync(x =>
+                    {
+                        x.Embed = SimpleEmbed.MinimalEmbed("Confirmation")
+                            .WithDescription("Cancelled!")
+                            .WithFooter(arg.User.Username, arg.User.GetAvatarUrl())
+                            .Build();
+
+                        var buttons = new List<ButtonBuilder>()
+                        {
+                            { new ButtonBuilder("Delete", $"del-dis", ButtonStyle.Danger, isDisabled: true) },
+                            { new ButtonBuilder("Cancel", $"cancel-dis", ButtonStyle.Secondary, isDisabled: true) }
+                        };
+                        var buttonComponent = SimpleComponents.MultipleButtons(buttons);
+                        x.Components = buttonComponent.Build();
+                    });
+
                     Context.Client.ButtonExecuted -= ButtonExecuted_EventAsync;
                 }
             }
         }
+
         #endregion
     }
 }

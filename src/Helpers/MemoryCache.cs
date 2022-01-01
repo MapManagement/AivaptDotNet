@@ -72,7 +72,8 @@ namespace AivaptDotNet.Helpers
                 {
                     if(DateTime.Now >= keyValue.DestroyAt)
                     {
-                        Cache.Remove(keyValue); //TODO: corresponding events?
+                        //TODO: remove event
+                        Cache.Remove(keyValue); 
                     }
                 }
             }

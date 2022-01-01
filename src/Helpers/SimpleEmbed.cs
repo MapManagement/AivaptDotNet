@@ -98,35 +98,6 @@ namespace AivaptDotNet.Helpers
 
             return new ComponentBuilder().WithSelectMenu(choiceBuilder);
         }
-
-        public static void DisableComponent()
-        {
-            return;
-        }
-
-        public static void DisableMessageComponents(IReadOnlyCollection<ActionRowComponent> components)
-        {
-            foreach (var row in components)
-            {
-                foreach (var component in row.Components)
-                {
-                    if (component.Type == ComponentType.Button)
-                    {
-                        var button = component as ButtonComponent;
-                        var builder = button.ToBuilder();
-                        builder.IsDisabled = true;
-                        builder.Build();
-                    }
-                    else if (component.Type == ComponentType.SelectMenu)
-                    {
-                         var selectMenu = component as SelectMenuComponent;
-                         var builder = selectMenu.ToBuilder();
-                         builder.IsDisabled = true;
-                         builder.Build();
-                    }
-                }
-            }
-        }
     }
 
     public class UserOption
