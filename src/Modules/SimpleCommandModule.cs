@@ -82,7 +82,7 @@ namespace AivaptDotNet.Modules
             var confirmationMsg = await ReplyAsync(components: buttonComponent.Build(), embed: confirmationEmbed.Build());
 
             var parameters = new Dictionary<string, object>() { { "name", name } };
-            ReactionKeywords keywords = new ReactionKeywords(userMsgId, confirmationMsg.Id, guildUser.Id, ButtonExecuted_EventAsync, AivaptClases.EventType.ButtonClick, parameters);
+            ButtonClickKeyword keywords = new ButtonClickKeyword(userMsgId, confirmationMsg.Id, guildUser.Id, ButtonExecuted_EventAsync, parameters);
             var item = new CacheKeyValue(confirmationMsg.Id.ToString(), keywords, DateTime.Now.AddMinutes(2));
             Cache.AddKeyValue(item);
 
@@ -172,19 +172,19 @@ namespace AivaptDotNet.Modules
             var buttonId = arg.Data.CustomId;
 
             var keyValue = Cache.GetKeyValue(messageId.ToString()) as CacheKeyValue;
-            var keywords = keyValue?.Value as ReactionKeywords;
+            var keywords = keyValue?.Value as ButtonClickKeyword;
             if (keywords == null) return;
 
             string commandName = keywords.Parameters["name"] as string;
 
-            if (messageId == keywords.BotMessageId && (userId == keywords.AuthorId))
+            if (messageId == keywords.BotReplyMsgId && (userId == keywords.InitialUserId))
             {
-                if (buttonId == $"del-{keywords.UserMessageId}")
+                if (buttonId == $"del-{keywords.InitialMsgId}")
                 {
                     string sql = @"delete from simple_command where name = @NAME and creator = @CREATOR";
                     var param = new Dictionary<string, object>();
                     param.Add("@NAME", commandName);
-                    param.Add("@CREATOR", keywords.AuthorId.ToString());
+                    param.Add("@CREATOR", keywords.InitialUserId.ToString());
 
                     Context._dbConnector.ExecuteDML(sql, param);
 
@@ -208,7 +208,7 @@ namespace AivaptDotNet.Modules
 
                     Context.Client.ButtonExecuted -= ButtonExecuted_EventAsync;
                 }
-                else if (buttonId == $"cancel-{keywords.UserMessageId}")
+                else if (buttonId == $"cancel-{keywords.InitialMsgId}")
                 {
                     await arg.UpdateAsync(x =>
                     {

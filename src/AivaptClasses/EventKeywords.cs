@@ -1,38 +1,16 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-
+using Discord;
 using Discord.WebSocket;
 
 namespace AivaptDotNet.AivaptClases
 {
-    public enum EventType
+
+    public class CacheKeyword
     {
-        ButtonClick,
-        ReactionAdd,
-        Reply,
-        SelectMenu
-    }
-
-    public class ReactionKeywords //TODO: inheritance?
-    {
-
-        public ReactionKeywords(ulong userMessageId, ulong botMessageId, ulong authorId, Dictionary<string, object> parameters)
-        {   
-            UserMessageId = userMessageId;
-            BotMessageId = botMessageId;
-            AuthorId = authorId;
-            Parameters = parameters;
-            _raisedAt = DateTime.Now;
-        }
-
-        public ReactionKeywords(ulong userMessageId, ulong botMessageId, ulong authorId, Func<SocketMessageComponent, Task> eventFunc, EventType eType,Dictionary<string, object> parameters)
-        {   
-            UserMessageId = userMessageId;
-            BotMessageId = botMessageId;
-            AuthorId = authorId;
-            EventFunc = eventFunc;
-            EType = eType;
+        public CacheKeyword(Dictionary<string, object> parameters)
+        {
             Parameters = parameters;
             _raisedAt = DateTime.Now;
         }
@@ -43,11 +21,72 @@ namespace AivaptDotNet.AivaptClases
             get { return _raisedAt; }
         }
 
-        public ulong UserMessageId;
-        public ulong BotMessageId;
-        public ulong AuthorId;
-        public Func<SocketMessageComponent, Task> EventFunc;
-        public Dictionary<string, object> Parameters;
-        public EventType EType;
+        private Dictionary<string, object> _parameters;
+        public Dictionary<string, object> Parameters
+        {
+            get { return _parameters; }
+            set { _parameters = value; }
+        }
+    }
+
+    public class EventKeyword : CacheKeyword
+    {
+        public EventKeyword(ulong initialMsgId, ulong botReplyMsgId, ulong initialUserId, Dictionary<string, object> parameters) : base(parameters)
+        {
+            _initialMsgId = initialMsgId;
+            _botReplyMsgId = botReplyMsgId;
+            _initialUserId = initialUserId;
+        }
+
+        private ulong _initialMsgId;
+        public ulong InitialMsgId
+        {
+            get { return _initialMsgId; }
+        }
+
+        private ulong _botReplyMsgId;
+        public ulong BotReplyMsgId
+        {
+            get { return _botReplyMsgId; }
+        }
+
+        private ulong _initialUserId;
+        public ulong InitialUserId
+        {
+            get { return _initialUserId; }
+        }
+    }
+
+    public class ButtonClickKeyword : EventKeyword
+    {
+        public ButtonClickKeyword(ulong initialMsgId, ulong botReplyMsgId, ulong initialUserId, Func<SocketMessageComponent, Task> eventFunc, Dictionary<string, object> parameters) :
+            base(initialMsgId, botReplyMsgId, initialMsgId, parameters)
+        {
+            _eventFunc = eventFunc;
+        }
+
+        private Func<SocketMessageComponent, Task> _eventFunc;
+        public Func<SocketMessageComponent, Task> EventFunc
+        {
+            get { return _eventFunc; }
+        }
+    }
+
+    public class ReactionAddKeyword : EventKeyword
+    {
+        public ReactionAddKeyword(ulong initialMsgId,
+                                  ulong botReplyMsgId,
+                                  ulong initialUserId,
+                                  Func<Cacheable<IUserMessage, ulong>, Cacheable<IMessageChannel, ulong>, SocketReaction, Task> eventFunc, Dictionary<string, object> parameters) :
+            base(initialMsgId, botReplyMsgId, initialMsgId, parameters)
+        {
+            _eventFunc = eventFunc;
+        }
+
+        private Func<Cacheable<IUserMessage, ulong>, Cacheable<IMessageChannel, ulong>, SocketReaction, Task> _eventFunc;
+        public Func<Cacheable<IUserMessage, ulong>, Cacheable<IMessageChannel, ulong>, SocketReaction, Task> EventFunc
+        {
+            get { return _eventFunc; }
+        }
     }
 }
