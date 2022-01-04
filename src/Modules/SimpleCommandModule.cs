@@ -62,6 +62,12 @@ namespace AivaptDotNet.Modules
             ulong userMsgId = Context.Message.Id;
             ulong? cmdAuthorId = GetCommandAuthor(name);
 
+            if(cmdAuthorId == null)
+            {
+                await Context.Message.ReplyAsync("This command does not exist!");
+                return;
+            }
+
             SocketGuildUser guildUser = Context.Guild.GetUser(Context.User.Id);
             if (!IsUserMod(guildUser.Roles) && guildUser.Id != Context.Client.AdminUserId && cmdAuthorId != guildUser.Id)
             {
@@ -83,7 +89,8 @@ namespace AivaptDotNet.Modules
 
             var parameters = new Dictionary<string, object>() { { "name", name } };
             ButtonClickKeyword keywords = new ButtonClickKeyword(userMsgId, confirmationMsg.Id, guildUser.Id, ButtonExecuted_EventAsync, parameters);
-            var item = new CacheKeyValue(confirmationMsg.Id.ToString(), keywords, DateTime.Now.AddMinutes(2));
+            Action clearAction = () => { Context.Client.ButtonExecuted -= ButtonExecuted_EventAsync; };
+            var item = new CacheKeyValue(confirmationMsg.Id.ToString(), keywords, DateTime.Now.AddMinutes(2), clearAction);
             Cache.AddKeyValue(item);
 
 
@@ -203,8 +210,6 @@ namespace AivaptDotNet.Modules
                         var buttonComponent = SimpleComponents.MultipleButtons(buttons);
                         x.Components = buttonComponent.Build();
                     });
-
-                    await arg.RespondAsync("Command has beed deleted!");
 
                     Context.Client.ButtonExecuted -= ButtonExecuted_EventAsync;
                 }

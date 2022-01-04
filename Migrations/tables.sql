@@ -3,7 +3,7 @@ CREATE TABLE simple_command (
   command_text text DEFAULT NULL,
   title varchar(24) DEFAULT NULL,
   active tinyint(1) NOT NULL,
-  creator tinytext NOT NULL, --TODO: using tinytext instead of bigint
+  creator tinytext NOT NULL, --//TODO: using tinytext instead of bigint
   color varchar(7) NOT NULL DEFAULT '#1ABC9C',
   PRIMARY KEY (name)
 );

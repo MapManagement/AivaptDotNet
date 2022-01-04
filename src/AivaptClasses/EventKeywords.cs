@@ -60,7 +60,7 @@ namespace AivaptDotNet.AivaptClases
     public class ButtonClickKeyword : EventKeyword
     {
         public ButtonClickKeyword(ulong initialMsgId, ulong botReplyMsgId, ulong initialUserId, Func<SocketMessageComponent, Task> eventFunc, Dictionary<string, object> parameters) :
-            base(initialMsgId, botReplyMsgId, initialMsgId, parameters)
+            base(initialMsgId, botReplyMsgId, initialUserId, parameters)
         {
             _eventFunc = eventFunc;
         }

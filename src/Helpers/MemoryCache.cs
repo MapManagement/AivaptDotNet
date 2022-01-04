@@ -68,14 +68,16 @@ namespace AivaptDotNet.Helpers
             while(!CTokenSource.Token.IsCancellationRequested)
             {
                 Thread.Sleep(Cycle * 1000);
-                foreach(var keyValue in Cache)
+                var tempCache = new List<CacheKeyValue> (Cache);
+                foreach(var keyValue in tempCache)
                 {
                     if(DateTime.Now >= keyValue.DestroyAt)
                     {
-                        //TODO: remove event
+                        keyValue.ClearAction();
                         Cache.Remove(keyValue); 
                     }
                 }
+                tempCache = null;
             }
             CTokenSource.Dispose();
         }
@@ -86,11 +88,20 @@ namespace AivaptDotNet.Helpers
         public string Key;
         public object Value;
         public DateTime DestroyAt;
+        public Action ClearAction;
         public CacheKeyValue(string key, object value, DateTime destroyAt)
         {
             Key = key;
             Value = value;
             DestroyAt = destroyAt;
+        }
+
+        public CacheKeyValue(string key, object value, DateTime destroyAt, Action clearAction)
+        {
+            Key = key;
+            Value = value;
+            DestroyAt = destroyAt;
+            ClearAction = clearAction;
         }
     }
 }
