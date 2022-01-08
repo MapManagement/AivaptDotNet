@@ -103,7 +103,7 @@ namespace AivaptDotNet.Modules
         {
             string creator = Context.User.Id.ToString();
 
-            string sql = @"select name, creator from simple_command";
+            string sql = @"select name, creator_id from simple_command";
 
             List<EmbedFieldBuilder> cmdDict = new List<EmbedFieldBuilder>();
 
@@ -113,7 +113,7 @@ namespace AivaptDotNet.Modules
                 {
                     while (reader.Read())
                     {
-                        var userId = ulong.Parse(reader.GetString("creator"));
+                        ulong userId = reader.GetUInt64("creator_id");
                         IUser user = await Context.Client.GetUserAsync(userId);
                         cmdDict.Add(new EmbedFieldBuilder { Name = reader.GetString("name"), Value = user.Username });
                     }
@@ -130,7 +130,7 @@ namespace AivaptDotNet.Modules
         private bool IsUserMod(IReadOnlyCollection<SocketRole> roles)
         {
             var sqlParam = new Dictionary<string, object> { { "GUILD", Context.Guild.Id } };
-            string sql = "select role_id from roles where guild_id = @GUILD and mod_permissions = 1";
+            string sql = "select role_id from role where guild_id = @GUILD and mod_permissions = 1";
             using (MySqlDataReader dbRoles = Context._dbConnector.ExecuteSelect(sql, sqlParam))
             {
                 while (dbRoles.Read())
@@ -159,12 +159,10 @@ namespace AivaptDotNet.Modules
                 {
                     while (reader.Read())
                     {
-                        var idString = reader.GetString(0);
-                        return ulong.Parse(idString);
+                        return reader.GetUInt64(0);
                     }
                 }
             }
-
             return null;
         }
 
