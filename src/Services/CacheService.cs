@@ -3,10 +3,13 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace AivaptDotNet.Helpers
+
+
+namespace AivaptDotNet.Services
 {
-    public class MemoryCache
+    public class CacheService
     {
+
         public readonly int Id;
         public readonly string Description;
         public readonly int Cycle;
@@ -14,7 +17,7 @@ namespace AivaptDotNet.Helpers
         private Task ClearTask;
         private CancellationTokenSource CTokenSource;
 
-        public MemoryCache(int id, string description, int cycle) //cycle in seconds
+        public CacheService(int id, string description, int cycle) //cycle in seconds
         {
             Id = id;
             Description = description;
@@ -103,5 +106,6 @@ namespace AivaptDotNet.Helpers
             DestroyAt = destroyAt;
             ClearAction = clearAction;
         }
+    
     }
 }

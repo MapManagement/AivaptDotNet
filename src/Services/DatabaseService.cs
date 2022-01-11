@@ -1,15 +1,15 @@
 using System;
-using MySql.Data.MySqlClient;
 using System.Collections.Generic;
+using MySql.Data.MySqlClient;
 
 
-namespace AivaptDotNet.Database
+namespace AivaptDotNet.Services
 {
-    public class Connector : IDisposable
+    public class DatabaseService
     {
         private  MySqlConnection _connection;
 
-        public Connector(MySqlConnection connection)
+        public DatabaseService(MySqlConnection connection)
         {
             _connection = connection;
             _connection.Open();
@@ -64,5 +64,4 @@ namespace AivaptDotNet.Database
             }
         }
     }
-
 }

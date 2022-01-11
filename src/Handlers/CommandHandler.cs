@@ -3,28 +3,32 @@ using System.Reflection;
 using System.Collections.Generic;
 using System;
 
+using Microsoft.Extensions.DependencyInjection;
+
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 
 using AivaptDotNet.Helpers;
-using AivaptDotNet.Database;
+using AivaptDotNet.Services;
 using AivaptDotNet.AivaptClases;
 
 
-namespace AivaptDotNet.Handlers 
+namespace AivaptDotNet.Handlers
 {
-    public class CommandHandler {
+    public class CommandHandler
+    {
+        private readonly IServiceProvider _services;
         private readonly AivaptClient _botClient;
         private readonly CommandService _commandService;
-        private readonly Connector _dbConnector;
+        private readonly DatabaseService _dbService;
 
-
-        public CommandHandler(AivaptClient botClient, CommandService commandService, Connector dbConnector)
+        public CommandHandler(IServiceProvider services)
         {
-            _botClient = botClient;
-            _commandService = commandService;
-            _dbConnector = dbConnector;
+            _services = services;
+            _botClient = services.GetRequiredService<AivaptClient>();
+            _commandService = services.GetRequiredService<CommandService>();
+            _dbService = services.GetRequiredService<DatabaseService>();
         }
 
         public async Task InitializeCommands()
@@ -43,7 +47,7 @@ namespace AivaptDotNet.Handlers
             if(!(message.HasCharPrefix('!', ref argPos) || message.HasMentionPrefix(_botClient.CurrentUser, ref argPos)) || message.Author.IsBot) return;
 
             
-            var context = new AivaptCommandContext(_botClient, message, _dbConnector);
+            var context = new CommandContext(_botClient, message);
 
             try 
             {
@@ -77,7 +81,7 @@ namespace AivaptDotNet.Handlers
                 var param = new Dictionary<string, object>();
                 param.Add("@COMMAND_NAME", msg.Remove(0,1));
 
-                using var result = _dbConnector.ExecuteSelect(sql, param);
+                using var result = _dbService.ExecuteSelect(sql, param);
 
                 if(!result.HasRows) await message.Channel.SendMessageAsync("Error");
                 result.Read();
@@ -100,7 +104,7 @@ namespace AivaptDotNet.Handlers
             var param = new Dictionary<string, object>();
             param.Add("@COMMAND_NAME", name);
 
-            using var result = _dbConnector.ExecuteSelect(sql, param);
+            using var result = _dbService.ExecuteSelect(sql, param);
             if(result.HasRows)
             {
                 return true;
