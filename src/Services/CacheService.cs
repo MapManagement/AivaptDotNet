@@ -9,19 +9,20 @@ namespace AivaptDotNet.Services
 {
     public class CacheService
     {
+        #region Fields
 
-        public readonly int Id;
-        public readonly string Description;
-        public readonly int Cycle;
+        private int _cycle;
         public List<CacheKeyValue> Cache;
         private Task ClearTask;
         private CancellationTokenSource CTokenSource;
 
-        public CacheService(int id, string description, int cycle) //cycle in seconds
+        #endregion
+
+        #region Public Methods
+
+        public void Initialize(int cycle)
         {
-            Id = id;
-            Description = description;
-            Cycle = cycle;
+            _cycle = cycle;
             Cache = new List<CacheKeyValue>();
 
             CTokenSource = new CancellationTokenSource();
@@ -66,11 +67,15 @@ namespace AivaptDotNet.Services
             CTokenSource.Cancel();
         }
 
+        #endregion
+
+        #region Private Methods
+
         private void ClearProcess()
         {
             while(!CTokenSource.Token.IsCancellationRequested)
             {
-                Thread.Sleep(Cycle * 1000);
+                Thread.Sleep(_cycle * 1000);
                 var tempCache = new List<CacheKeyValue> (Cache);
                 foreach(var keyValue in tempCache)
                 {
@@ -84,14 +89,23 @@ namespace AivaptDotNet.Services
             }
             CTokenSource.Dispose();
         }
+
+        #endregion
     }
 
     public class CacheKeyValue
     {
+        #region Fields
+
         public string Key;
         public object Value;
         public DateTime DestroyAt;
         public Action ClearAction;
+
+        #endregion
+
+        #region Cosntructors
+    
         public CacheKeyValue(string key, object value, DateTime destroyAt)
         {
             Key = key;
@@ -106,6 +120,7 @@ namespace AivaptDotNet.Services
             DestroyAt = destroyAt;
             ClearAction = clearAction;
         }
-    
+
+        #endregion
     }
 }

@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+
 using MySql.Data.MySqlClient;
 
 
@@ -7,17 +9,23 @@ namespace AivaptDotNet.Services
 {
     public class DatabaseService
     {
+        #region Fields
+
         private  MySqlConnection _connection;
 
-        public DatabaseService(MySqlConnection connection)
-        {
-            _connection = connection;
-            _connection.Open();
-        }
+        #endregion
+
+        #region Public Methods
 
         public void Dispose()
         {
             _connection.Close();
+        }
+
+        public async Task Initialize(string connectionString)
+        {
+            _connection = new MySqlConnection(connectionString);
+            await _connection.OpenAsync();
         }
 
         public MySqlDataReader ExecuteSelect(string commandString, Dictionary<string, object> commandParameters)
@@ -48,6 +56,10 @@ namespace AivaptDotNet.Services
             command.Prepare();
             command.ExecuteNonQuery();
         }
+        
+        #endregion
+
+        #region Private Methods
 
         private MySqlDbType GetDbDataType(object value)
         {
@@ -63,5 +75,7 @@ namespace AivaptDotNet.Services
                     return MySqlDbType.VarChar;
             }
         }
+
+        #endregion
     }
 }
