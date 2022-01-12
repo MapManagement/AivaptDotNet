@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
-namespace AivaptDotNet.AivaptClases.Json
+namespace AivaptDotNet.DataClasses
 {
     ///<summary>
     /// Represents a Git repository on GitHub

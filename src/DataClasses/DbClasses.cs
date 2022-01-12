@@ -4,10 +4,14 @@ using MySql.Data.MySqlClient;
 using System.Collections.Generic;
 
 
-namespace AivaptDotNet.Database
+namespace AivaptDotNet.DataClasses
 {
+    #region SimpleCommand Class
+
     public class SimpleCommand
     {
+        #region Constructor
+
         public SimpleCommand(string name, string text, string title, bool active, ulong creatorId)
         {
             Name = name;
@@ -27,6 +31,10 @@ namespace AivaptDotNet.Database
             CreatorId = creatorId;
             Color = color;
         }
+
+        #endregion
+
+        #region Properties
 
         private string _name;
         public string Name
@@ -70,16 +78,27 @@ namespace AivaptDotNet.Database
             set { _color = value; }
         }
 
+        #endregion
     }
+
+    #endregion
+
+    #region Role Class
 
     public class Role
     {
+        #region Constructors
+
         public Role(ulong roleId, ulong guildId, bool modPermissions)
         {
             RoleId = roleId;
             GuildId = guildId;
             ModPermissions = modPermissions;
         }
+
+        #endregion
+
+        #region Properties
 
         private ulong _roleId;
         public ulong RoleId
@@ -101,16 +120,28 @@ namespace AivaptDotNet.Database
             get { return _modPermissions; }
             set { _modPermissions = value; }
         }
+
+        #endregion
     }
+
+    #endregion
+
+    #region Guild Class
 
     public class Guild
     {
+        #region Constructors
+
         public Guild(ulong id, string name, ulong ownerId)
         {
             Id = id;
             Name = name;
             OwnerId = ownerId;
         }
+
+        #endregion
+
+        #region Properties
 
         private ulong _id;
         public ulong Id
@@ -132,5 +163,9 @@ namespace AivaptDotNet.Database
             get { return _ownerId; }
             set { _ownerId = value; }
         }
+
+        #endregion
     }
+
+    #endregion
 }
