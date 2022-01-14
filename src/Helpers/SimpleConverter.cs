@@ -4,7 +4,7 @@ using Discord;
 
 namespace AivaptDotNet.Helpers
 {
-    public static class ConverterHelper
+    public static class SimpleConverter
     {
         public static Color HexToColor(string hexString)
         {
