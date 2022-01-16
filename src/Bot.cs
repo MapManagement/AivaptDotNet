@@ -11,6 +11,8 @@ using AivaptDotNet.Helpers;
 using AivaptDotNet.Handlers;
 using AivaptDotNet.Services;
 
+using Victoria;
+
 namespace AivaptDotNet 
 {
     public class Bot
@@ -23,6 +25,9 @@ namespace AivaptDotNet
         private readonly CommandHandler _commandHandler;
         private readonly DatabaseService _dbService;
         private readonly CacheService _cacheService;
+        private readonly AudioService _audioService;
+        private readonly EventService _eventService;
+        private readonly LavaNode _lavaNode;
 
         #endregion
 
@@ -35,6 +40,9 @@ namespace AivaptDotNet
             _commandHandler = _services.GetRequiredService<CommandHandler>();
             _dbService = _services.GetRequiredService<DatabaseService>();
             _cacheService = _services.GetRequiredService<CacheService>();
+            _audioService = _services.GetRequiredService<AudioService>();
+            _eventService = _services.GetRequiredService<EventService>();
+            _lavaNode = _services.GetRequiredService<LavaNode>();
 
             _botClient.Ready += OnBotReady;
             _botClient.Log += Logging;
@@ -52,12 +60,12 @@ namespace AivaptDotNet
 
         public async Task StartBot()
         {
+            await _botClient.LoginAsync(TokenType.Bot, Credentials.GetBotToken());
+            await _botClient.StartAsync();
+
             await _commandHandler.InitializeCommands();
             await _dbService.Initialize(Credentials.GetDbConnection());
             _cacheService.Initialize(120);
-
-            await _botClient.LoginAsync(TokenType.Bot, Credentials.GetBotToken());
-            await _botClient.StartAsync();
 
             await Task.Delay(-1);
         }
@@ -74,6 +82,9 @@ namespace AivaptDotNet
             .AddSingleton<CommandHandler>()
             .AddSingleton<DatabaseService>()
             .AddSingleton<CacheService>()
+            .AddSingleton<AudioService>()
+            .AddSingleton<EventService>()
+            .AddLavaNode(x => { x.SelfDeaf = true; })
             .BuildServiceProvider();
         }
 
@@ -89,7 +100,9 @@ namespace AivaptDotNet
 
         private async Task OnBotReady()
         {
-            await _botClient.SetActivityAsync(new GameActivity("Sudoku", "Almost finished..."));
+            //await _botClient.SetActivityAsync(new DefaultActivity("Sudoku", "Almost finished..."));
+
+            if(!_lavaNode.IsConnected) await _lavaNode.ConnectAsync(); 
         }
 
         #endregion

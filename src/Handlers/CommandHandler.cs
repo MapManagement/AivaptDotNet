@@ -11,7 +11,6 @@ using Discord.WebSocket;
 
 using AivaptDotNet.Helpers;
 using AivaptDotNet.Services;
-using AivaptDotNet.AivaptClases;
 
 
 namespace AivaptDotNet.Handlers
@@ -19,14 +18,14 @@ namespace AivaptDotNet.Handlers
     public class CommandHandler
     {
         private readonly IServiceProvider _services;
-        private readonly AivaptClient _botClient;
+        private readonly DiscordSocketClient _botClient;
         private readonly CommandService _commandService;
         private readonly DatabaseService _dbService;
 
         public CommandHandler(IServiceProvider services)
         {
             _services = services;
-            _botClient = services.GetRequiredService<AivaptClient>();
+            _botClient = services.GetRequiredService<DiscordSocketClient>();
             _commandService = services.GetRequiredService<CommandService>();
             _dbService = services.GetRequiredService<DatabaseService>();
         }
@@ -34,7 +33,7 @@ namespace AivaptDotNet.Handlers
         public async Task InitializeCommands()
         {
             _botClient.MessageReceived += HandleCommand;
-            await _commandService.AddModulesAsync(Assembly.GetEntryAssembly(), services: null);
+            await _commandService.AddModulesAsync(Assembly.GetEntryAssembly(), services: _services);
         }
 
         private async Task HandleCommand(SocketMessage msg) 
@@ -54,7 +53,7 @@ namespace AivaptDotNet.Handlers
             var commandTask = await _commandService.ExecuteAsync(
                 context: context,
                 argPos: argPos,
-                services: null
+                services: _services
             );
 
             // If the "normal" command is not available, the handler will check if a database command exists. If so, that command will be executed.
@@ -88,7 +87,7 @@ namespace AivaptDotNet.Handlers
 
                 string title = result.GetString("title");
                 string text = result.GetString("command_text");
-                Color color = ConverterHelper.HexToColor(result.GetString("color"));
+                Color color = SimpleConverter.HexToColor(result.GetString("color"));
 
                 EmbedBuilder builder = SimpleEmbed.MinimalEmbed(title, text);
                 builder.WithColor(color);

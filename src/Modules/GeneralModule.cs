@@ -6,12 +6,12 @@ using Discord.Commands;
 using Discord;
 
 using AivaptDotNet.Helpers;
-using AivaptDotNet.AivaptClases;
+using AivaptDotNet.DataClasses;
 
 
 namespace AivaptDotNet.Modules 
 {
-    public class GeneralModule : ModuleBase<AivaptCommandContext>
+    public class GeneralModule : ModuleBase<CommandContext>
     {
         [Command("test")]
         [Summary("Simple Test-Command")]
@@ -24,11 +24,9 @@ namespace AivaptDotNet.Modules
         [Summary("Information about the bot")]
         public async Task InfoCommand()
         {
-            //await Context.Channel.SendMessageAsync("", false, SimpleEmbed.ErrorEmbed("Text"));
-
             OperatingSystem os = Environment.OSVersion;
 
-            var botUser = Context.Client.GetUser(476002638169767936);
+            var botUser = await Context.Client.GetUserAsync(476002638169767936);
             EmbedBuilder builder = new EmbedBuilder();
 
             builder.WithTitle($"Information - {botUser.Username}");

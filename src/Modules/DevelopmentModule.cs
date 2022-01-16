@@ -10,13 +10,12 @@ using Discord.WebSocket;
 using Discord.Rest;
 
 using AivaptDotNet.Helpers;
-using AivaptDotNet.AivaptClases;
-using AivaptDotNet.AivaptClases.Json;
+using AivaptDotNet.DataClasses;
 
 namespace AivaptDotNet.Modules 
 {
     [Group("dev")]
-    public class DevelopmentModule: ModuleBase<AivaptCommandContext>
+    public class DevelopmentModule: ModuleBase<CommandContext>
     {
 
         [Command("latest")]

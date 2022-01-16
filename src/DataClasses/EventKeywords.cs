@@ -86,10 +86,10 @@ namespace AivaptDotNet.DataClasses
     {
         #region Constructors
 
-        public ButtonClickKeyword(ulong initialMsgId, ulong botReplyMsgId, ulong initialUserId, Func<SocketMessageComponent, Task> eventFunc, Dictionary<string, object> parameters) :
+        public ButtonClickKeyword(ulong initialMsgId, ulong botReplyMsgId, ulong initialUserId, Dictionary<string, object> parameters) :
             base(initialMsgId, botReplyMsgId, initialUserId, parameters)
         {
-            _eventFunc = eventFunc;
+
         }
 
         #endregion
@@ -100,6 +100,7 @@ namespace AivaptDotNet.DataClasses
         public Func<SocketMessageComponent, Task> EventFunc
         {
             get { return _eventFunc; }
+            set { _eventFunc = value; }
         }
 
         #endregion
