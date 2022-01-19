@@ -22,5 +22,11 @@ namespace AivaptDotNet.Helpers
             ulong adminId = Convert.ToUInt64(File.ReadAllText("admin_id.txt"));
             return adminId;
         }
+
+        public static string GetLavalinkPassword()
+        {
+            string lavalinkPassword = File.ReadAllText("lavalink_pass.txt");
+            return lavalinkPassword;
+        }
     }
 }

@@ -40,3 +40,36 @@ use it like a normal command:
 - ``cmd del [commandName]`` - delete an existing command
 - ``cmd all`` - displays all available "Simple Commands"
 
+## Setup
+### Discord Bot User
+First of all you need to create a bot Discord user. You can create your bot on
+[this website](https://discord.com/login?redirect_to=%2Fdevelopers%2Fapplications).
+You'll get a unique token which consists of 60 symbols. See [Credentials](#credentials)
+for further information. However, you probably want to adjust some permissions. I tested
+following selection and had now problems so far:
+<!-- TODO: add permissions -->
+
+### Database
+A MariaDB (MySQL should work too) connection is needed. You can find everything you
+need in the [Migrations folder](Migrations/). Follow the instructions in
+[Credentials](#credentials) for authentication.
+
+### Lavalink
+The audio module and respectively the whole audio service is based on
+[Lavalink](https://github.com/freyacodes/Lavalink). I'm using a wrapper for Discord .NET
+called [Victoria](https://github.com/Yucked/Victoria) to play any kind of audio. The bot
+connects to a running Lavalink server which needs to be configured via a simple file.
+You can find more about the configuration of Lavalink servers
+[here](https://github.com/freyacodes/Lavalink#server-configuration). Keep in mind that
+you also need to change the corresponding password. More about it in 
+[Credentials](#credentials).
+
+### Credentials
+At the moment I'm storing my credentials in simple .txt files. The exact files are:
+| Service   | File Name                 | Format                                                             |
+|-----------|---------------------------|--------------------------------------------------------------------|
+| MariaDB   | sql_connection_string.txt | server=localhost;port=3306;database=name;userid=user;password=pass |
+| Bot Token | token.txt                 | thisismytoken...                                                   |
+| Lavalink  | lavalink_pass.txt         | mypassword...                                                      |
+
+

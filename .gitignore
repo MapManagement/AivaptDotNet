@@ -3,7 +3,9 @@ src/obj/
 src/token.txt
 src/sql_connection_string.txt
 src/admin_id.txt
+src/lavalink_pass.txt
 src/bin
+src/Lavalink
 
 .vscode/
 vscode/*

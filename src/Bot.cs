@@ -84,7 +84,7 @@ namespace AivaptDotNet
             .AddSingleton<CacheService>()
             .AddSingleton<AudioService>()
             .AddSingleton<EventService>()
-            .AddLavaNode(x => { x.SelfDeaf = true; })
+            .AddLavaNode(x => { x.SelfDeaf = true; x.Authorization = Credentials.GetLavalinkPassword(); })
             .BuildServiceProvider();
         }
 
