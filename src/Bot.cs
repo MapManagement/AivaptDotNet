@@ -25,7 +25,7 @@ namespace AivaptDotNet
         private readonly CommandHandler _commandHandler;
         private readonly DatabaseService _dbService;
         private readonly CacheService _cacheService;
-        private readonly AudioService _audioService;
+        private readonly IAudioService _audioService;
         private readonly EventService _eventService;
         private readonly LavaNode _lavaNode;
 
@@ -40,7 +40,7 @@ namespace AivaptDotNet
             _commandHandler = _services.GetRequiredService<CommandHandler>();
             _dbService = _services.GetRequiredService<DatabaseService>();
             _cacheService = _services.GetRequiredService<CacheService>();
-            _audioService = _services.GetRequiredService<AudioService>();
+            _audioService = _services.GetRequiredService<IAudioService>();
             _eventService = _services.GetRequiredService<EventService>();
             _lavaNode = _services.GetRequiredService<LavaNode>();
 
@@ -82,7 +82,7 @@ namespace AivaptDotNet
             .AddSingleton<CommandHandler>()
             .AddSingleton<DatabaseService>()
             .AddSingleton<CacheService>()
-            .AddSingleton<AudioService>()
+            .AddSingleton<IAudioService, VictoriaAudioService>()
             .AddSingleton<EventService>()
             .AddLavaNode(x => { x.SelfDeaf = true; x.Authorization = Credentials.GetLavalinkPassword(); })
             .BuildServiceProvider();

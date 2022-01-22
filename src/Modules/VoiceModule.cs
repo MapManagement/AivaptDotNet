@@ -1,85 +1,74 @@
-using System;
 using System.Threading.Tasks;
-using System.IO;
-using System.Diagnostics;
-using System.Collections.ObjectModel;
-using System.Collections.Specialized ;
-using System.Collections.Generic;
 
-using YoutubeDLSharp;
-using YoutubeDLSharp.Options;
-using YoutubeDLSharp.Metadata;
+using AivaptDotNet.Services;
 
 using Discord;
-using Discord.Audio;
 using Discord.Commands;
-using Discord.Audio.Streams;
 
-using AivaptDotNet.AivaptClases;
+using Victoria;
 
 namespace AivaptDotNet.Modules 
 {
-    public class VoiceModules : ModuleBase<AivaptCommandContext>
+    public class VoiceModule : ModuleBase<CommandContext>
     {
+        #region Fields
 
-        #region Commands
-
-        [Command("join", RunMode = RunMode.Async)]
-        [Summary("Bot joins the voice channel")]
-        public async Task JoinCommand(IVoiceChannel channel = null)
-        {
-            channel = channel ?? (Context.User as IGuildUser)?.VoiceChannel;
-            if (channel == null) { await Context.Channel.SendMessageAsync("ERROR"); return; }
-
-            await Context.Client.ClientAudioManager.JoinVoiceChannel(channel);
-        }
-
-        [Command("leave", RunMode = RunMode.Async)]
-        [Summary("Bot leaves the voice channel")]
-        public async Task LeaveCommand()
-        {
-            Context.Client.ClientAudioManager.LeaveVoiceChannel();
-        }
-
-        [Command("play", RunMode = RunMode.Async)]
-        [Summary("Bot plays given audio")]
-        public async Task PlayCommand(string audioPath)
-        {
-            await Context.Client.ClientAudioManager.JoinVoiceChannel(Context.Guild, Context.User.Id);
-            if(Context.Client.ClientAudioManager.CurrentAudioClient == null) return;
-
-            bool success = Context.Client.ClientAudioManager.PlayAudio(audioPath);
-            if(!success)
-            {
-                await Context.Channel.SendMessageAsync("The specified link didn't lead to any valid source.");
-            }
-        }
-
-        [Command("skip", RunMode = RunMode.Async)]
-        [Summary("Skips current audio")]
-        public async Task SkipCommand()
-        {
-            Context.Client.ClientAudioManager.SkipAudio();
-            await Context.Channel.SendMessageAsync("Skipping audio...");
-        }
-
-        [Command("stop", RunMode = RunMode.Async)]
-        [Summary("Stops current audio")]
-        public async Task StopCommand()
-        {
-            //TODO: add stop method
-            await Context.Channel.SendMessageAsync("Stopping audio...");
-        }
-
-        [Command("continue", RunMode = RunMode.Async)]
-        [Summary("Continues playing audio")]
-        public async Task ContinueCommand()
-        {
-            //TODO: continue stop method
-            await Context.Channel.SendMessageAsync("Continuing...");
-        }
+        public IAudioService AudioService { get; set; }
 
         #endregion
 
+        #region Commands
+
+        [Command("join")]
+        public async Task JoinCommand()
+        {
+            var userChannel = ((IVoiceState)Context.User).VoiceChannel;
+
+            if(userChannel != null)
+            {
+                await AudioService.JoinAsync(userChannel);
+            }
+            else
+            {
+                await ReplyAsync("You're not connected to a voice channel!");
+            }
+        }
+
+        [Command("leave")]
+        public async Task LeaveCommand()
+        {
+            await AudioService.LeaveAsync(Context.Guild);
+        }
+
+        [Command("play")]
+        public async Task PlayCommand(string url)
+        {
+            var userChannel = ((IVoiceState)Context.User).VoiceChannel;
+            if(userChannel == null)
+                await ReplyAsync("You're not connected to a voice channel.");
+
+            var message = await AudioService.PlayAudioAsync(url, Context);
+            await ReplyAsync(message);
+        }
+
+        [Command("skip")]
+        public async Task SkipCommand()
+        {
+            //TODO: implement skip
+        }
+
+        [Command("stop")]
+        public async Task StopCommand()
+        {
+            //TODO: implement stop
+        }
+
+        [Command("continue")]
+        public async Task ContinueCommand()
+        {
+            //TODO: implement continue 
+        }
+
+        #endregion
     }
 }
