@@ -1,24 +1,24 @@
 using System;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using System.Threading;
 
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
-using Discord.Rest;
 
 using AivaptDotNet.Helpers;
-using AivaptDotNet.AivaptClases;
+using AivaptDotNet.Services;
+using AivaptDotNet.DataClasses;
 
 using MySql.Data.MySqlClient;
 
 namespace AivaptDotNet.Modules
 {
     [Group("cmd")]
-    public class SimpleCommandModule : ModuleBase<AivaptCommandContext>
+    public class SimpleCommandModule : ModuleBase<CommandContext>
     {
-        private MemoryCache Cache = new MemoryCache(0, "SimpleCommandModule", 120);
+        public DatabaseService DbService { get; set; }
+        public EventService EventService { get; set; }
 
         #region Modules
 
@@ -35,7 +35,7 @@ namespace AivaptDotNet.Modules
             param.Add("@TITLE", title);
             param.Add("@CREATOR", creator);
 
-            Context._dbConnector.ExecuteDML(sql, param);
+            DbService.ExecuteDML(sql, param);
 
             await Context.Channel.SendMessageAsync("Success!");
         }
@@ -50,7 +50,7 @@ namespace AivaptDotNet.Modules
             param.Add("@TEXT", text);
             param.Add("@TITLE", title);
 
-            Context._dbConnector.ExecuteDML(sql, param);
+            DbService.ExecuteDML(sql, param);
 
             await Context.Channel.SendMessageAsync("Success!");
         }
@@ -68,8 +68,8 @@ namespace AivaptDotNet.Modules
                 return;
             }
 
-            SocketGuildUser guildUser = Context.Guild.GetUser(Context.User.Id);
-            if (!IsUserMod(guildUser.Roles) && guildUser.Id != Context.Client.AdminUserId && cmdAuthorId != guildUser.Id)
+            IGuildUser guildUser = await Context.Guild.GetUserAsync(Context.User.Id);
+            if (!IsUserMod(guildUser.RoleIds) && guildUser.Id != Credentials.GetAdminId() && cmdAuthorId != guildUser.Id)
             {
                 await Context.Message.ReplyAsync("You do not have the permissions to delete this command!");
                 return;
@@ -88,13 +88,8 @@ namespace AivaptDotNet.Modules
             var confirmationMsg = await ReplyAsync(components: buttonComponent.Build(), embed: confirmationEmbed.Build());
 
             var parameters = new Dictionary<string, object>() { { "name", name } };
-            ButtonClickKeyword keywords = new ButtonClickKeyword(userMsgId, confirmationMsg.Id, guildUser.Id, ButtonExecuted_EventAsync, parameters);
-            Action clearAction = () => { Context.Client.ButtonExecuted -= ButtonExecuted_EventAsync; };
-            var item = new CacheKeyValue(confirmationMsg.Id.ToString(), keywords, DateTime.Now.AddMinutes(2), clearAction);
-            Cache.AddKeyValue(item);
-
-
-            Context.Client.ButtonExecuted += ButtonExecuted_EventAsync;
+            ButtonClickKeyword keyword = new ButtonClickKeyword(userMsgId, confirmationMsg.Id, guildUser.Id, parameters);
+            EventService.AddButtonEvent(keyword, confirmationMsg.Id.ToString());
         }
 
         [Command("all")]
@@ -107,7 +102,7 @@ namespace AivaptDotNet.Modules
 
             List<EmbedFieldBuilder> cmdDict = new List<EmbedFieldBuilder>();
 
-            using (var reader = Context._dbConnector.ExecuteSelect(sql, new Dictionary<string, object>()))
+            using (var reader = DbService.ExecuteSelect(sql, new Dictionary<string, object>()))
             {
                 if (reader.HasRows)
                 {
@@ -127,17 +122,17 @@ namespace AivaptDotNet.Modules
 
         #region Methods
 
-        private bool IsUserMod(IReadOnlyCollection<SocketRole> roles)
+        private bool IsUserMod(IReadOnlyCollection<ulong> roleIds)
         {
             var sqlParam = new Dictionary<string, object> { { "GUILD", Context.Guild.Id } };
             string sql = "select role_id from role where guild_id = @GUILD and mod_permissions = 1";
-            using (MySqlDataReader dbRoles = Context._dbConnector.ExecuteSelect(sql, sqlParam))
+            using (MySqlDataReader dbRoles = DbService.ExecuteSelect(sql, sqlParam))
             {
                 while (dbRoles.Read())
                 {
-                    foreach (var role in roles)
+                    foreach (var roleId in roleIds)
                     {
-                        if (role.Id == dbRoles.GetUInt64(0))
+                        if (roleId == dbRoles.GetUInt64(0))
                         {
                             return true;
                         }
@@ -153,7 +148,7 @@ namespace AivaptDotNet.Modules
             var param = new Dictionary<string, object>();
             param.Add("@COMMAND", commandName);
 
-            using (MySqlDataReader reader = Context._dbConnector.ExecuteSelect(sql, param))
+            using (MySqlDataReader reader = DbService.ExecuteSelect(sql, param))
             {
                 if (reader.HasRows)
                 {
@@ -164,74 +159,6 @@ namespace AivaptDotNet.Modules
                 }
             }
             return null;
-        }
-
-        #endregion
-
-        #region Events
-
-        private async Task ButtonExecuted_EventAsync(SocketMessageComponent arg)
-        {
-            ulong userId = arg.User.Id;
-            ulong messageId = arg.Message.Id;
-            var buttonId = arg.Data.CustomId;
-
-            var keyValue = Cache.GetKeyValue(messageId.ToString()) as CacheKeyValue;
-            var keywords = keyValue?.Value as ButtonClickKeyword;
-            if (keywords == null) return;
-
-            string commandName = keywords.Parameters["name"] as string;
-
-            if (messageId == keywords.BotReplyMsgId && (userId == keywords.InitialUserId))
-            {
-                if (buttonId == $"del-{keywords.InitialMsgId}")
-                {
-                    string sql = @"delete from simple_command where name = @NAME and creator = @CREATOR";
-                    var param = new Dictionary<string, object>();
-                    param.Add("@NAME", commandName);
-                    param.Add("@CREATOR", keywords.InitialUserId.ToString());
-
-                    Context._dbConnector.ExecuteDML(sql, param);
-
-                    await arg.UpdateAsync(x =>
-                    {
-                        x.Embed = SimpleEmbed.MinimalEmbed("Confirmation")
-                            .WithDescription("Command has been deleted!")
-                            .WithFooter(arg.User.Username, arg.User.GetAvatarUrl())
-                            .Build();
-
-                        var buttons = new List<ButtonBuilder>()
-                        {
-                            { new ButtonBuilder("Delete", $"del-dis", ButtonStyle.Danger, isDisabled: true) },
-                            { new ButtonBuilder("Cancel", $"cancel-dis", ButtonStyle.Secondary, isDisabled: true) }
-                        };
-                        var buttonComponent = SimpleComponents.MultipleButtons(buttons);
-                        x.Components = buttonComponent.Build();
-                    });
-
-                    Context.Client.ButtonExecuted -= ButtonExecuted_EventAsync;
-                }
-                else if (buttonId == $"cancel-{keywords.InitialMsgId}")
-                {
-                    await arg.UpdateAsync(x =>
-                    {
-                        x.Embed = SimpleEmbed.MinimalEmbed("Confirmation")
-                            .WithDescription("Cancelled!")
-                            .WithFooter(arg.User.Username, arg.User.GetAvatarUrl())
-                            .Build();
-
-                        var buttons = new List<ButtonBuilder>()
-                        {
-                            { new ButtonBuilder("Delete", $"del-dis", ButtonStyle.Danger, isDisabled: true) },
-                            { new ButtonBuilder("Cancel", $"cancel-dis", ButtonStyle.Secondary, isDisabled: true) }
-                        };
-                        var buttonComponent = SimpleComponents.MultipleButtons(buttons);
-                        x.Components = buttonComponent.Build();
-                    });
-
-                    Context.Client.ButtonExecuted -= ButtonExecuted_EventAsync;
-                }
-            }
         }
 
         #endregion

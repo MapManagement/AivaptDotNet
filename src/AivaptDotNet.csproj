@@ -6,12 +6,16 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Discord.Net" Version="3.1.0" />
+    <PackageReference Include="Discord.Net" Version="3.2.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
     <PackageReference Include="MySql.Data" Version="8.0.27" />
     <PackageReference Include="System.Data.SqlClient" Version="4.8.3" />
     <PackageReference Include="YoutubeDLSharp" Version="0.4.0" />
     <PackageReference Include="Victoria" Version="5.2.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Audapt\src\Audapt.csproj" /> <!--TODO: fix reference?-->
   </ItemGroup>
 
 </Project>
