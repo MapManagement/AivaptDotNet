@@ -37,13 +37,15 @@ namespace AivaptDotNet.Services
 
         public async Task<string> PlayAudioAsync(string url, CommandContext context)
         {
-            //TODO: implement play audio
             var player = _lavaNode.GetPlayer(context.Guild);
 
             if (!_lavaNode.HasPlayer(context.Guild))
             {
                 await JoinAsync(((IVoiceState)context.User).VoiceChannel);
             }
+
+            if(player == null)
+                return "Aivapt is currently not connected to any voice channel.";
 
             var urlResult = await _lavaNode.SearchAsync(SearchType.Direct, url);
 
@@ -69,19 +71,60 @@ namespace AivaptDotNet.Services
             return "Playing song...";
         }
 
-        public async Task SkipAudioAsync()
+        public async Task<string> SkipAudioAsync(CommandContext context)
         {
-            //TODO: implement skipd audio
+            var player = _lavaNode.GetPlayer(context.Guild);
+
+            if(player == null)
+                return "Aivapt is currently not connected to any voice channel.";
+
+            if(player.Queue.Count > 1)
+            {
+                var currentAudio = player.Track;
+                await player.SkipAsync();
+                return $"Skipped Audio: {currentAudio.Title}.";
+            }
+            else
+            {
+                return "No songs can be skipped.";
+            }
         }
 
-        public async Task StopAudioAsync()
+        public async Task<string> StopAudioAsync(CommandContext context)
         {
-            //TODO: implement stop audio
+            var player = _lavaNode.GetPlayer(context.Guild);
+
+            if(player == null)
+                return "Aivapt is currently not connected to any voice channel.";
+
+            if(player.PlayerState == PlayerState.Playing)
+            {
+                await player.PauseAsync();
+                return "Stopped playing.";
+            }
+            else
+            {
+                return "Aivapt is currently not playing any music.";
+            }
         }
 
-        public async Task ContinueAudioAsync()
+        public async Task<string> ContinueAudioAsync(CommandContext context)
         {
-            //TODO: implement continue audio
+
+            var player = _lavaNode.GetPlayer(context.Guild);
+
+            if(player == null)
+                return "Aivapt is currently not connected to any voice channel.";
+
+            if(player.PlayerState == PlayerState.Paused)
+            {
+                await player.ResumeAsync();
+                return "Continuing...";
+            }
+            else
+            {
+                return "Aivapt is currently not stopped.";
+            }
         }
     }
 }

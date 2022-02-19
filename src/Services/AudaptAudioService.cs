@@ -6,7 +6,7 @@ namespace AivaptDotNet.Services
 {
     public class AudaptAudioService : IAudioService
     {
-        public Task ContinueAudioAsync()
+        public Task<string> ContinueAudioAsync(CommandContext context)
         {
             throw new System.NotImplementedException();
         }
@@ -26,12 +26,12 @@ namespace AivaptDotNet.Services
             throw new System.NotImplementedException();
         }
 
-        public Task SkipAudioAsync()
+        public Task<string> SkipAudioAsync(CommandContext context)
         {
             throw new System.NotImplementedException();
         }
 
-        public Task StopAudioAsync()
+        public Task<string> StopAudioAsync(CommandContext context)
         {
             throw new System.NotImplementedException();
         }

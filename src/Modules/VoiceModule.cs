@@ -54,19 +54,22 @@ namespace AivaptDotNet.Modules
         [Command("skip")]
         public async Task SkipCommand()
         {
-            //TODO: implement skip
+            var message = await AudioService.SkipAudioAsync(Context);
+            await ReplyAsync(message);
         }
 
         [Command("stop")]
         public async Task StopCommand()
         {
-            //TODO: implement stop
+            var message = await AudioService.StopAudioAsync(Context);
+            await ReplyAsync(message);
         }
 
         [Command("continue")]
         public async Task ContinueCommand()
         {
-            //TODO: implement continue 
+            var message = await AudioService.ContinueAudioAsync(Context);
+            await ReplyAsync(message); 
         }
 
         #endregion
