@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Configuration;
 
 using Discord;
 using Discord.WebSocket;
@@ -19,15 +20,25 @@ namespace AivaptDotNet
     {
         #region Fields
         
-        private  IServiceProvider _services; 
+        private IServiceProvider _services; 
+
         private readonly DiscordSocketClient _botClient;
+
         private readonly CommandService _commands;
+
         private readonly CommandHandler _commandHandler;
+
         private readonly DatabaseService _dbService;
+
         private readonly CacheService _cacheService;
+
         private readonly IAudioService _audioService;
+
         private readonly EventService _eventService;
+
         private readonly LavaNode _lavaNode;
+
+        private Credentials _credentials;
 
         #endregion
 
@@ -35,6 +46,8 @@ namespace AivaptDotNet
 
         public Bot()
         {
+            GetConfiguration();
+
             ConfigureServices();
             _botClient = _services.GetRequiredService<DiscordSocketClient>();
             _commandHandler = _services.GetRequiredService<CommandHandler>();
@@ -60,11 +73,11 @@ namespace AivaptDotNet
 
         public async Task StartBot()
         {
-            await _botClient.LoginAsync(TokenType.Bot, Credentials.GetBotToken());
+            await _botClient.LoginAsync(TokenType.Bot, _credentials.BotToken);
             await _botClient.StartAsync();
 
             await _commandHandler.InitializeCommands();
-            await _dbService.Initialize(Credentials.GetDbConnection());
+            await _dbService.Initialize(_credentials.DbConnectionString);
             _cacheService.Initialize(120);
 
             await Task.Delay(-1);
@@ -84,8 +97,18 @@ namespace AivaptDotNet
             .AddSingleton<CacheService>()
             .AddSingleton<IAudioService, VictoriaAudioService>()
             .AddSingleton<EventService>()
-            .AddLavaNode(x => { x.SelfDeaf = true; x.Authorization = Credentials.GetLavalinkPassword(); })
+            .AddLavaNode(x => { x.SelfDeaf = true; x.Authorization = _credentials.LavalinkPassword; })
             .BuildServiceProvider();
+        }
+
+        private void GetConfiguration()
+        {
+            var config = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json")
+                .AddEnvironmentVariables()
+                .Build();
+            
+            _credentials = config.GetRequiredSection("Credentials").Get<Credentials>();
         }
 
         #endregion

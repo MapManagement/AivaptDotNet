@@ -3,30 +3,14 @@ using System.IO;
 
 namespace AivaptDotNet.Helpers
 {
-    static class Credentials
+    public class Credentials
     {
-        public static string GetBotToken()
-        {
-            string token = File.ReadAllText("token.txt");
-            return token;
-        }
+        public ulong AdminId { get; set; }
 
-        public static string GetDbConnection()
-        {
-            string dbConnection = File.ReadAllText("sql_connection_string.txt");
-            return dbConnection;
-        }
+        public string BotToken { get; set; }
 
-        public static ulong GetAdminId()
-        {
-            ulong adminId = Convert.ToUInt64(File.ReadAllText("admin_id.txt"));
-            return adminId;
-        }
+        public string DbConnectionString { get; set; }
 
-        public static string GetLavalinkPassword()
-        {
-            string lavalinkPassword = File.ReadAllText("lavalink_pass.txt");
-            return lavalinkPassword;
-        }
+        public string LavalinkPassword { get; set; }
     }
 }

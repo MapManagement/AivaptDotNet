@@ -69,7 +69,7 @@ namespace AivaptDotNet.Modules
             }
 
             IGuildUser guildUser = await Context.Guild.GetUserAsync(Context.User.Id);
-            if (!IsUserMod(guildUser.RoleIds) && guildUser.Id != Credentials.GetAdminId() && cmdAuthorId != guildUser.Id)
+            if (!IsUserMod(guildUser.RoleIds) && /*guildUser.Id != Credentials.GetAdminId() && */cmdAuthorId != guildUser.Id) //TODO: crdentials service?
             {
                 await Context.Message.ReplyAsync("You do not have the permissions to delete this command!");
                 return;

@@ -1,11 +1,8 @@
 src/bin/Debug/net5.0/
 src/obj/
-src/token.txt
-src/sql_connection_string.txt
-src/admin_id.txt
-src/lavalink_pass.txt
 src/bin
 src/Lavalink
+src/appsettings.json
 
 .vscode/
 vscode/*

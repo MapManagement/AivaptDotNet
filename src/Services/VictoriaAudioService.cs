@@ -33,6 +33,7 @@ namespace AivaptDotNet.Services
                 await player.StopAsync();
                 await _lavaNode.LeaveAsync(player.VoiceChannel);
             }
+            await _lavaNode.LeaveAsync(player.VoiceChannel);
         }
 
         public async Task<string> PlayAudioAsync(string url, CommandContext context)
