@@ -168,4 +168,13 @@ namespace AivaptDotNet.DataClasses
     }
 
     #endregion
+
+    #region Quote Class
+
+    public class Quote
+    {
+        //TODO: add properties
+    }
+
+    #endregion
 }

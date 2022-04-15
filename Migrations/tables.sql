@@ -21,3 +21,11 @@ CREATE TABLE guild (
   owner_id bigint(20) UNSIGNED NOT NULL,
   PRIMARY KEY (id)
 );
+
+CREATE TABLE quote (
+	id BIGINT UNSIGNED auto_increment NOT NULL,
+	user_id BIGINT UNSIGNED NOT NULL,
+	text varchar(400) NULL,
+	datetime DATETIME NOT NULL,
+  PRIMARY KEY (id)
+)

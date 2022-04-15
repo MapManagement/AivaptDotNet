@@ -29,11 +29,13 @@ namespace AivaptDotNet.Modules
             string creator = Context.User.Id.ToString();
 
             string sql = @"insert into simple_command (name, command_text, title, active, creator) values (@NAME, @TEXT, @TITLE, 1, @CREATOR)";
-            var param = new Dictionary<string, object>();
-            param.Add("@NAME", name);
-            param.Add("@TEXT", text);
-            param.Add("@TITLE", title);
-            param.Add("@CREATOR", creator);
+            var param = new Dictionary<string, object>()
+            {
+                { "QNAME", name },
+                { "@TEXT", text },
+                { "@TITLE", title },
+                { "@CREATOR", creator }
+            };
 
             DbService.ExecuteDML(sql, param);
 
