@@ -1,5 +1,5 @@
 using AivaptDotNet.DataClasses;
-using AivaptDotNet.Helpers;
+using AivaptDotNet.Helpers.General;
 
 using Discord;
 using Discord.WebSocket;

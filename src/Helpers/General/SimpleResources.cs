@@ -1,7 +1,7 @@
 using Discord;
 
 
-namespace AivaptDotNet.Helpers
+namespace AivaptDotNet.Helpers.General
 {
     public static class SimpleResources 
     {

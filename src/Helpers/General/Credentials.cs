@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 
-namespace AivaptDotNet.Helpers
+namespace AivaptDotNet.Helpers.General
 {
     public class Credentials
     {

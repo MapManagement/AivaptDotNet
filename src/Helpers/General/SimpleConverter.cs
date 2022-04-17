@@ -2,7 +2,7 @@ using System;
 
 using Discord;
 
-namespace AivaptDotNet.Helpers
+namespace AivaptDotNet.Helpers.General
 {
     public static class SimpleConverter
     {

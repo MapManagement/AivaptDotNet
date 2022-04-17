@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 using AivaptDotNet.DataClasses;
 
-namespace AivaptDotNet.Helpers
+namespace AivaptDotNet.Helpers.General
 {
     static class HttpRequests
     {

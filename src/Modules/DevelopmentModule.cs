@@ -9,7 +9,7 @@ using Discord.Commands;
 using Discord.WebSocket;
 using Discord.Rest;
 
-using AivaptDotNet.Helpers;
+using AivaptDotNet.Helpers.General;
 using AivaptDotNet.DataClasses;
 
 namespace AivaptDotNet.Modules 

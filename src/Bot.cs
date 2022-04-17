@@ -8,7 +8,7 @@ using Discord;
 using Discord.WebSocket;
 using Discord.Commands;
 
-using AivaptDotNet.Helpers;
+using AivaptDotNet.Helpers.General;
 using AivaptDotNet.Handlers;
 using AivaptDotNet.Services;
 

@@ -5,7 +5,7 @@ using System.IO;
 using Discord.Commands;
 using Discord;
 
-using AivaptDotNet.Helpers;
+using AivaptDotNet.Helpers.General;
 using AivaptDotNet.DataClasses;
 using Discord.WebSocket;
 using AivaptDotNet.Services;
@@ -22,7 +22,7 @@ namespace AivaptDotNet.Modules
         [Summary("Create a new quote")]
         public async Task NewQuoteCommand(SocketUser user, string quote)
         {   
-            string sql = "insert into quote (user_id, text, datetime) values (@USER_ID, @TEXT, sysdate())";
+            string sql = "insert into quote (user_id, text, created_at) values (@USER_ID, @TEXT, sysdate())";
             var param = new Dictionary<string, object>
             {
                 { "@USER_ID", user.Id },
@@ -54,12 +54,12 @@ namespace AivaptDotNet.Modules
             UInt64 id = result.GetUInt64("id");
             UInt64 userId = result.GetUInt64("user_id");
             string text = result.GetString("text");
-            DateTime dateTime = result.GetDateTime("datetime");
+            DateTime createdAt = result.GetDateTime("created_at");
 
             IUser user = await Context.Client.GetUserAsync(userId);
 
             EmbedBuilder builder = SimpleEmbed.MinimalEmbed($"#{id}", text);
-            builder.WithTimestamp(dateTime);
+            builder.WithTimestamp(createdAt);
             builder.WithAuthor(user.Username, user.GetAvatarUrl());
 
             await ReplyAsync("", false, builder.Build());

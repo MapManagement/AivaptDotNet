@@ -15,7 +15,7 @@ using Discord;
 using Discord.Audio;
 using Discord.WebSocket;
 
-namespace AivaptDotNet.Helpers
+namespace AivaptDotNet.Helpers.Modules
 {
     public class AudioManager
     {
