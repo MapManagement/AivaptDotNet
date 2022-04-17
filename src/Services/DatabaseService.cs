@@ -28,32 +28,40 @@ namespace AivaptDotNet.Services
             await _connection.OpenAsync();
         }
 
-        public MySqlDataReader ExecuteSelect(string commandString, Dictionary<string, object> commandParameters)
+        public MySqlDataReader ExecuteSelect(string commandString, Dictionary<string, object> commandParameters = null)
         {
             MySqlCommand command = new MySqlCommand(commandString, _connection);
 
-            foreach(var parameter in commandParameters)
+            if (commandParameters != null)
             {
-                MySqlDbType dbType = GetDbDataType(parameter.Value);
-                command.Parameters.AddWithValue(parameter.Key, parameter.Value);
-            }
+                foreach(var parameter in commandParameters)
+                {
+                    MySqlDbType dbType = GetDbDataType(parameter.Value);
+                    command.Parameters.AddWithValue(parameter.Key, parameter.Value);
+                }
 
-            command.Prepare();
+                command.Prepare();
+            }
+            
             var data = command.ExecuteReader();
             return data;
         }
 
-        public void ExecuteDML(string commandString, Dictionary<string, object> commandParameters)
+        public void ExecuteDML(string commandString, Dictionary<string, object> commandParameters = null)
         {
             MySqlCommand command = new MySqlCommand(commandString, _connection);
 
-            foreach(var parameter in commandParameters)
+            if (commandParameters != null)
             {
-                MySqlDbType dbType = GetDbDataType(parameter.Value);
-                command.Parameters.AddWithValue(parameter.Key, parameter.Value);
-            }
+                foreach(var parameter in commandParameters)
+                {
+                    MySqlDbType dbType = GetDbDataType(parameter.Value);
+                    command.Parameters.AddWithValue(parameter.Key, parameter.Value);
+                }
 
-            command.Prepare();
+                command.Prepare();
+            }
+            
             command.ExecuteNonQuery();
         }
         
@@ -68,6 +76,8 @@ namespace AivaptDotNet.Services
                 case TypeCode.String:
                     return MySqlDbType.VarChar;
                 case TypeCode.Decimal:
+                    return MySqlDbType.Decimal;
+                case TypeCode.Int32:
                     return MySqlDbType.Decimal;
                 case TypeCode.DateTime:
                     return MySqlDbType.DateTime;

@@ -10,7 +10,7 @@ namespace AivaptDotNet.DataClasses
 
     public class SimpleCommand
     {
-        #region Constructor
+        #region Constructors
 
         public SimpleCommand(string name, string text, string title, bool active, ulong creatorId)
         {
@@ -36,47 +36,17 @@ namespace AivaptDotNet.DataClasses
 
         #region Properties
 
-        private string _name;
-        public string Name
-        {
-            get { return _name; }
-            set { _name = value; }
-        }
+        public string Name { get; set; }
 
-        private string _text;
-        public string Text
-        {
-            get { return _text; }
-            set { _text = value; }
-        }
+        public string Text { get; set; }
 
-        private string _title;
-        public string Title
-        {
-            get { return _title; }
-            set { _title = value; }
-        }
+        public string Title { get; set; }
 
-        private bool _active;
-        public bool Active
-        {
-            get { return _active; }
-            set { _active = value; }
-        }
+        public bool Active { get; set; }
 
-        private ulong _creatorId;
-        public ulong CreatorId
-        {
-            get { return _creatorId; }
-            set { _creatorId = value; }
-        }
+        public ulong CreatorId { get; set; }
 
-        private string _color;
-        public string Color
-        {
-            get { return _color; }
-            set { _color = value; }
-        }
+        public string Color { get; set; }
 
         #endregion
     }
@@ -100,26 +70,11 @@ namespace AivaptDotNet.DataClasses
 
         #region Properties
 
-        private ulong _roleId;
-        public ulong RoleId
-        {
-            get { return _roleId; }
-            set { _roleId = value; }
-        }
+        public ulong RoleId { get; set; }
 
-        private ulong _guildId;
-        public ulong GuildId
-        {
-            get { return _guildId; }
-            set { _guildId = value; }
-        }
+        public ulong GuildId { get; set; }
         
-        private bool _modPermissions;
-        public bool ModPermissions
-        {
-            get { return _modPermissions; }
-            set { _modPermissions = value; }
-        }
+        public bool ModPermissions { get; set; }
 
         #endregion
     }
@@ -143,26 +98,11 @@ namespace AivaptDotNet.DataClasses
 
         #region Properties
 
-        private ulong _id;
-        public ulong Id
-        {
-            get { return _id; }
-            set { _id = value; } 
-        }
+        public ulong Id { get; set; }
 
-        private string _name;
-        public string Name
-        {
-            get { return _name; }
-            set { _name = value; }
-        }
+        public string Name { get; set; }
         
-        private ulong _ownerId;
-        public ulong OwnerId
-        {
-            get { return _ownerId; }
-            set { _ownerId = value; }
-        }
+        public ulong OwnerId { get; set; }
 
         #endregion
     }
@@ -173,7 +113,25 @@ namespace AivaptDotNet.DataClasses
 
     public class Quote
     {
-        //TODO: add properties
+        #region Constructors
+
+        public Quote(ulong id, ulong userId, string text, DateTime createdAt)
+        {
+            Id = id;
+            UserId = userId;
+            Text = text;
+            CreatedAt = createdAt;
+        }
+
+        #endregion
+
+        public ulong Id { get; set; }
+
+        public ulong UserId { get; set; }
+
+        public string Text { get; set; }
+
+        public DateTime CreatedAt { get; set; }
     }
 
     #endregion
