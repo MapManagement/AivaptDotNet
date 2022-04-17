@@ -6,6 +6,7 @@ using Discord.Commands;
 using Discord;
 
 using AivaptDotNet.Helpers.General;
+using AivaptDotNet.Helpers.Modules;
 using AivaptDotNet.DataClasses;
 using Discord.WebSocket;
 using AivaptDotNet.Services;
@@ -20,16 +21,9 @@ namespace AivaptDotNet.Modules
 
         [Command("new")]
         [Summary("Create a new quote")]
-        public async Task NewQuoteCommand(SocketUser user, string quote)
+        public async Task NewQuoteCommand(SocketUser user, string quoteText)
         {   
-            string sql = "insert into quote (user_id, text, created_at) values (@USER_ID, @TEXT, sysdate())";
-            var param = new Dictionary<string, object>
-            {
-                { "@USER_ID", user.Id },
-                { "@TEXT", quote },
-            };
-
-            DbService.ExecuteDML(sql, param);
+            QuoteHelper.InsertQuote(DbService, user, quoteText);
 
             await ReplyAsync("New quote has been created!");
         }
@@ -38,31 +32,47 @@ namespace AivaptDotNet.Modules
         [Summary("Returns a quote")]
         public async Task ShowQuoteCommand(int quoteId)
         {   
-            string sql = "select * from quote where id = @QUOTE_ID";
-            var param = new Dictionary<string, object>
-            {
-                { "@QUOTE_ID", quoteId }
-            };
+            Quote quote = QuoteHelper.GetQuote(DbService, quoteId);
 
-            using var result = DbService.ExecuteSelect(sql, param);
+            IUser user = await Context.Client.GetUserAsync(quote.UserId);
 
-            if(!result.HasRows)
-                await ReplyAsync($"There's no quote #{quoteId}");
+            if ( user == null)
+                return;
 
-            result.Read();
-
-            UInt64 id = result.GetUInt64("id");
-            UInt64 userId = result.GetUInt64("user_id");
-            string text = result.GetString("text");
-            DateTime createdAt = result.GetDateTime("created_at");
-
-            IUser user = await Context.Client.GetUserAsync(userId);
-
-            EmbedBuilder builder = SimpleEmbed.MinimalEmbed($"#{id}", text);
-            builder.WithTimestamp(createdAt);
+            EmbedBuilder builder = SimpleEmbed.MinimalEmbed($"#{quote.Id}", quote.Text);
+            builder.WithTimestamp(quote.CreatedAt);
             builder.WithAuthor(user.Username, user.GetAvatarUrl());
 
             await ReplyAsync("", false, builder.Build());
+
+        }
+
+        [Command("random")]
+        [Summary("Returns a random quote")]
+        public async Task ShowRandomQuoteCommand()
+        {   
+            Quote quote = QuoteHelper.GetRandomQuote(DbService);
+
+            IUser user = await Context.Client.GetUserAsync(quote.UserId);
+
+            if (user == null)
+                return;
+
+            EmbedBuilder builder = SimpleEmbed.MinimalEmbed($"#{quote.Id}", quote.Text);
+            builder.WithTimestamp(quote.CreatedAt);
+            builder.WithAuthor(user.Username, user.GetAvatarUrl());
+
+            await ReplyAsync("", false, builder.Build());
+
+        }
+
+        [Command("amount")]
+        [Summary("Returns the amount of quotes that exist")]
+        public async Task QuoteAmountCommand()
+        {   
+            int amount = QuoteHelper.GetAmountOfQuotes(DbService);
+
+            await ReplyAsync($"There are currently {amount} quotes.");
 
         }
     }

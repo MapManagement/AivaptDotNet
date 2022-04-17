@@ -50,17 +50,17 @@ namespace AivaptDotNet.Handlers
 
             try 
             {
-            var commandTask = await _commandService.ExecuteAsync(
-                context: context,
-                argPos: argPos,
-                services: _services
-            );
+                var commandTask = await _commandService.ExecuteAsync(
+                    context: context,
+                    argPos: argPos,
+                    services: _services
+                );
 
-            // If the "normal" command is not available, the handler will check if a database command exists. If so, that command will be executed.
-            if(!commandTask.IsSuccess)
-            {
-                await OnSimpleCommand(message);
-            }
+                // If the "normal" command is not available, the handler will check if a database command exists. If so, that command will be executed.
+                if(!commandTask.IsSuccess)
+                {
+                    await OnSimpleCommand(message);
+                }
 
             }
             catch(Exception e)

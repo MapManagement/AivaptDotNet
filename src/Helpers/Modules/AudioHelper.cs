@@ -17,10 +17,10 @@ using Discord.WebSocket;
 
 namespace AivaptDotNet.Helpers.Modules
 {
-    public class AudioManager
+    public class AudioHelper
     {
         #region Constructors
-        public AudioManager()
+        public AudioHelper()
         {
             AudioQueue = new ObservableCollection<FormatData>();
             AudioQueue.CollectionChanged += OnQueueChanged;
