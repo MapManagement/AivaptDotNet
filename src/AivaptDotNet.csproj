@@ -24,8 +24,4 @@
     <PackageReference Include="Victoria" Version="5.2.5" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\Audapt\src\Audapt.csproj" /> <!--TODO: fix reference?-->
-  </ItemGroup>
-
 </Project>

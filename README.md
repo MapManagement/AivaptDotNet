@@ -5,40 +5,12 @@ the other hand I really wanted use [Discord .NET](https://docs.stillu.cc/index.h
 this time instead of [discord.py](https://discordpy.readthedocs.io/en/stable/).
 Therefore I'm using C# and not Python anymore.
 
-## Modules
-I try to divide all fucntionalities in different modules. Not only to keep my code
-as clean as possible but also to ensure a better usability later on. For now there
-are these modules:
+## Commands
+The bot offers a wide range of built-in commands. In addition to them you can
+also create your own commands. I call them ``SimpleCommands``. A small guide
+for ``SimpleCommands`` and all built-in commands as well, are listed in
+[COMMANDS.md](docs/COMMANDS.md).
 
-### General
-Basic commands and information about the bot can be found here:
-- ``test`` - used for a basic repsonse
-- ``info`` - returns an embed that contains general information about the bot
-
-### Voice
-Contains anything that is related to oprations within a voice channel:
-- ``join`` - bot connects to current voice channel
-- ``leave`` - bot disconnects from current voice channel
-- ``play [songUrl]`` - bot uses the entered URL to play audio
-- ``skip`` - bot skips current audio
-- ``stop`` - bot stops playing current audio
-- ``continue`` - bot continues playing audio
-
-### Development
-These commands return information about current development stages:
-- ``dev latest`` - returns the latest commit
-- ``dev info`` - returns general information about the repository
-- ``dev release`` - returns the latest release
-- ``dev issue [issue_number]`` - returns the specific issue
-
-### Simple Command
-Users can also create their own commands which do only display a specific text given
-by the user. I called them **Simple Commands**. Once you created a command you can
-use it like a normal command:
-- ``cmd create [commandName] [title] [text]`` - create a new command
-- ``cmd edit [commandName] [newTitle] [newText]`` - edit an existing command
-- ``cmd del [commandName]`` - delete an existing command
-- ``cmd all`` - displays all available "Simple Commands"
 
 ## Setup
 ### Discord Bot User
@@ -65,11 +37,14 @@ you also need to change the corresponding password. More about it in
 [Credentials](#credentials).
 
 ### Credentials
-At the moment I'm storing my credentials in simple .txt files. The exact files are:
-| Service   | File Name                 | Format                                                             |
-|-----------|---------------------------|--------------------------------------------------------------------|
-| MariaDB   | sql_connection_string.txt | server=localhost;port=3306;database=name;userid=user;password=pass |
-| Bot Token | token.txt                 | thisismytoken...                                                   |
-| Lavalink  | lavalink_pass.txt         | mypassword...                                                      |
+My credentials are written down in an excluded file called ``appsettings.json`` in the ``/src``
+directory. It contains following key-value pairs:
+| Key                | Value                               |
+|:------------------:|:-----------------------------------:|
+| AdminId            | Discord admin-user ID               |
+| BotToken           | Discord bot token                   |
+| DbConnectionString | credentials for datebase connection |
+| LavalinkPassword   | Lavalink server password            |
+
 
 
