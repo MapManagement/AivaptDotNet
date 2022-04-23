@@ -104,11 +104,16 @@ namespace AivaptDotNet
         private void GetConfiguration()
         {
             var config = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.json")
-                .AddEnvironmentVariables()
+                .AddUserSecrets<Program>()
                 .Build();
             
-            _credentials = config.GetRequiredSection("Credentials").Get<Credentials>();
+            _credentials = new Credentials
+            {
+                AdminId = Convert.ToUInt64(config["ADMIN_ID"]),
+                BotToken = config["BOT_TOKEN"],
+                DbConnectionString = config["DB_CONNECTION_STRING"],
+                LavalinkPassword = config["LAVALINK_PASSWORD"]
+            };
         }
 
         #endregion
