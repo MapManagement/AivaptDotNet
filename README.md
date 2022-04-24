@@ -39,12 +39,12 @@ you also need to change the corresponding password. More about it in
 ### Credentials
 I'm using [user-secrets](https://docs.microsoft.com/en-us/aspnet/core/security/app-secrets?view=aspnetcore-6.0&tabs=linux)
 to store my credentials for development purposes. Following are the key-value pairs:
-| Key                  | Value                               |
-|:--------------------:|:-----------------------------------:|
-| ADMIN_ID             | Discord admin-user ID               |
-| BOT_TOKEN            | Discord bot token                   |
-| DB_CONNECTION_STRING | credentials for datebase connection |
-| LAVALINK_PASSWORD    | Lavalink server password            |
+| Key                          | Value                               |
+|:----------------------------:|:-----------------------------------:|
+| AIVAPT__ADMIN_ID             | Discord admin-user ID               |
+| AIVAPT__BOT_TOKEN            | Discord bot token                   |
+| AIVAPT__DB_CONNECTION_STRING | credentials for datebase connection |
+| AIVAPT__LAVALINK_PASSWORD    | Lavalink server password            |
 
 
 

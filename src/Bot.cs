@@ -105,14 +105,16 @@ namespace AivaptDotNet
         {
             var config = new ConfigurationBuilder()
                 .AddUserSecrets<Program>()
+                .AddEnvironmentVariables()
                 .Build();
+            var aivaptSection = config.GetSection("AIVAPT");
             
             _credentials = new Credentials
             {
-                AdminId = Convert.ToUInt64(config["ADMIN_ID"]),
-                BotToken = config["BOT_TOKEN"],
-                DbConnectionString = config["DB_CONNECTION_STRING"],
-                LavalinkPassword = config["LAVALINK_PASSWORD"]
+                AdminId = Convert.ToUInt64(aivaptSection["ADMIN_ID"]),
+                BotToken = aivaptSection["BOT_TOKEN"],
+                DbConnectionString = aivaptSection["DB_CONNECTION_STRING"],
+                LavalinkPassword = aivaptSection["LAVALINK_PASSWORD"]
             };
         }
 
