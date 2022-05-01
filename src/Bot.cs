@@ -104,7 +104,7 @@ namespace AivaptDotNet
         private void GetConfiguration()
         {
             var config = new ConfigurationBuilder()
-                .AddUserSecrets<Program>()
+                .AddUserSecrets<Program>(optional: true)
                 .AddEnvironmentVariables()
                 .Build();
             var aivaptSection = config.GetSection("AIVAPT");
