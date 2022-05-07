@@ -40,7 +40,7 @@ called [Victoria](https://github.com/Yucked/Victoria) to play any kind of audio.
 connects to a running Lavalink server which needs to be configured via a simple file.
 You can find more about the configuration of Lavalink servers
 [here](https://github.com/freyacodes/Lavalink#server-configuration). Keep in mind that
-you also need to change the corresponding password. More about it in 
+you also need to change the corresponding password. More about it in
 [Credentials](#credentials).
 
 ### Credentials

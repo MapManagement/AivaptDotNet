@@ -1,0 +1,30 @@
+version: "3.9"
+
+services:
+  mariadb:
+    container_name: MariaDB
+    image: mariadb
+    restart: always
+    environment:
+      MARIADB_USER: aivapt
+      MARIADB_PASSWORD: ${MARIADB_PASSWORD}
+      MARIADB_ROOT_PASSWORD: ${MARIADB_PASSWORD}
+      MARIADB_DATABASE: aivaptdotnet
+    ports:
+      - "3306:3306"
+
+  bot:
+    container_name: AivaptDotNet
+    image: bot
+    restart: always
+    environment:
+      AIVAPT__LAVALINK_PASSWORD: ${AIVAPT__LAVALINK_PASSWORD}
+      AIVAPT__DB_CONNECTION_STRING: ${AIVAPT__DB_CONNECTION_STRING}
+      AIVAPT__BOT_TOKEN: ${AIVAPT__BOT_TOKEN}
+      AIVAPT__ADMIN_ID: ${AIVAPT__ADMIN_ID}
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runtime
+    depends_on:
+      - mariadb
