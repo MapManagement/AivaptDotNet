@@ -26,6 +26,6 @@ CREATE TABLE quote (
 	id BIGINT UNSIGNED auto_increment NOT NULL,
 	user_id BIGINT UNSIGNED NOT NULL,
 	text varchar(400) NULL,
-	datetime DATETIME NOT NULL,
+	created_at DATETIME NOT NULL,
   PRIMARY KEY (id)
-)
+);

@@ -31,10 +31,10 @@ namespace AivaptDotNet.Modules
             string sql = @"insert into simple_command (name, command_text, title, active, creator) values (@NAME, @TEXT, @TITLE, 1, @CREATOR)";
             var param = new Dictionary<string, object>()
             {
-                { "QNAME", name },
+                { "@NAME", name },
                 { "@TEXT", text },
                 { "@TITLE", title },
-                { "@CREATOR", creator }
+                { "@CREATOR_ID", creator }
             };
 
             DbService.ExecuteDML(sql, param);
