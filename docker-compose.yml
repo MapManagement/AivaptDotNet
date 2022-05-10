@@ -11,7 +11,10 @@ services:
       MARIADB_ROOT_PASSWORD: ${MARIADB_PASSWORD}
       MARIADB_DATABASE: aivaptdotnet
     ports:
-      - "3306:3306"
+      - 3306:3306
+    volumes:
+      - /var/lib/mysql:/var/lib/mysql
+      - ./Migrations:/docker-entrypoint-initdb.d
 
   bot:
     container_name: AivaptDotNet
