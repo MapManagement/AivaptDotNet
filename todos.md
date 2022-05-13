@@ -1,7 +1,11 @@
 # ToDos
+
 ## Actual ToDos
-- [x] set bot status/activity
+
+- [ ] set bot status/activity
 - [ ] better queueing system for audio tracks
-- [ ] credential service
+- [ ] add fully working docker-compose file
+
 ## Ideas
+
 - use ability to stream screens/games?

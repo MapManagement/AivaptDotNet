@@ -15,12 +15,12 @@ Contains anything that is related to oprations within a voice channel:
 - ``leave`` - bot disconnects from current voice channel
 - ``play [songUrl]`` - bot uses the entered URL to play audio
 - ``skip`` - bot skips current audio
-- ``stop`` - bot stops playing current audio
-- ``continue`` - bot continues playing audio
+- ``stop`` - bot stops current audio
+- ``continue`` - bot continues current audio
 
 ## Development
 
-These commands return information about current development stages:
+These commands return information about current the development stage:
 
 - ``dev latest`` - returns the latest commit
 - ``dev info`` - returns general information about the repository
@@ -38,9 +38,8 @@ Create quotes of users on your Discord server:
 
 ## Simple Command
 
-Users can also create their own commands which do only display a specific text given
-by the user. I called them **Simple Commands**. Once you created a command you can
-use it like a normal command:
+Users can also create their own commands which display a specific text chosen by the user. I called them
+**Simple Commands**. Once you created a **Simple Command** you can use it like a normal command:
 
 - ``cmd create [commandName] [title] [text]`` - create a new command
 - ``cmd edit [commandName] [newTitle] [newText]`` - edit an existing command
