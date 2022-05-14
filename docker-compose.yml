@@ -16,6 +16,17 @@ services:
       - /var/lib/mysql:/var/lib/mysql
       - ./Migrations:/docker-entrypoint-initdb.d
 
+  lavalink:
+    container_name: Lavalink
+    image: fredboat/lavalink:dev
+    restart: always
+    environment:
+      AIVAPT__LAVALINK_PASSWORD: ${AIVAPT__LAVALINK_PASSWORD}
+    ports:
+      - 2333:2333
+    volumes:
+      - ./lavalink_config.yml:/opt/Lavalink/application.yml
+
   bot:
     container_name: AivaptDotNet
     image: bot
@@ -31,3 +42,4 @@ services:
       target: runtime
     depends_on:
       - mariadb
+      - lavalink
