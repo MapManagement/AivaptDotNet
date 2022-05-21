@@ -10,15 +10,36 @@ using Victoria.Responses.Search;
 
 namespace AivaptDotNet.Services
 {
-
     public class VictoriaAudioService : IAudioService
     {
+        #region Enums
+
+        enum TrackStatusResponse
+        {
+            AddingToQueue,
+            Playing
+        }   
+
+        #endregion
+
+        #region Fields
+
         private readonly LavaNode _lavaNode;
+
+        #endregion
+
+        #region Constructor
 
         public VictoriaAudioService(LavaNode lavaNode)
         {
             _lavaNode = lavaNode;
         }
+
+        #endregion
+
+        #region Methods
+
+        #region Public Methods
 
         public async Task JoinAsync(IVoiceChannel voiceChannel)
         {
@@ -28,11 +49,13 @@ namespace AivaptDotNet.Services
         public async Task LeaveAsync(IGuild guild)
         {
             var player = _lavaNode.GetPlayer(guild);
+
             if (player.PlayerState == Victoria.Enums.PlayerState.Playing)
             {
                 await player.StopAsync();
                 await _lavaNode.LeaveAsync(player.VoiceChannel);
             }
+
             await _lavaNode.LeaveAsync(player.VoiceChannel);
         }
 
@@ -45,31 +68,20 @@ namespace AivaptDotNet.Services
                 await JoinAsync(((IVoiceState)context.User).VoiceChannel);
             }
 
-            if(player == null)
+            if (player == null)
                 return "Aivapt is currently not connected to any voice channel.";
 
-            var urlResult = await _lavaNode.SearchAsync(SearchType.Direct, url);
+            var searchRepsonse = await GetSearchResponse(url);
 
-            if (urlResult.Status == SearchStatus.LoadFailed || urlResult.Status == SearchStatus.NoMatches)
-                return "Couldn't find any proper source.";
+            if(searchRepsonse == null)
+                return "Couldn't find that song!";
 
-            if (urlResult.Tracks.Count < 1)
-                return "Something went wrong...";
+            var trackResponse = await AddTrackToQueue((SearchResponse)searchRepsonse, player);
 
-            player.Queue.Enqueue(urlResult.Tracks.FirstOrDefault());
-
-            if (player.PlayerState is PlayerState.Playing or PlayerState.Paused)
-            {
-                return "Added source to queue.";
-            }
-
-            player.Queue.TryDequeue(out var lavaTrack);
-            await player.PlayAsync(x =>
-            {
-                x.Track = lavaTrack;
-                x.ShouldPause = false;
-            });
-            return "Playing song...";
+            if (trackResponse == TrackStatusResponse.AddingToQueue)
+                return "Added song to queue.";
+            else
+                return "Playing...";
         }
 
         public async Task<string> SkipAudioAsync(CommandContext context)
@@ -127,5 +139,45 @@ namespace AivaptDotNet.Services
                 return "Aivapt is currently not stopped.";
             }
         }
+
+        #endregion
+
+        #region Private Methods
+
+        private async Task<SearchResponse?> GetSearchResponse(string url)
+        {
+            var urlResult = await _lavaNode.SearchAsync(SearchType.Direct, url);
+
+            if (urlResult.Status == SearchStatus.LoadFailed ||
+                urlResult.Status == SearchStatus.NoMatches  ||
+                urlResult.Tracks.Count < 1)
+                return null;
+
+            return urlResult;
+        }
+
+        private async Task<TrackStatusResponse> AddTrackToQueue(SearchResponse searchResponse, LavaPlayer player)
+        {
+            player.Queue.Enqueue(searchResponse.Tracks.FirstOrDefault());
+
+            if (player.PlayerState is PlayerState.Playing or PlayerState.Paused)
+            {
+                return TrackStatusResponse.AddingToQueue;
+            }
+
+            player.Queue.TryDequeue(out var lavaTrack);
+
+            await player.PlayAsync(x =>
+            {
+                x.Track = lavaTrack;
+                x.ShouldPause = false;
+            });
+
+            return TrackStatusResponse.Playing;
+        }
+
+        #endregion
+
+        #endregion
     }
 }
