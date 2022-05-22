@@ -44,7 +44,7 @@ namespace AivaptDotNet.DataClasses
 
     public class EventKeyword : CacheKeyword
     {
-        #region Constructors
+        #region Constructor
 
         public EventKeyword(ulong initialMsgId, ulong botReplyMsgId, ulong initialUserId, Dictionary<string, object> parameters) : base(parameters)
         {
@@ -84,7 +84,7 @@ namespace AivaptDotNet.DataClasses
 
     public class ButtonClickKeyword : EventKeyword
     {
-        #region Constructors
+        #region Constructor
 
         public ButtonClickKeyword(ulong initialMsgId, ulong botReplyMsgId, ulong initialUserId, Dictionary<string, object> parameters) :
             base(initialMsgId, botReplyMsgId, initialUserId, parameters)

@@ -12,8 +12,6 @@ using System.Threading.Tasks;
 
 namespace AivaptDotNet.Services
 {
-
-
     public class EventService
     {
         #region Fields
@@ -37,6 +35,8 @@ namespace AivaptDotNet.Services
 
         #endregion
 
+        #region Methods
+
         #region Public Methods
 
         public void AddButtonEvent(ButtonClickKeyword keyword, string key)
@@ -47,6 +47,22 @@ namespace AivaptDotNet.Services
             _cacheService.AddKeyValue(item);
             _botClient.ButtonExecuted += ButtonExecuted_EventAsync;
         }
+
+        #endregion
+
+        #region Private Methods
+
+        private void CancelButtonEvent()
+        {
+
+        }
+
+        private void ExecuteButtonEVent()
+        {
+
+        }
+
+        #endregion
 
         #endregion
 

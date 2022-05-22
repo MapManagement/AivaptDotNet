@@ -13,8 +13,8 @@ namespace AivaptDotNet.Services
 
         private int _cycle;
         public List<CacheKeyValue> Cache;
-        private Task ClearTask;
-        private CancellationTokenSource CTokenSource;
+        private Task _clearTask;
+        private CancellationTokenSource _cTokenSource;
 
         #endregion
 
@@ -25,11 +25,11 @@ namespace AivaptDotNet.Services
             _cycle = cycle;
             Cache = new List<CacheKeyValue>();
 
-            CTokenSource = new CancellationTokenSource();
-            var cToken = CTokenSource.Token; 
+            _cTokenSource = new CancellationTokenSource();
+            var cToken = _cTokenSource.Token; 
 
-            ClearTask = new Task(ClearProcess, cToken);
-            ClearTask.Start();
+            _clearTask = new Task(ClearProcess, cToken);
+            _clearTask.Start();
         }
 
         public void AddKeyValue(CacheKeyValue keyValue)
@@ -64,7 +64,7 @@ namespace AivaptDotNet.Services
 
         public void StopClearProcess()
         {
-            CTokenSource.Cancel();
+            _cTokenSource.Cancel();
         }
 
         #endregion
@@ -73,10 +73,10 @@ namespace AivaptDotNet.Services
 
         private void ClearProcess()
         {
-            while(!CTokenSource.Token.IsCancellationRequested)
+            while(!_cTokenSource.Token.IsCancellationRequested)
             {
                 Thread.Sleep(_cycle * 1000);
-                var tempCache = new List<CacheKeyValue> (Cache);
+                var tempCache = new List<CacheKeyValue>(Cache);
                 foreach(var keyValue in tempCache)
                 {
                     if(DateTime.Now >= keyValue.DestroyAt)
@@ -87,7 +87,7 @@ namespace AivaptDotNet.Services
                 }
                 tempCache = null;
             }
-            CTokenSource.Dispose();
+            _cTokenSource.Dispose();
         }
 
         #endregion
