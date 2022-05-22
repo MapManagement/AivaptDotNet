@@ -11,48 +11,36 @@ using AivaptDotNet.Services;
 using AivaptDotNet.DataClasses;
 
 using MySql.Data.MySqlClient;
+using AivaptDotNet.Helpers.Modules;
 
 namespace AivaptDotNet.Modules
 {
     [Group("cmd")]
     public class SimpleCommandModule : ModuleBase<CommandContext>
     {
+        #region Properties
+
         public DatabaseService DbService { get; set; }
         public EventService EventService { get; set; }
 
-        #region Modules
+        #endregion
+
+        #region Commands
 
         [Command("create")]
         [Summary("Creates new simple command")]
-        public async Task CreateCmdCommand(string name, string title, [Remainder] string text)
+        public async Task CreateCmdCommand(string name, [Remainder] string text)
         {
-            string creator = Context.User.Id.ToString();
-
-            string sql = @"insert into simple_command (name, command_text, title, active, creator) values (@NAME, @TEXT, @TITLE, 1, @CREATOR)";
-            var param = new Dictionary<string, object>()
-            {
-                { "@NAME", name },
-                { "@TEXT", text },
-                { "@TITLE", title },
-                { "@CREATOR_ID", creator }
-            };
-
-            DbService.ExecuteDML(sql, param);
+            SimpleCommandHelper.CreateSimpleCommand(DbService, name, text, Context.User.Id);
 
             await Context.Channel.SendMessageAsync("Success!");
         }
 
         [Command("edit")]
         [Summary("Edits a simple command")]
-        public async Task EditCmdCommand(string name, string title, [Remainder] string text)
+        public async Task EditCmdCommand(string name, string title, [Remainder] string newText)
         {
-            string sql = @"update simple_command set title = @TITLE, command_text = @TEXT where name = @NAME";
-            var param = new Dictionary<string, object>();
-            param.Add("@NAME", name);
-            param.Add("@TEXT", text);
-            param.Add("@TITLE", title);
-
-            DbService.ExecuteDML(sql, param);
+            SimpleCommandHelper.EditSimpleCommand(DbService, name, newText);
 
             await Context.Channel.SendMessageAsync("Success!");
         }
@@ -62,20 +50,15 @@ namespace AivaptDotNet.Modules
         public async Task DeleteCmdCommand(string name)
         {
             ulong userMsgId = Context.Message.Id;
-            ulong? cmdAuthorId = GetCommandAuthor(name);
+            bool commandAvailable = SimpleCommandHelper.IsCommandAvailable(DbService, name);
 
-            if(cmdAuthorId == null)
+            if(!commandAvailable)
             {
                 await Context.Message.ReplyAsync("This command does not exist!");
                 return;
             }
 
             IGuildUser guildUser = await Context.Guild.GetUserAsync(Context.User.Id);
-            if (!IsUserMod(guildUser.RoleIds) && /*guildUser.Id != Credentials.GetAdminId() && */cmdAuthorId != guildUser.Id) //TODO: crdentials service?
-            {
-                await Context.Message.ReplyAsync("You do not have the permissions to delete this command!");
-                return;
-            }
 
             var buttons = new List<ButtonBuilder>()
             {
@@ -98,69 +81,17 @@ namespace AivaptDotNet.Modules
         [Summary("Shows all simple commands")]
         public async Task AllCmdsCommand()
         {
-            string creator = Context.User.Id.ToString();
+            var commands = SimpleCommandHelper.GetAllSimpleCommands(DbService);
+            List<EmbedFieldBuilder> embedFields = new List<EmbedFieldBuilder>();
 
-            string sql = @"select name, creator_id from simple_command";
-
-            List<EmbedFieldBuilder> cmdDict = new List<EmbedFieldBuilder>();
-
-            using (var reader = DbService.ExecuteSelect(sql, new Dictionary<string, object>()))
+            foreach (var command in commands.Keys)
             {
-                if (reader.HasRows)
-                {
-                    while (reader.Read())
-                    {
-                        ulong userId = reader.GetUInt64("creator_id");
-                        IUser user = await Context.Client.GetUserAsync(userId);
-                        cmdDict.Add(new EmbedFieldBuilder { Name = reader.GetString("name"), Value = user.Username });
-                    }
-                }
+                IUser user = await Context.Client.GetUserAsync(commands[command]);
+                embedFields.Add(new EmbedFieldBuilder { Name = command, Value = user.Username });
             }
-            EmbedBuilder builder = SimpleEmbed.FieldsEmbed("All User Commands", cmdDict);
+
+            EmbedBuilder builder = SimpleEmbed.FieldsEmbed("All User Commands", embedFields);
             await Context.Channel.SendMessageAsync("", false, builder.Build());
-        }
-
-        #endregion
-
-        #region Methods
-
-        private bool IsUserMod(IReadOnlyCollection<ulong> roleIds)
-        {
-            var sqlParam = new Dictionary<string, object> { { "GUILD", Context.Guild.Id } };
-            string sql = "select role_id from role where guild_id = @GUILD and mod_permissions = 1";
-            using (MySqlDataReader dbRoles = DbService.ExecuteSelect(sql, sqlParam))
-            {
-                while (dbRoles.Read())
-                {
-                    foreach (var roleId in roleIds)
-                    {
-                        if (roleId == dbRoles.GetUInt64(0))
-                        {
-                            return true;
-                        }
-                    }
-                }
-            }
-            return false;
-        }
-
-        private ulong? GetCommandAuthor(string commandName)
-        {
-            string sql = "select creator from simple_command where name = @COMMAND";
-            var param = new Dictionary<string, object>();
-            param.Add("@COMMAND", commandName);
-
-            using (MySqlDataReader reader = DbService.ExecuteSelect(sql, param))
-            {
-                if (reader.HasRows)
-                {
-                    while (reader.Read())
-                    {
-                        return reader.GetUInt64(0);
-                    }
-                }
-            }
-            return null;
         }
 
         #endregion

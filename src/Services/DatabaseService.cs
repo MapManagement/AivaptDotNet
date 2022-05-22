@@ -15,6 +15,8 @@ namespace AivaptDotNet.Services
 
         #endregion
 
+        #region Methods
+
         #region Public Methods
 
         public void Dispose()
@@ -44,6 +46,25 @@ namespace AivaptDotNet.Services
             }
             
             var data = command.ExecuteReader();
+            return data;
+        }
+
+        public object ExecuteScalar(string commandString, Dictionary<string, object> commandParameters = null)
+        {
+            MySqlCommand command = new MySqlCommand(commandString, _connection);
+
+            if (commandParameters != null)
+            {
+                foreach(var parameter in commandParameters)
+                {
+                    MySqlDbType dbType = GetDbDataType(parameter.Value);
+                    command.Parameters.AddWithValue(parameter.Key, parameter.Value);
+                }
+
+                command.Prepare();
+            }
+            
+            var data = command.ExecuteScalar();
             return data;
         }
 
@@ -85,6 +106,8 @@ namespace AivaptDotNet.Services
                     return MySqlDbType.VarChar;
             }
         }
+
+        #endregion
 
         #endregion
     }
