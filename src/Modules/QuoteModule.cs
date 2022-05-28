@@ -1,26 +1,22 @@
-using System;
 using System.Threading.Tasks;
-using System.IO;
 
-using Discord.Commands;
 using Discord;
+using Discord.Interactions;
+using Discord.WebSocket;
 
 using AivaptDotNet.Helpers.General;
 using AivaptDotNet.Helpers.Modules;
 using AivaptDotNet.DataClasses;
-using Discord.WebSocket;
 using AivaptDotNet.Services;
-using System.Collections.Generic;
 
 namespace AivaptDotNet.Modules 
 {
-    [Group("quote")]
-    public class QuoteModule : ModuleBase<CommandContext>
+    [Group("quote", "Manage quotes of different users on a server")]
+    public class QuoteModule : InteractionModuleBase<SocketInteractionContext>
     {
         public DatabaseService DbService { get; set; }
 
-        [Command("new")]
-        [Summary("Create a new quote")]
+        [SlashCommand("new", "Create a new quote.")]
         public async Task NewQuoteCommand(SocketUser user, string quoteText)
         {   
             QuoteHelper.InsertQuote(DbService, user, quoteText);
@@ -28,8 +24,7 @@ namespace AivaptDotNet.Modules
             await ReplyAsync("New quote has been created!");
         }
 
-        [Command("show")]
-        [Summary("Returns a quote")]
+        [SlashCommand("show", "Get a specific quote by ID.")]
         public async Task ShowQuoteCommand(int quoteId)
         {   
             Quote quote = QuoteHelper.GetQuote(DbService, quoteId);
@@ -47,8 +42,7 @@ namespace AivaptDotNet.Modules
 
         }
 
-        [Command("random")]
-        [Summary("Returns a random quote")]
+        [SlashCommand("random", "Get a random quote.")]
         public async Task ShowRandomQuoteCommand()
         {   
             Quote quote = QuoteHelper.GetRandomQuote(DbService);
@@ -66,8 +60,7 @@ namespace AivaptDotNet.Modules
 
         }
 
-        [Command("amount")]
-        [Summary("Returns the amount of quotes that exist")]
+        [SlashCommand("amount", "Get the amount of all quote that have been created so far.")]
         public async Task QuoteAmountCommand()
         {   
             int amount = QuoteHelper.GetAmountOfQuotes(DbService);

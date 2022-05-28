@@ -3,13 +3,13 @@ using System.Threading.Tasks;
 using AivaptDotNet.Services;
 
 using Discord;
-using Discord.Commands;
-
+using Discord.Interactions;
 using Victoria;
 
 namespace AivaptDotNet.Modules 
 {
-    public class VoiceModule : ModuleBase<CommandContext>
+    [Group("audio", "Any voice/audio related commands")]
+    public class VoiceModule : InteractionModuleBase<SocketInteractionContext>
     {
         #region Fields
 
@@ -19,7 +19,7 @@ namespace AivaptDotNet.Modules
 
         #region Commands
 
-        [Command("join")]
+        [SlashCommand("join", "Let the bot join your current voice channel.")]
         public async Task JoinCommand()
         {
             var userChannel = ((IVoiceState)Context.User).VoiceChannel;
@@ -34,13 +34,13 @@ namespace AivaptDotNet.Modules
             }
         }
 
-        [Command("leave")]
+        [SlashCommand("leave", "Disconnect the bot from a voice channel.")]
         public async Task LeaveCommand()
         {
             await AudioService.LeaveAsync(Context.Guild);
         }
 
-        [Command("play")]
+        [SlashCommand("play", "Play some audio.")]
         public async Task PlayCommand(string url)
         {
             var userChannel = ((IVoiceState)Context.User).VoiceChannel;
@@ -51,21 +51,21 @@ namespace AivaptDotNet.Modules
             await ReplyAsync(message);
         }
 
-        [Command("skip")]
+        [SlashCommand("skip", "Skip the current audio.")]
         public async Task SkipCommand()
         {
             var message = await AudioService.SkipAudioAsync(Context);
             await ReplyAsync(message);
         }
 
-        [Command("stop")]
+        [SlashCommand("stop", "Stop the current audio.")]
         public async Task StopCommand()
         {
             var message = await AudioService.StopAudioAsync(Context);
             await ReplyAsync(message);
         }
 
-        [Command("continue")]
+        [SlashCommand("continue", "Continue playing the current aduio.")]
         public async Task ContinueCommand()
         {
             var message = await AudioService.ContinueAudioAsync(Context);

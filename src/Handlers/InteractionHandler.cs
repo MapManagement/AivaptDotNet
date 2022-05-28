@@ -32,13 +32,14 @@ namespace AivaptDotNet.Handlers
 
         public async Task InitializeCommands()
         {
-            _botClient.InteractionCreated += HandleInteraction;
             await _interactionService.AddModulesAsync(Assembly.GetEntryAssembly(), services: _services);
+
+            _botClient.InteractionCreated += HandleInteraction;
         }
 
         private async Task HandleInteraction(SocketInteraction interaction) 
         {
-            if(interaction == null)
+            if (interaction == null)
                 return;
 
             var context = new SocketInteractionContext(_botClient, interaction);
@@ -48,7 +49,7 @@ namespace AivaptDotNet.Handlers
                 await _interactionService.ExecuteCommandAsync(context, _services);
 
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Embed errorEmbed = SimpleEmbed.ErrorEmbed(e.InnerException.ToString().Substring(0, 256));
                 await context.Channel.SendMessageAsync("", false, errorEmbed);

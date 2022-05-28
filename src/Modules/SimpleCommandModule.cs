@@ -1,20 +1,17 @@
-using System;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 
 using Discord;
-using Discord.Commands;
 
 using AivaptDotNet.Helpers.General;
 using AivaptDotNet.Services;
-using AivaptDotNet.DataClasses;
 
 using AivaptDotNet.Helpers.Modules;
 using Discord.Interactions;
 
 namespace AivaptDotNet.Modules
 {
-    [Discord.Interactions.Group("cmd", "Manage simple commands")]
+    [Group("cmd", "Manage simple commands")]
     public class SimpleCommandModule : InteractionModuleBase<SocketInteractionContext>
     {
         #region Fields
@@ -33,8 +30,8 @@ namespace AivaptDotNet.Modules
 
         #region Commands
 
-        [SlashCommand("create", "Create a new simplec command.")]
-        public async Task CreateCmdCommand(string name, [Remainder] string text)
+        [SlashCommand("create", "Create a new simple command.")]
+        public async Task CreateCmdCommand(string name, [Discord.Commands.Remainder] string text)
         {
             SimpleCommandHelper.CreateSimpleCommand(DbService, name, text, Context.User.Id);
 
@@ -42,7 +39,7 @@ namespace AivaptDotNet.Modules
         }
 
         [SlashCommand("edit", "Edit a specific simple command.")]
-        public async Task EditCmdCommand(string name, string title, [Remainder] string newText)
+        public async Task EditCmdCommand(string name, string title, [Discord.Commands.Remainder] string newText)
         {
             SimpleCommandHelper.EditSimpleCommand(DbService, name, newText);
 
@@ -68,7 +65,7 @@ namespace AivaptDotNet.Modules
 
             var buttons = new List<ButtonBuilder>()
             {
-                { new ButtonBuilder("Delete", deleteButtonId, ButtonStyle.Danger) },
+                { new ButtonBuilder(label: "Delete", customId: "test", style: ButtonStyle.Danger) },
                 { new ButtonBuilder("Cancel", QuoteCancelButtonId, ButtonStyle.Secondary) }
             };
             var buttonComponent = SimpleComponents.MultipleButtons(buttons);
@@ -80,11 +77,11 @@ namespace AivaptDotNet.Modules
 
         }
 
-        [ComponentInteraction(QuoteDeleteButtonId+"*,*")]
-        public async Task HandleButtonClick(string commandName, string authorId)
+        [ComponentInteraction("test")]
+        public async Task HandleButtonClick()
         {
             //TODO: check author-ID
-            SimpleCommandHelper.DeleteSimpleCommand(DbService, commandName); 
+            //SimpleCommandHelper.DeleteSimpleCommand(DbService, commandName); 
             await ReplyAsync("Command has been deleted.");
         }
 
