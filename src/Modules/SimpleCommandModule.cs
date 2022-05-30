@@ -52,7 +52,7 @@ namespace AivaptDotNet.Modules
             ulong userMsgId = Context.User.Id;
             bool commandAvailable = SimpleCommandHelper.IsCommandAvailable(DbService, name);
 
-            if(!commandAvailable)
+            if (!commandAvailable)
             {
                 await RespondAsync("This command does not exist!");
                 return;
@@ -77,6 +77,7 @@ namespace AivaptDotNet.Modules
 
         }
 
+        //TODO: not working yet
         [ComponentInteraction("test")]
         public async Task HandleButtonClick()
         {

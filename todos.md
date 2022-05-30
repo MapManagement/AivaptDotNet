@@ -2,10 +2,24 @@
 
 ## Actual ToDos
 
-- [ ] set bot status/activity
+### Deployment
+
+- [x] add fully working docker-compose file
+
+### Services
+
+- [ ] rework cache and event service
 - [ ] better queueing system for audio tracks
-- [ ] add fully working docker-compose file
+
+### Modules
+
+- [ ] add administration module
+
+### Miscellaneous
+
+- [ ] set bot status/activity
+- [ ] fix error embed
 
 ## Ideas
 
-- use ability to stream screens/games?
+- stream certain media if possible

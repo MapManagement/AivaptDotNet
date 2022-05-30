@@ -65,6 +65,7 @@ namespace AivaptDotNet
 
             _botClient.Ready += OnBotReady;
             _botClient.Log += Logging;
+            _commands.Log += Logging;
 
             DiscordSocketConfig clientConfig = new DiscordSocketConfig
             {
