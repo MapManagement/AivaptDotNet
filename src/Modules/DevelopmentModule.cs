@@ -11,6 +11,7 @@ using Discord.Rest;
 
 using AivaptDotNet.Helpers.General;
 using AivaptDotNet.DataClasses;
+using AivaptDotNet.Helpers.Modules;
 
 namespace AivaptDotNet.Modules 
 {
@@ -22,55 +23,46 @@ namespace AivaptDotNet.Modules
         [Summary("Sends information about the latest commit.")]
         public async Task LatestCommand()
         {
-            List<string> headersList = new List<string>() { "application/vnd.github.v3+json" };
-            string response = await HttpRequests.SimpleGetRequest(
-                "https://api.github.com/repos/mapmanagement/AivaptDotNet/commits?page=1&per_page=1",
-                headersList,
-                ".NET Foundation Repository Reporter"
-            );
+            Commit latestCommit = DevelopmentHelper.GetLatestCommit();
 
-            List<Commit> commitList = JsonSerializer.Deserialize<List<Commit>>(response);
-            Commit commit = commitList[0];
-            List<EmbedFieldBuilder> fields = new List<EmbedFieldBuilder>();
-            fields.Add(new EmbedFieldBuilder{Name = "Author", Value = commit.Author.Login, IsInline = false});
-            fields.Add(new EmbedFieldBuilder{Name = "Message", Value = commit.Details.Message, IsInline = false});
+            List<EmbedFieldBuilder> fields = new List<EmbedFieldBuilder>()
+            {
+                { new EmbedFieldBuilder{Name = "Author", Value = latestCommit.Author.Login, IsInline = false} },
+                { new EmbedFieldBuilder{Name = "Message", Value = latestCommit.Details.Message, IsInline = false} }
+            };
 
-            EmbedBuilder builder =  SimpleEmbed.FieldsEmbed($"{commit.SHA.Substring(0,8)}", fields);
-            builder.WithUrl(commit.URL);
-            builder.WithThumbnailUrl(commit.Author.AvatarUrl);
-            builder.WithColor(Color.Teal);
-            builder.WithFooter("Latest Commit");
+            EmbedBuilder builder =  SimpleEmbed.FieldsEmbed($"{latestCommit.SHA.Substring(0,8)}", fields)
+                .WithUrl(latestCommit.URL)
+                .WithThumbnailUrl(latestCommit.Author.AvatarUrl)
+                .WithColor(Color.Teal)
+                .WithFooter("Latest Commit");
 
-            await Context.Channel.SendMessageAsync("", false, builder.Build());
+            await Context.Channel.SendMessageAsync(String.Empty, false, builder.Build());
         }
 
         [Command("info")]
         [Summary("Sends general information about the project.")]
         public async Task InfoCommand()
         {
-            List<string> headersList = new List<string>() { "application/vnd.github.v3+json" };
-            string response = await HttpRequests.SimpleGetRequest(
-                "https://api.github.com/repos/mapmanagement/AivaptDotNet",
-                headersList,
-                ".NET Foundation Repository Reporter"
-            );
+            Repository repo = DevelopmentHelper.GetGeneralInformation();
 
-            Repository repo = JsonSerializer.Deserialize<Repository>(response);
-            List<EmbedFieldBuilder> fields = new List<EmbedFieldBuilder>();
-            fields.Add(new EmbedFieldBuilder{Name = "ID", Value = repo.ID ,IsInline = true});
-            fields.Add(new EmbedFieldBuilder{Name = "Created at", Value = repo.CreatedAt.ToString("HH:mm | dd.MM.yyyy") ,IsInline = true});
-            fields.Add(new EmbedFieldBuilder{Name = "Last updated", Value = repo.UpdatedAt.ToString("HH:mm | dd.MM.yyyy") ,IsInline = true});
-            fields.Add(new EmbedFieldBuilder{Name = "Languages", Value = repo.Language ,IsInline = true});
-            fields.Add(new EmbedFieldBuilder{Name = "Watchers", Value = repo.Watchers ,IsInline = true});
-            fields.Add(new EmbedFieldBuilder{Name = "Stars", Value = repo.Stars ,IsInline = true});
-            fields.Add(new EmbedFieldBuilder{Name = "Open issues", Value = repo.OpenIssues ,IsInline = true});
+            List<EmbedFieldBuilder> fields = new List<EmbedFieldBuilder>()
+            {
+                { new EmbedFieldBuilder{Name = "ID", Value = repo.ID ,IsInline = true} },
+                { new EmbedFieldBuilder{Name = "Created at", Value = repo.CreatedAt.ToString("HH:mm | dd.MM.yyyy") ,IsInline = true} },
+                { new EmbedFieldBuilder{Name = "Last updated", Value = repo.UpdatedAt.ToString("HH:mm | dd.MM.yyyy") ,IsInline = true} },
+                { new EmbedFieldBuilder{Name = "Languages", Value = repo.Language ,IsInline = true} },
+                { new EmbedFieldBuilder{Name = "Watchers", Value = repo.Watchers ,IsInline = true} },
+                { new EmbedFieldBuilder{Name = "Stars", Value = repo.Stars ,IsInline = true} },
+                { new EmbedFieldBuilder{Name = "Open issues", Value = repo.OpenIssues ,IsInline = true} }
+            };
+           
+            EmbedBuilder builder =  SimpleEmbed.FieldsEmbed(repo.Name, fields)
+                .WithUrl(repo.URL)
+                .WithColor(Color.Teal)
+                .WithFooter("General Info");
 
-            EmbedBuilder builder =  SimpleEmbed.FieldsEmbed(repo.Name, fields);
-            builder.WithUrl(repo.URL);
-            builder.WithColor(Color.Teal);
-            builder.WithFooter("General Info");
-
-            await Context.Channel.SendMessageAsync("", false, builder.Build());
+            await Context.Channel.SendMessageAsync(String.Empty, false, builder.Build());
         }
 
         [Command("release")]
