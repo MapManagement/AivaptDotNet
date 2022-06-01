@@ -7,12 +7,6 @@ namespace AivaptDotNet.Helpers.Modules
 {
     public static class SimpleCommandHelper
     {
-        #region Fields
-
-
-
-        #endregion
-
         #region Methods
 
         #region Public Methods

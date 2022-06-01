@@ -1,27 +1,20 @@
 using System;
 using System.Threading.Tasks;
-using System.IO;
 
-using Discord.Commands;
 using Discord;
-
-using AivaptDotNet.Helpers;
-using AivaptDotNet.DataClasses;
-
+using Discord.Interactions;
 
 namespace AivaptDotNet.Modules 
 {
-    public class GeneralModule : ModuleBase<CommandContext>
+    public class GeneralModule : InteractionModuleBase<SocketInteractionContext>
     {
-        [Command("test")]
-        [Summary("Simple Test-Command")]
+        [SlashCommand("test", "Check the bot connection.")]
         public async Task TestCommand()
         {   
             await Context.Channel.SendMessageAsync("Test");
         }
 
-        [Command("info")]
-        [Summary("Information about the bot")]
+        [SlashCommand("info", "Get general information about the bot.")]
         public async Task InfoCommand()
         {
             OperatingSystem os = Environment.OSVersion;

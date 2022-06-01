@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 
@@ -13,6 +14,7 @@ using AivaptDotNet.Handlers;
 using AivaptDotNet.Services;
 
 using Victoria;
+using Discord.Interactions;
 
 namespace AivaptDotNet 
 {
@@ -24,17 +26,19 @@ namespace AivaptDotNet
 
         private readonly DiscordSocketClient _botClient;
 
+        private readonly InteractionService _interactions;
+
+        private readonly InteractionHandler _interactionHandler;
+
         private readonly CommandService _commands;
 
         private readonly CommandHandler _commandHandler;
 
         private readonly DatabaseService _dbService;
 
-        private readonly CacheService _cacheService;
+        private readonly IMemoryCache _cacheService;
 
         private readonly IAudioService _audioService;
-
-        private readonly EventService _eventService;
 
         private readonly LavaNode _lavaNode;
 
@@ -50,15 +54,18 @@ namespace AivaptDotNet
 
             ConfigureServices();
             _botClient = _services.GetRequiredService<DiscordSocketClient>();
+            _commands = _services.GetRequiredService<CommandService>();
             _commandHandler = _services.GetRequiredService<CommandHandler>();
+            _interactions = _services.GetRequiredService<InteractionService>();
+            _interactionHandler = _services.GetRequiredService<InteractionHandler>();
             _dbService = _services.GetRequiredService<DatabaseService>();
-            _cacheService = _services.GetRequiredService<CacheService>();
+            _cacheService = _services.GetRequiredService<IMemoryCache>();
             _audioService = _services.GetRequiredService<IAudioService>();
-            _eventService = _services.GetRequiredService<EventService>();
             _lavaNode = _services.GetRequiredService<LavaNode>();
 
             _botClient.Ready += OnBotReady;
             _botClient.Log += Logging;
+            _commands.Log += Logging;
 
             DiscordSocketConfig clientConfig = new DiscordSocketConfig
             {
@@ -77,8 +84,8 @@ namespace AivaptDotNet
             await _botClient.StartAsync();
 
             await _commandHandler.InitializeCommands();
+            await _interactionHandler.InitializeCommands();
             await _dbService.Initialize(_credentials.DbConnectionString);
-            _cacheService.Initialize(120);
 
             await Task.Delay(-1);
         }
@@ -94,10 +101,11 @@ namespace AivaptDotNet
             .AddSingleton<CommandService>()
             .AddSingleton<CommandHandler>()
             .AddSingleton<DatabaseService>()
-            .AddSingleton<CacheService>()
+            .AddSingleton(x => new InteractionService(x.GetRequiredService<DiscordSocketClient>()))
+            .AddSingleton<InteractionHandler>()
             .AddSingleton<IAudioService, VictoriaAudioService>()
-            .AddSingleton<EventService>()
             .AddLavaNode(lc => { lc.SelfDeaf = true; lc.Authorization = _credentials.LavalinkPassword; lc.Hostname = "lavalink"; })
+            .AddMemoryCache()
             .BuildServiceProvider();
         }
 
@@ -131,6 +139,7 @@ namespace AivaptDotNet
         private async Task OnBotReady()
         {
             //await _botClient.SetActivityAsync(new DefaultActivity("Sudoku", "Almost finished..."));
+            await _interactions.RegisterCommandsToGuildAsync(832636487215874168); //TODO: read guild id from config
 
             if(!_lavaNode.IsConnected) await _lavaNode.ConnectAsync(); 
         }

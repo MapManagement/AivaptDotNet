@@ -1,12 +1,12 @@
 using System.Threading.Tasks;
 using Discord;
-using Discord.Commands;
+using Discord.Interactions;
 
 namespace AivaptDotNet.Services
 {
     public class AudaptAudioService : IAudioService
     {
-        public Task<string> ContinueAudioAsync(CommandContext context)
+        public Task<string> ContinueAudioAsync(SocketInteractionContext context)
         {
             throw new System.NotImplementedException();
         }
@@ -21,17 +21,17 @@ namespace AivaptDotNet.Services
             throw new System.NotImplementedException();
         }
 
-        public Task<string> PlayAudioAsync(string url, CommandContext context)
+        public Task<string> PlayAudioAsync(string url, SocketInteractionContext context)
         {
             throw new System.NotImplementedException();
         }
 
-        public Task<string> SkipAudioAsync(CommandContext context)
+        public Task<string> SkipAudioAsync(SocketInteractionContext context)
         {
             throw new System.NotImplementedException();
         }
 
-        public Task<string> StopAudioAsync(CommandContext context)
+        public Task<string> StopAudioAsync(SocketInteractionContext context)
         {
             throw new System.NotImplementedException();
         }

@@ -5,22 +5,19 @@ using System.Text.Json;
 using System.Net.Http;
 
 using Discord;
-using Discord.Commands;
-using Discord.WebSocket;
-using Discord.Rest;
 
 using AivaptDotNet.Helpers.General;
 using AivaptDotNet.DataClasses;
 using AivaptDotNet.Helpers.Modules;
+using Discord.Interactions;
 
 namespace AivaptDotNet.Modules 
 {
-    [Group("dev")]
-    public class DevelopmentModule: ModuleBase<CommandContext>
+    [Group("dev", "Check the developtment status of the AivaptDotNet GitHub repository")]
+    public class DevelopmentModule: InteractionModuleBase<SocketInteractionContext>
     {
 
-        [Command("latest")]
-        [Summary("Sends information about the latest commit.")]
+        [SlashCommand("latest", "Get the latest changes.")]
         public async Task LatestCommand()
         {
             Commit latestCommit = DevelopmentHelper.GetLatestCommit();
@@ -40,8 +37,7 @@ namespace AivaptDotNet.Modules
             await Context.Channel.SendMessageAsync(String.Empty, false, builder.Build());
         }
 
-        [Command("info")]
-        [Summary("Sends general information about the project.")]
+        [SlashCommand("info", "Get general information about the repository.")]
         public async Task InfoCommand()
         {
             Repository repo = DevelopmentHelper.GetGeneralInformation();
@@ -65,8 +61,7 @@ namespace AivaptDotNet.Modules
             await Context.Channel.SendMessageAsync(String.Empty, false, builder.Build());
         }
 
-        [Command("release")]
-        [Summary("Sends the latest release of the bot.")]
+        [SlashCommand("release", "Get information about the latest release.")]
         public async Task ReleaseCommand()
         {
             string response;
@@ -103,8 +98,7 @@ namespace AivaptDotNet.Modules
             await Context.Channel.SendMessageAsync("", false, builder.Build());
         }
 
-        [Command("issue")]
-        [Summary("Sends corresponding issue")]
+        [SlashCommand("issue", "Get a specific issues by its number.")]
         public async Task IssueCommand(int number)
         {
             string response;

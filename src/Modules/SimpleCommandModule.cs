@@ -1,84 +1,92 @@
-using System;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 
 using Discord;
-using Discord.Commands;
-using Discord.WebSocket;
 
 using AivaptDotNet.Helpers.General;
 using AivaptDotNet.Services;
-using AivaptDotNet.DataClasses;
 
-using MySql.Data.MySqlClient;
 using AivaptDotNet.Helpers.Modules;
+using Discord.Interactions;
 
 namespace AivaptDotNet.Modules
 {
-    [Group("cmd")]
-    public class SimpleCommandModule : ModuleBase<CommandContext>
+    [Group("cmd", "Manage simple commands")]
+    public class SimpleCommandModule : InteractionModuleBase<SocketInteractionContext>
     {
+        #region Fields
+
+        const string QuoteDeleteButtonId = "qdelete:";
+        const string QuoteCancelButtonId = "qcancel:";
+
+
+        #endregion
+
         #region Properties
 
         public DatabaseService DbService { get; set; }
-        public EventService EventService { get; set; }
 
         #endregion
 
         #region Commands
 
-        [Command("create")]
-        [Summary("Creates new simple command")]
-        public async Task CreateCmdCommand(string name, [Remainder] string text)
+        [SlashCommand("create", "Create a new simple command.")]
+        public async Task CreateCmdCommand(string name, [Discord.Commands.Remainder] string text)
         {
             SimpleCommandHelper.CreateSimpleCommand(DbService, name, text, Context.User.Id);
 
             await Context.Channel.SendMessageAsync("Success!");
         }
 
-        [Command("edit")]
-        [Summary("Edits a simple command")]
-        public async Task EditCmdCommand(string name, string title, [Remainder] string newText)
+        [SlashCommand("edit", "Edit a specific simple command.")]
+        public async Task EditCmdCommand(string name, string title, [Discord.Commands.Remainder] string newText)
         {
             SimpleCommandHelper.EditSimpleCommand(DbService, name, newText);
 
             await Context.Channel.SendMessageAsync("Success!");
         }
 
-        [Command("del")]
-        [Summary("Deletes a simple command")]
+        [SlashCommand("del", "Delete a specific simple command.")]
         public async Task DeleteCmdCommand(string name)
         {
-            ulong userMsgId = Context.Message.Id;
+            ulong userMsgId = Context.User.Id;
             bool commandAvailable = SimpleCommandHelper.IsCommandAvailable(DbService, name);
 
-            if(!commandAvailable)
+            if (!commandAvailable)
             {
-                await Context.Message.ReplyAsync("This command does not exist!");
+                await RespondAsync("This command does not exist!");
                 return;
             }
 
-            IGuildUser guildUser = await Context.Guild.GetUserAsync(Context.User.Id);
+            IGuildUser guildUser = Context.Guild.GetUser(Context.User.Id);
+
+            //TODO: build button-ID
+            var deleteButtonId = $"{QuoteDeleteButtonId}{name},{userMsgId}";
 
             var buttons = new List<ButtonBuilder>()
             {
-                { new ButtonBuilder("Delete", $"del-{userMsgId}", ButtonStyle.Danger) },
-                { new ButtonBuilder("Cancel", $"cancel-{userMsgId}", ButtonStyle.Secondary) }
+                { new ButtonBuilder(label: "Delete", customId: "test", style: ButtonStyle.Danger) },
+                { new ButtonBuilder("Cancel", QuoteCancelButtonId, ButtonStyle.Secondary) }
             };
             var buttonComponent = SimpleComponents.MultipleButtons(buttons);
 
             EmbedBuilder confirmationEmbed = SimpleEmbed.MinimalEmbed("Confirmation");
             confirmationEmbed.WithDescription("Do you want to delete this command?");
 
-            var confirmationMsg = await ReplyAsync(components: buttonComponent.Build(), embed: confirmationEmbed.Build());
+            await RespondAsync(components: buttonComponent.Build(), embed: confirmationEmbed.Build());
 
-            var parameters = new Dictionary<string, object>() { { "name", name } };
-            ButtonClickKeyword keyword = new ButtonClickKeyword(userMsgId, confirmationMsg.Id, guildUser.Id, parameters);
-            EventService.AddButtonEvent(keyword, confirmationMsg.Id.ToString());
         }
 
-        [Command("all")]
-        [Summary("Shows all simple commands")]
+        //TODO: not working yet
+        [ComponentInteraction("test")]
+        public async Task HandleButtonClick()
+        {
+            //TODO: check author-ID
+            //SimpleCommandHelper.DeleteSimpleCommand(DbService, commandName); 
+            await ReplyAsync("Command has been deleted.");
+        }
+
+        [SlashCommand("all", "Get a list of all simple commands")]
         public async Task AllCmdsCommand()
         {
             var commands = SimpleCommandHelper.GetAllSimpleCommands(DbService);

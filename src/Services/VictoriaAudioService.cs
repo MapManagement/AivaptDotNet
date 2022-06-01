@@ -2,8 +2,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 using Discord;
-using Discord.Commands;
-
+using Discord.Interactions;
 using Victoria;
 using Victoria.Enums;
 using Victoria.Responses.Search;
@@ -59,7 +58,7 @@ namespace AivaptDotNet.Services
             await _lavaNode.LeaveAsync(player.VoiceChannel);
         }
 
-        public async Task<string> PlayAudioAsync(string url, CommandContext context)
+        public async Task<string> PlayAudioAsync(string url, SocketInteractionContext context)
         {
             var player = _lavaNode.GetPlayer(context.Guild);
 
@@ -84,7 +83,7 @@ namespace AivaptDotNet.Services
                 return "Playing...";
         }
 
-        public async Task<string> SkipAudioAsync(CommandContext context)
+        public async Task<string> SkipAudioAsync(SocketInteractionContext context)
         {
             var player = _lavaNode.GetPlayer(context.Guild);
 
@@ -103,7 +102,7 @@ namespace AivaptDotNet.Services
             }
         }
 
-        public async Task<string> StopAudioAsync(CommandContext context)
+        public async Task<string> StopAudioAsync(SocketInteractionContext context)
         {
             var player = _lavaNode.GetPlayer(context.Guild);
 
@@ -121,7 +120,7 @@ namespace AivaptDotNet.Services
             }
         }
 
-        public async Task<string> ContinueAudioAsync(CommandContext context)
+        public async Task<string> ContinueAudioAsync(SocketInteractionContext context)
         {
 
             var player = _lavaNode.GetPlayer(context.Guild);
