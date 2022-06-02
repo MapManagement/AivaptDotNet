@@ -9,18 +9,18 @@ namespace AivaptDotNet.Helpers.General
 {
     static class HttpRequests
     {
-        public static async Task<string> SimpleGetRequest(string url, List<string> headers, string userAgent)
+        public static async Task<string> SimpleGetRequest(HttpRequestParameters requestParameters)
         {
             using(HttpClient client = new HttpClient())
             {
                 client.DefaultRequestHeaders.Accept.Clear();
-                foreach(string header in headers)
+                foreach(string header in requestParameters.Headers)
                 {
                     client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(header));
                 }
-                client.DefaultRequestHeaders.Add("User-Agent", userAgent);
+                client.DefaultRequestHeaders.Add("User-Agent", requestParameters.UserAgent);
 
-                string repoTask = await client.GetStringAsync(url);
+                string repoTask = await client.GetStringAsync(requestParameters.RequestUrl);
                 return repoTask;
             }
         }
