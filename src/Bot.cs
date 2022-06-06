@@ -122,7 +122,8 @@ namespace AivaptDotNet
                 AdminId = Convert.ToUInt64(aivaptSection["ADMIN_ID"]),
                 BotToken = aivaptSection["BOT_TOKEN"],
                 DbConnectionString = aivaptSection["DB_CONNECTION_STRING"],
-                LavalinkPassword = aivaptSection["LAVALINK_PASSWORD"]
+                LavalinkPassword = aivaptSection["LAVALINK_PASSWORD"],
+                DebugGuildId = Convert.ToUInt64(aivaptSection["DEBUG_GUILD_ID"])
             };
         }
 
@@ -139,7 +140,12 @@ namespace AivaptDotNet
         private async Task OnBotReady()
         {
             //await _botClient.SetActivityAsync(new DefaultActivity("Sudoku", "Almost finished..."));
-            await _interactions.RegisterCommandsToGuildAsync(832636487215874168); //TODO: read guild id from config
+            await _interactions.RegisterCommandsGloballyAsync();
+
+            if (_credentials.DebugGuildId != null || _credentials.DebugGuildId != 0)
+            {
+                await _interactions.RegisterCommandsToGuildAsync((ulong)_credentials.DebugGuildId);
+            }
 
             if(!_lavaNode.IsConnected) await _lavaNode.ConnectAsync(); 
         }

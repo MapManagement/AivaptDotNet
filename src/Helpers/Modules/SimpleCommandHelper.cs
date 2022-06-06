@@ -64,7 +64,7 @@ namespace AivaptDotNet.Helpers.Modules
 
         public static void DeleteSimpleCommand(DatabaseService dbService, string name)
         {
-            //TODO: rework permissiond and guild system
+            //TODO: rework permission and guild system
 
             //TODO: work in progress
         }
