@@ -44,6 +44,7 @@ namespace AivaptDotNet.Modules
         public async Task PlayCommand(string url)
         {
             var userChannel = ((IVoiceState)Context.User).VoiceChannel;
+            
             if(userChannel == null)
                 await ReplyAsync("You're not connected to a voice channel.");
 

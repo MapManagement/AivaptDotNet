@@ -20,15 +20,15 @@ namespace AivaptDotNet.Modules
             OperatingSystem os = Environment.OSVersion;
 
             var botUser = await Context.Client.GetUserAsync(476002638169767936);
-            EmbedBuilder builder = new EmbedBuilder();
+            
+            EmbedBuilder builder = new EmbedBuilder()
+                .WithTitle($"Information - {botUser.Username}")
+                .AddField("Server OS", os.VersionString.ToString(), false)
+                .AddField("Created at", botUser.CreatedAt.ToString("HH:mm | dd.MM.yyyy"), false)
+                .AddField("User ID", botUser.Id, false)
+                .WithThumbnailUrl(botUser.GetAvatarUrl())
+                .WithColor(Color.Teal);
 
-            builder.WithTitle($"Information - {botUser.Username}");
-            builder.AddField("Server OS", os.VersionString.ToString(), false);
-            builder.AddField("Created at", botUser.CreatedAt.ToString("HH:mm | dd.MM.yyyy"), false);
-            builder.AddField("User ID", botUser.Id, false);
-            builder.WithThumbnailUrl(botUser.GetAvatarUrl());
-
-            builder.WithColor(Color.Teal);
             await Context.Channel.SendMessageAsync("", false, builder.Build());
         }
     }

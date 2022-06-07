@@ -14,10 +14,12 @@ namespace AivaptDotNet.Helpers.General
             using(HttpClient client = new HttpClient())
             {
                 client.DefaultRequestHeaders.Accept.Clear();
+
                 foreach(string header in requestParameters.Headers)
                 {
                     client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(header));
                 }
+                
                 client.DefaultRequestHeaders.Add("User-Agent", requestParameters.UserAgent);
 
                 string repoTask = await client.GetStringAsync(requestParameters.RequestUrl);

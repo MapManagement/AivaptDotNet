@@ -19,7 +19,6 @@ namespace AivaptDotNet.Modules
         const string QuoteDeleteButtonId = "qdelete:";
         const string QuoteCancelButtonId = "qcancel:";
 
-
         #endregion
 
         #region Properties

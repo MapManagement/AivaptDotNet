@@ -53,6 +53,7 @@ namespace AivaptDotNet
             GetConfiguration();
 
             ConfigureServices();
+
             _botClient = _services.GetRequiredService<DiscordSocketClient>();
             _commands = _services.GetRequiredService<CommandService>();
             _commandHandler = _services.GetRequiredService<CommandHandler>();
@@ -75,6 +76,8 @@ namespace AivaptDotNet
         }
 
         #endregion
+
+        #region Methods
 
         #region Public Methods
 
@@ -129,6 +132,8 @@ namespace AivaptDotNet
 
         #endregion
 
+        #endregion
+
         #region Events
 
         private Task Logging(LogMessage msg)
@@ -143,11 +148,10 @@ namespace AivaptDotNet
             await _interactions.RegisterCommandsGloballyAsync();
 
             if (_credentials.DebugGuildId != null || _credentials.DebugGuildId != 0)
-            {
                 await _interactions.RegisterCommandsToGuildAsync((ulong)_credentials.DebugGuildId);
-            }
 
-            if(!_lavaNode.IsConnected) await _lavaNode.ConnectAsync(); 
+            if(!_lavaNode.IsConnected)
+                await _lavaNode.ConnectAsync(); 
         }
 
         #endregion
