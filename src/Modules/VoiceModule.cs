@@ -30,7 +30,7 @@ namespace AivaptDotNet.Modules
             }
             else
             {
-                await ReplyAsync("You're not connected to a voice channel!");
+                await RespondAsync("You're not connected to a voice channel!");
             }
         }
 
@@ -46,31 +46,31 @@ namespace AivaptDotNet.Modules
             var userChannel = ((IVoiceState)Context.User).VoiceChannel;
             
             if(userChannel == null)
-                await ReplyAsync("You're not connected to a voice channel.");
+                await RespondAsync("You're not connected to a voice channel.");
 
             var message = await AudioService.PlayAudioAsync(url, Context);
-            await ReplyAsync(message);
+            await RespondAsync(message);
         }
 
         [SlashCommand("skip", "Skip the current audio.")]
         public async Task SkipCommand()
         {
             var message = await AudioService.SkipAudioAsync(Context);
-            await ReplyAsync(message);
+            await RespondAsync(message);
         }
 
         [SlashCommand("stop", "Stop the current audio.")]
         public async Task StopCommand()
         {
             var message = await AudioService.StopAudioAsync(Context);
-            await ReplyAsync(message);
+            await RespondAsync(message);
         }
 
         [SlashCommand("continue", "Continue playing the current aduio.")]
         public async Task ContinueCommand()
         {
             var message = await AudioService.ContinueAudioAsync(Context);
-            await ReplyAsync(message); 
+            await RespondAsync(message); 
         }
 
         #endregion

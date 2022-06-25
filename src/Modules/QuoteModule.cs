@@ -21,7 +21,7 @@ namespace AivaptDotNet.Modules
         {   
             QuoteHelper.InsertQuote(DbService, user, quoteText);
 
-            await ReplyAsync("New quote has been created!");
+            await RespondAsync("New quote has been created!");
         }
 
         [SlashCommand("show", "Get a specific quote by ID.")]
@@ -38,7 +38,7 @@ namespace AivaptDotNet.Modules
             builder.WithTimestamp(quote.CreatedAt);
             builder.WithAuthor(user.Username, user.GetAvatarUrl());
 
-            await ReplyAsync("", false, builder.Build());
+            await RespondAsync(embed: builder.Build());
 
         }
 
@@ -56,7 +56,7 @@ namespace AivaptDotNet.Modules
             builder.WithTimestamp(quote.CreatedAt);
             builder.WithAuthor(user.Username, user.GetAvatarUrl());
 
-            await ReplyAsync("", false, builder.Build());
+            await RespondAsync(embed: builder.Build());
 
         }
 
@@ -65,7 +65,7 @@ namespace AivaptDotNet.Modules
         {   
             int amount = QuoteHelper.GetAmountOfQuotes(DbService);
 
-            await ReplyAsync($"There are currently {amount} quotes.");
+            await RespondAsync($"There are currently {amount} quotes.");
 
         }
     }

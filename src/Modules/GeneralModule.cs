@@ -11,7 +11,7 @@ namespace AivaptDotNet.Modules
         [SlashCommand("test", "Check the bot connection.")]
         public async Task TestCommand()
         {   
-            await Context.Channel.SendMessageAsync("Test");
+            await RespondAsync("Test");
         }
 
         [SlashCommand("info", "Get general information about the bot.")]
@@ -29,7 +29,7 @@ namespace AivaptDotNet.Modules
                 .WithThumbnailUrl(botUser.GetAvatarUrl())
                 .WithColor(Color.Teal);
 
-            await Context.Channel.SendMessageAsync("", false, builder.Build());
+            await RespondAsync(embed: builder.Build());
         }
     }
 }

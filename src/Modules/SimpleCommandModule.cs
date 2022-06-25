@@ -34,7 +34,7 @@ namespace AivaptDotNet.Modules
         {
             SimpleCommandHelper.CreateSimpleCommand(DbService, name, text, Context.User.Id);
 
-            await Context.Channel.SendMessageAsync("Success!");
+            await RespondAsync("Success!");
         }
 
         [SlashCommand("edit", "Edit a specific simple command.")]
@@ -42,7 +42,7 @@ namespace AivaptDotNet.Modules
         {
             SimpleCommandHelper.EditSimpleCommand(DbService, name, newText);
 
-            await Context.Channel.SendMessageAsync("Success!");
+            await RespondAsync("Success!");
         }
 
         [SlashCommand("del", "Delete a specific simple command.")]
@@ -82,7 +82,7 @@ namespace AivaptDotNet.Modules
         {
             //TODO: check author-ID
             //SimpleCommandHelper.DeleteSimpleCommand(DbService, commandName); 
-            await ReplyAsync("Command has been deleted.");
+            await RespondAsync("Command has been deleted.");
         }
 
         [SlashCommand("all", "Get a list of all simple commands")]
@@ -98,7 +98,7 @@ namespace AivaptDotNet.Modules
             }
 
             EmbedBuilder builder = SimpleEmbed.FieldsEmbed("All User Commands", embedFields);
-            await Context.Channel.SendMessageAsync("", false, builder.Build());
+            await RespondAsync(embed: builder.Build());
         }
 
         #endregion
