@@ -6,7 +6,7 @@ using Discord;
 using Discord.Interactions;
 using Victoria;
 
-namespace AivaptDotNet.Modules 
+namespace AivaptDotNet.Modules
 {
     [Group("audio", "Any voice/audio related commands")]
     public class VoiceModule : InteractionModuleBase<SocketInteractionContext>
@@ -24,7 +24,7 @@ namespace AivaptDotNet.Modules
         {
             var userChannel = ((IVoiceState)Context.User).VoiceChannel;
 
-            if(userChannel != null)
+            if (userChannel != null)
             {
                 await AudioService.JoinAsync(userChannel);
             }
@@ -44,8 +44,8 @@ namespace AivaptDotNet.Modules
         public async Task PlayCommand(string url)
         {
             var userChannel = ((IVoiceState)Context.User).VoiceChannel;
-            
-            if(userChannel == null)
+
+            if (userChannel == null)
                 await RespondAsync("You're not connected to a voice channel.");
 
             var message = await AudioService.PlayAudioAsync(url, Context);
@@ -70,7 +70,7 @@ namespace AivaptDotNet.Modules
         public async Task ContinueCommand()
         {
             var message = await AudioService.ContinueAudioAsync(Context);
-            await RespondAsync(message); 
+            await RespondAsync(message);
         }
 
         #endregion

@@ -38,7 +38,7 @@ namespace AivaptDotNet.Helpers.Modules
         //TODO: add operation result
         public static void CreateSimpleCommand(DatabaseService dbService, string name, string text, ulong authorId)
         {
-            string sql = @"insert into simple_command (name, command_text, title, active, creator) values (@NAME, @TEXT, @TITLE, 1, @CREATOR)";
+            string sql = @"insert into simple_command (name, command_text, title, active, creator_id) values (@NAME, @TEXT, @TITLE, 1, @CREATOR_ID)";
             var param = new Dictionary<string, object>()
             {
                 { "@NAME", name },
