@@ -14,6 +14,7 @@
 ### Modules
 
 - [ ] add administration module
+- [ ] add game module
 
 ### Miscellaneous
 
