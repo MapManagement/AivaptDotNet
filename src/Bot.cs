@@ -92,7 +92,6 @@ namespace AivaptDotNet
 
             await Task.Delay(-1);
         }
-
         #endregion
 
         #region Private Methods
@@ -147,8 +146,9 @@ namespace AivaptDotNet
             //await _botClient.SetActivityAsync(new DefaultActivity("Sudoku", "Almost finished..."));
             await _interactions.RegisterCommandsGloballyAsync();
 
-            if (_credentials.DebugGuildId != null || _credentials.DebugGuildId != 0)
-                await _interactions.RegisterCommandsToGuildAsync((ulong)_credentials.DebugGuildId);
+			// TODO: no permissions
+            //if (_credentials.DebugGuildId != null || _credentials.DebugGuildId != 0)
+                //await _interactions.RegisterCommandsToGuildAsync((ulong)_credentials.DebugGuildId);
 
             if(!_lavaNode.IsConnected)
                 await _lavaNode.ConnectAsync(); 
