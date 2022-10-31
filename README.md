@@ -18,7 +18,7 @@ anymore.
 The bot offers a wide range of built-in commands. In addition to them you can also create your own commands. I call them
 ``SimpleCommands``. [COMMANDS.md](docs/COMMANDS.md) contains a small explanation for each command.
 
-## Setup
+## Prerequisites
 
 ### Discord Bot User
 
@@ -27,7 +27,9 @@ First of all you need to create a bot Discord user. You can create your bot on
 of 60 symbols. See [credentials](#credentials) for further information. However, you probably want to adjust some
 permissions. I'm using following permission integer for my bot:
 
-```Permission Integer: 2217856064```
+```
+Permission Integer: 2217856064
+```
 
 ### Credentials
 
@@ -39,6 +41,8 @@ to store my credentials for development purposes. You need following variables:
 | AIVAPT__BOT_TOKEN            | Discord bot token                   |
 | AIVAPT__DB_CONNECTION_STRING | credentials for database connection |
 | AIVAPT__LAVALINK_PASSWORD    | Lavalink server password            |
+
+## Setup
 
 ### Manual
 
@@ -58,10 +62,21 @@ library that simplifies any voice channel interaction. Once it's finished it'll 
 
 ### Docker
 
-To simplify the deployment process, I created a simple docker-compose file. It includes the Dockerfile of the bot, a MariaDB
+#### Local Build
+
+To simplify the deployment process, I created a simple docker-compose file. Using this approach, you need to clone the whole
+repository to build the Docker image locally. The docker-compose setup includes the Dockerfile of the bot, a MariaDB
 instance and a Lavalink server. You only need to insert your credentials with an environment file. Then you can start
 the compose file:
 
 ```sh
-docker-compose --env-file your_env_file
+docker-compose up -d
+```
+
+#### Pulling Image
+
+Alternatively you can also pull the latest image right from GitHub's container registry:
+
+```sh
+docker pull ghcr.io/mapmanagement/aivaptdotnet:master
 ```

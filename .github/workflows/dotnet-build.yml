@@ -12,12 +12,17 @@ jobs:
       run:
         working-directory: ./src
     steps:
-      - uses: actions/checkout@v2
+
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
       - name: Install .NET
         uses: actions/setup-dotnet@v2
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
+
       - name: Install dependencies
         run: dotnet restore
+
       - name: Build
         run: dotnet build --configuration Release --no-restore
