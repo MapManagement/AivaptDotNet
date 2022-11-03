@@ -27,6 +27,7 @@ namespace AivaptDotNet.Modules
             if (userChannel != null)
             {
                 await AudioService.JoinAsync(userChannel);
+				await RespondAsync("Joined!");
             }
             else
             {
@@ -38,6 +39,7 @@ namespace AivaptDotNet.Modules
         public async Task LeaveCommand()
         {
             await AudioService.LeaveAsync(Context.Guild);
+			await RespondAsync("Leaving channel.");
         }
 
         [SlashCommand("play", "Play some audio.")]
