@@ -26,6 +26,11 @@ namespace AivaptDotNet.Services
             throw new System.NotImplementedException();
         }
 
+		public Task<string> PauseAudioAsync(SocketInteractionContext context)
+		{
+			throw new System.NotImplementedException();
+		}
+
         public Task<string> SkipAudioAsync(SocketInteractionContext context)
         {
             throw new System.NotImplementedException();

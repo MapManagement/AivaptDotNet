@@ -1,6 +1,5 @@
 using System;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Discord;
@@ -12,14 +11,13 @@ using AivaptDotNet.Services;
 using Victoria;
 using Discord.Interactions;
 
-namespace AivaptDotNet 
+namespace AivaptDotNet
 {
     public class Bot
     {
         #region Fields
-        
-        private IServiceProvider _services; 
 
+        private IServiceProvider _services;
         private Credentials _credentials;
 
         #endregion
@@ -135,7 +133,7 @@ namespace AivaptDotNet
             //if (_credentials.DebugGuildId != null || _credentials.DebugGuildId != 0)
                 //await _interactions.RegisterCommandsToGuildAsync((ulong)_credentials.DebugGuildId);
 
-            if(!lavaNode.IsConnected)
+            if (!lavaNode.IsConnected)
                 await lavaNode.ConnectAsync(); 
         }
 

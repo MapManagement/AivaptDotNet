@@ -1,6 +1,5 @@
 using System.Linq;
 using System.Threading.Tasks;
-
 using Discord;
 using Discord.Interactions;
 using Victoria;
@@ -70,49 +69,48 @@ namespace AivaptDotNet.Services
             if (player == null)
                 return "Aivapt is currently not connected to any voice channel.";
 
-            var searchRepsonse = await GetSearchResponse(url);
+            var searchRepsonse = await GetSearchResponse(url) as SearchResponse?;
 
-            if(searchRepsonse == null)
+            if (searchRepsonse == null)
                 return "Couldn't find that song!";
 
-            var trackResponse = await AddTrackToQueue((SearchResponse)searchRepsonse, player);
+            var trackResponse = await AddTrackToQueue(searchRepsonse.Value, player);
+			var track = searchRepsonse.Value.Tracks.First();
 
             if (trackResponse == TrackStatusResponse.AddingToQueue)
-                return "Added song to queue.";
+                return $"Added {track.Title} by {track.Author} to the queue.";
             else
-                return "Playing...";
+                return $"Playing {track.Title} by {track.Author}.";
         }
 
         public async Task<string> SkipAudioAsync(SocketInteractionContext context)
         {
             var player = _lavaNode.GetPlayer(context.Guild);
 
-            if(player == null)
+            if (player == null)
                 return "Aivapt is currently not connected to any voice channel.";
 
-            if(player.Queue.Count > 1)
-            {
-                var currentAudio = player.Track;
-                await player.SkipAsync();
-                return $"Skipped Audio: {currentAudio.Title}.";
-            }
-            else
-            {
-                return "No songs can be skipped.";
-            }
+            if (player.Queue.Count == 0)
+				return "There are no songs in the queue.";
+            
+            var currentTrack = player.Track;
+            await player.SkipAsync();
+
+            return $"Skipped {currentTrack.Title} by {currentTrack.Author}.";
         }
 
-        public async Task<string> StopAudioAsync(SocketInteractionContext context)
+        public async Task<string> PauseAudioAsync(SocketInteractionContext context)
         {
             var player = _lavaNode.GetPlayer(context.Guild);
 
-            if(player == null)
+            if (player == null)
                 return "Aivapt is currently not connected to any voice channel.";
 
-            if(player.PlayerState == PlayerState.Playing)
+            if (player.PlayerState == PlayerState.Playing)
             {
                 await player.PauseAsync();
-                return "Stopped playing.";
+
+                return "Paused.";
             }
             else
             {
@@ -120,22 +118,42 @@ namespace AivaptDotNet.Services
             }
         }
 
+		public async Task<string> StopAudioAsync(SocketInteractionContext context)
+		{
+			var player = _lavaNode.GetPlayer(context.Guild);
+
+            if (player == null)
+                return "Aivapt is currently not connected to any voice channel.";
+
+            if (player.PlayerState == PlayerState.Playing)
+            {
+                await player.StopAsync();
+
+                return "Stopped.";
+            }
+            else
+            {
+                return "Aivapt is currently not playing any music.";
+            }
+
+		}
+
         public async Task<string> ContinueAudioAsync(SocketInteractionContext context)
         {
 
             var player = _lavaNode.GetPlayer(context.Guild);
 
-            if(player == null)
+            if (player == null)
                 return "Aivapt is currently not connected to any voice channel.";
 
-            if(player.PlayerState == PlayerState.Paused)
+            if (player.PlayerState == PlayerState.Paused || player.PlayerState == PlayerState.Stopped)
             {
                 await player.ResumeAsync();
                 return "Continuing...";
             }
             else
             {
-                return "Aivapt is currently not stopped.";
+                return "Aivapt is currently not paused.";
             }
         }
 

@@ -4,7 +4,6 @@ using AivaptDotNet.Services;
 
 using Discord;
 using Discord.Interactions;
-using Victoria;
 
 namespace AivaptDotNet.Modules
 {
@@ -67,6 +66,13 @@ namespace AivaptDotNet.Modules
             var message = await AudioService.StopAudioAsync(Context);
             await RespondAsync(message);
         }
+
+		[SlashCommand("pause", "Pause the current audio,")]
+		public async Task PauseCommand()
+		{
+			var message = await AudioService.PauseAudioAsync(Context);
+			await RespondAsync(message);
+		}
 
         [SlashCommand("continue", "Continue playing the current aduio.")]
         public async Task ContinueCommand()

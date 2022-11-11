@@ -13,5 +13,6 @@ namespace AivaptDotNet.Services
         Task<string> PlayAudioAsync(string url, SocketInteractionContext context);
         Task<string> SkipAudioAsync(SocketInteractionContext context);
         Task<string> StopAudioAsync(SocketInteractionContext context);
+		Task<string> PauseAudioAsync(SocketInteractionContext context);
     }
 }
