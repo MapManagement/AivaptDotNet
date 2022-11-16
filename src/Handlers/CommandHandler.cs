@@ -2,15 +2,13 @@ using System.Threading.Tasks;
 using System.Reflection;
 using System.Collections.Generic;
 using System;
-
 using Microsoft.Extensions.DependencyInjection;
-
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
-
-using AivaptDotNet.Helpers.General;
 using AivaptDotNet.Services;
+using AivaptDotNet.Helpers.General;
+using AivaptDotNet.Helpers.DiscordClasses;
 
 
 namespace AivaptDotNet.Handlers
@@ -39,12 +37,17 @@ namespace AivaptDotNet.Handlers
         private async Task HandleCommand(SocketMessage msg) 
         {
             var message = msg as SocketUserMessage;
-            if(message == null) return;
+			int argPos = 0;
 
-            int argPos = 0;
+            if (message == null)
+				return;
 
-            if(!(message.HasCharPrefix('!', ref argPos) || message.HasMentionPrefix(_botClient.CurrentUser, ref argPos)) || message.Author.IsBot) return;
+			bool messageHasNoPrefix = !(message.HasCharPrefix('!', ref argPos));
+			bool hasMentionPrefix = message.HasMentionPrefix(_botClient.CurrentUser, ref argPos);
+			bool isBot = message.Author.IsBot;
 
+            if ((messageHasNoPrefix || hasMentionPrefix) || isBot)
+				return;
             
             var context = new CommandContext(_botClient, message);
 
@@ -57,13 +60,13 @@ namespace AivaptDotNet.Handlers
                 );
 
                 // If the "normal" command is not available, the handler will check if a database command exists. If so, that command will be executed.
-                if(!commandTask.IsSuccess)
+                if (!commandTask.IsSuccess)
                 {
                     await OnSimpleCommand(message);
                 }
 
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Embed errorEmbed = SimpleEmbed.ErrorEmbed(e.InnerException.ToString().Substring(0, 256));
                 await context.Channel.SendMessageAsync("", false, errorEmbed);
@@ -74,7 +77,7 @@ namespace AivaptDotNet.Handlers
         private async Task OnSimpleCommand(SocketMessage message)
         {
             var msg = message.ToString();
-            if(CheckCommandExistence(msg.Remove(0,1)))
+            if (CheckCommandExistence(msg.Remove(0,1)))
             {
                 string sql = "select * from simple_command where name = @COMMAND_NAME";
                 var param = new Dictionary<string, object>();
@@ -82,12 +85,14 @@ namespace AivaptDotNet.Handlers
 
                 using var result = _dbService.ExecuteSelect(sql, param);
 
-                if(!result.HasRows) await message.Channel.SendMessageAsync("Error");
+                if (!result.HasRows)
+					await message.Channel.SendMessageAsync("Error");
+
                 result.Read();
 
                 string title = result.GetString("title");
                 string text = result.GetString("command_text");
-                Color color = SimpleConverter.HexToColor(result.GetString("color"));
+                Color color = Converters.HexToColor(result.GetString("color"));
 
                 EmbedBuilder builder = SimpleEmbed.MinimalEmbed(title, text);
                 builder.WithColor(color);
@@ -104,7 +109,8 @@ namespace AivaptDotNet.Handlers
             param.Add("@COMMAND_NAME", name);
 
             using var result = _dbService.ExecuteSelect(sql, param);
-            if(result.HasRows)
+
+            if (result.HasRows)
             {
                 return true;
             }

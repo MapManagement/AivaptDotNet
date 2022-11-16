@@ -1,13 +1,10 @@
 using System.Threading.Tasks;
 using System.Collections.Generic;
-
 using Discord;
-
-using AivaptDotNet.Helpers.General;
-using AivaptDotNet.Services;
-
-using AivaptDotNet.Helpers.Modules;
 using Discord.Interactions;
+using AivaptDotNet.Services;
+using AivaptDotNet.Helpers.Modules;
+using AivaptDotNet.Helpers.DiscordClasses;
 
 namespace AivaptDotNet.Modules
 {

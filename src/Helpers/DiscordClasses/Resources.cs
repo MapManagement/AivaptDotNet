@@ -1,9 +1,9 @@
 using Discord;
 
 
-namespace AivaptDotNet.Helpers.General
+namespace AivaptDotNet.Helpers.DiscordClasses
 {
-    public static class SimpleResources 
+    public static class Resources 
     {
         public static Emoji GreenCircleEmoji = new Emoji("🟢");
         public static Emoji RedCircleEmoji = new Emoji("🔴");

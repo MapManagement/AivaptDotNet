@@ -1,6 +1,3 @@
-using System;
-using System.IO;
-
 namespace AivaptDotNet.Helpers.General
 {
     public class Credentials

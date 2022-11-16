@@ -1,15 +1,10 @@
-using System;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using System.Text.Json;
-using System.Net.Http;
-
 using Discord;
-
-using AivaptDotNet.Helpers.General;
+using Discord.Interactions;
 using AivaptDotNet.DataClasses;
 using AivaptDotNet.Helpers.Modules;
-using Discord.Interactions;
+using AivaptDotNet.Helpers.DiscordClasses;
 
 namespace AivaptDotNet.Modules 
 {

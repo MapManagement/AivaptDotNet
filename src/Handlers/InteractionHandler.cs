@@ -1,17 +1,12 @@
 using System.Threading.Tasks;
 using System.Reflection;
-using System.Collections.Generic;
 using System;
-
 using Microsoft.Extensions.DependencyInjection;
-
 using Discord;
-using Discord.Commands;
 using Discord.WebSocket;
-
-using AivaptDotNet.Helpers.General;
-using AivaptDotNet.Services;
 using Discord.Interactions;
+using AivaptDotNet.Services;
+using AivaptDotNet.Helpers.DiscordClasses;
 
 namespace AivaptDotNet.Handlers
 {

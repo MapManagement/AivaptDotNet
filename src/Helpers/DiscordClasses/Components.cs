@@ -1,9 +1,8 @@
 using System.Collections.Generic;
 using System.IO;
-
 using Discord;
 
-namespace AivaptDotNet.Helpers.General
+namespace AivaptDotNet.Helpers.DiscordClasses
 {
     public static class SimpleEmbed
     {

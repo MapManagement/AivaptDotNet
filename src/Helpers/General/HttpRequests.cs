@@ -1,8 +1,6 @@
 using System.Threading.Tasks;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Collections.Generic;
-
 using AivaptDotNet.DataClasses;
 
 namespace AivaptDotNet.Helpers.General
@@ -11,11 +9,11 @@ namespace AivaptDotNet.Helpers.General
     {
         public static async Task<string> SimpleGetRequest(HttpRequestParameters requestParameters)
         {
-            using(HttpClient client = new HttpClient())
+            using (HttpClient client = new HttpClient())
             {
                 client.DefaultRequestHeaders.Accept.Clear();
 
-                foreach(string header in requestParameters.Headers)
+                foreach (string header in requestParameters.Headers)
                 {
                     client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(header));
                 }

@@ -4,11 +4,11 @@ using Discord;
 
 namespace AivaptDotNet.Helpers.General
 {
-    public static class SimpleConverter
+    public static class Converters
     {
         public static Color HexToColor(string hexString)
         {
-            if(hexString.Length != 7)
+            if (hexString.Length != 7)
             {
                 throw new ArgumentException("HexString has to be valid color string.");
             }
@@ -22,6 +22,7 @@ namespace AivaptDotNet.Helpers.General
             int blue = Convert.ToInt32(blueString, 16);
 
             Color color = new Color(red, green, blue);
+
             return color;
 
         }
