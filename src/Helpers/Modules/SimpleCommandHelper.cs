@@ -1,7 +1,6 @@
-using System;
 using System.Collections.Generic;
 using AivaptDotNet.Services;
-using Discord;
+using AivaptDotNet.DataClasses;
 
 namespace AivaptDotNet.Helpers.Modules
 {
@@ -11,9 +10,32 @@ namespace AivaptDotNet.Helpers.Modules
 
         #region Public Methods
 
-        public static void GetSimpleCommand()
+        public static SimpleCommand GetSimpleCommand(DatabaseService dbService, string commandName)
         {
+			string sql = "select * from simple_command where name = @COMMAND_NAME";
+			var sqlParameters = new Dictionary<string, object>()
+			{
+				{ "@COMMAND_NAME", commandName }
+			};
 
+			using (var selectData = dbService.ExecuteSelect(sql, sqlParameters))
+			{
+				if (!selectData.HasRows)
+					return null;
+
+				selectData.Read();
+
+				var simpleCommand = new SimpleCommand(
+						name: selectData.GetString("name"),
+						text: selectData.GetString("text"),
+						title: selectData.GetString("title"),
+						active: selectData.GetBoolean("active"),
+						creatorId: selectData.GetUInt64("creator_id"),
+						color: selectData.GetString("color")
+				);
+
+				return simpleCommand;
+			}
         }
 
         public static Dictionary<string, ulong> GetAllSimpleCommands(DatabaseService dbService)
@@ -80,7 +102,7 @@ namespace AivaptDotNet.Helpers.Modules
 
             var result = dbService.ExecuteScalar(sql, param) as int?;
 
-            if(result == null)
+            if (result == null)
                 return false;
 
             return true;
