@@ -29,22 +29,23 @@ namespace AivaptDotNet.Helpers.Modules
                 { "@QUOTE_ID", quoteId }
             };
 
-            using var result = dbService.ExecuteSelect(sql, param);
+            using (var result = dbService.ExecuteSelect(sql, param))
+			{
+            	if (!result.HasRows)
+                	return null;
 
-            if(!result.HasRows)
-                return null;
+            	result.Read();
 
-            result.Read();
+            	var quote = new Quote
+            	(
+                	id: result.GetUInt64("id"),
+                	userId: result.GetUInt64("user_id"),
+                	text: result.GetString("text"),
+                	createdAt: result.GetDateTime("created_at")
+            	);
 
-            var quote = new Quote
-            (
-                id: result.GetUInt64("id"),
-                userId: result.GetUInt64("user_id"),
-                text: result.GetString("text"),
-                createdAt: result.GetDateTime("created_at")
-            );
-
-            return quote;
+            	return quote;
+			}
         }
 
         public static Quote GetRandomQuote(DatabaseService dbService)
@@ -53,7 +54,7 @@ namespace AivaptDotNet.Helpers.Modules
 
             using var result = dbService.ExecuteSelect(sql);
 
-            if(!result.HasRows)
+            if (!result.HasRows)
                 return null;
 
             result.Read();
@@ -73,14 +74,15 @@ namespace AivaptDotNet.Helpers.Modules
         {
             string sql = "select sum(1) amount from quote";
 
-            using var result = dbService.ExecuteSelect(sql);
+            using (var result = dbService.ExecuteSelect(sql))
+			{
+            	if (!result.HasRows)
+                	return 0;
 
-            if(!result.HasRows)
-                return 0;
+            	result.Read();
 
-            result.Read();
-
-            return result.GetInt32("amount");
+            	return result.GetInt32("amount");
+			}
         }
 
         #endregion

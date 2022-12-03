@@ -8,7 +8,7 @@ namespace AivaptDotNet.Helpers.Modules
     {
         #region Methods
 
-        #region Public Methods
+        #region Public
 
         public static SimpleCommand GetSimpleCommand(DatabaseService dbService, string commandName)
         {
@@ -45,12 +45,12 @@ namespace AivaptDotNet.Helpers.Modules
 
             using (var reader = dbService.ExecuteSelect(sql))
             {
-                if (reader.HasRows)
+				if (reader.HasRows)
+					return commands;
+
+                while (reader.Read())
                 {
-                    while (reader.Read())
-                    {
-                        commands.Add(reader.GetString("name"), reader.GetUInt64("creator_id"));
-                    }
+                    commands.Add(reader.GetString("name"), reader.GetUInt64("creator_id"));
                 }
             }
             
@@ -110,7 +110,7 @@ namespace AivaptDotNet.Helpers.Modules
 
         #endregion
 
-        #region Private Methods
+        #region Private
 
         private static ulong? GetCommandAuthor(DatabaseService dbService, string name)
         {
@@ -129,7 +129,5 @@ namespace AivaptDotNet.Helpers.Modules
         #endregion
 
         #endregion
-
-
     }
 }

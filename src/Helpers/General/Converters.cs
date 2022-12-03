@@ -6,11 +6,13 @@ namespace AivaptDotNet.Helpers.General
 {
     public static class Converters
     {
+		#region Methods
+
         public static Color HexToColor(string hexString)
         {
             if (hexString.Length != 7)
             {
-                throw new ArgumentException("HexString has to be valid color string.");
+                throw new ArgumentException("HexString has to be a valid color string.");
             }
 
             string redString = hexString.Substring(1, 2);
@@ -24,8 +26,8 @@ namespace AivaptDotNet.Helpers.General
             Color color = new Color(red, green, blue);
 
             return color;
-
         }
 
+		#endregion
     }
 }

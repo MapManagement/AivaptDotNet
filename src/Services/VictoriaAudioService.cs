@@ -135,7 +135,6 @@ namespace AivaptDotNet.Services
             {
                 return "Aivapt is currently not playing any music.";
             }
-
 		}
 
         public async Task<string> ContinueAudioAsync(SocketInteractionContext context)

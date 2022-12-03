@@ -17,7 +17,7 @@ namespace AivaptDotNet.Services
 
         #region Methods
 
-        #region Public Methods
+        #region Public
 
         public void Dispose()
         {

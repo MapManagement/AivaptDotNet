@@ -1,12 +1,9 @@
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
 using AivaptDotNet.DataClasses;
 using AivaptDotNet.Helpers.General;
-using AivaptDotNet.Services;
-using Discord.WebSocket;
 
 namespace AivaptDotNet.Helpers.Modules
 {
@@ -14,7 +11,7 @@ namespace AivaptDotNet.Helpers.Modules
     {
         #region Methods
 
-        #region Public Methods
+        #region Public
 
         public static Commit GetLatestCommit()
         {
@@ -94,7 +91,7 @@ namespace AivaptDotNet.Helpers.Modules
 
         #endregion
 
-        #region Private Methods
+        #region Private
 
         private static HttpRequestParameters GetRequestParameters(string url)
         {

@@ -70,7 +70,6 @@ namespace AivaptDotNet.Modules
             confirmationEmbed.WithDescription("Do you want to delete this command?");
 
             await RespondAsync(components: buttonComponent.Build(), embed: confirmationEmbed.Build());
-
         }
 
         //TODO: not working yet

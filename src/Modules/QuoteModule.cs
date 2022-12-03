@@ -37,7 +37,6 @@ namespace AivaptDotNet.Modules
             builder.WithAuthor(user.Username, user.GetAvatarUrl());
 
             await RespondAsync(embed: builder.Build());
-
         }
 
         [SlashCommand("random", "Get a random quote.")]
@@ -55,7 +54,6 @@ namespace AivaptDotNet.Modules
             builder.WithAuthor(user.Username, user.GetAvatarUrl());
 
             await RespondAsync(embed: builder.Build());
-
         }
 
         [SlashCommand("amount", "Get the amount of all quote that have been created so far.")]
@@ -64,7 +62,6 @@ namespace AivaptDotNet.Modules
             int amount = QuoteHelper.GetAmountOfQuotes(DbService);
 
             await RespondAsync($"There are currently {amount} quotes.");
-
         }
     }
 }

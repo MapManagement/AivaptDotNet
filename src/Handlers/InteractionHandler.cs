@@ -12,10 +12,16 @@ namespace AivaptDotNet.Handlers
 {
     public class InteractionHandler
     {
+		#region Fields
+
         private readonly IServiceProvider _services;
         private readonly DiscordSocketClient _botClient;
         private readonly InteractionService _interactionService;
         private readonly DatabaseService _dbService;
+
+		#endregion
+
+		#region Constructor
 
         public InteractionHandler(IServiceProvider services)
         {
@@ -25,12 +31,22 @@ namespace AivaptDotNet.Handlers
             _dbService = services.GetRequiredService<DatabaseService>();
         }
 
+		#endregion
+
+		#region Methods
+
+		#region Public
+
         public async Task InitializeCommands()
         {
             await _interactionService.AddModulesAsync(Assembly.GetEntryAssembly(), services: _services);
 
             _botClient.InteractionCreated += HandleInteraction;
         }
+
+		#endregion
+
+		#region Private
 
         private async Task HandleInteraction(SocketInteraction interaction) 
         {
@@ -42,14 +58,16 @@ namespace AivaptDotNet.Handlers
             try 
             {
                 await _interactionService.ExecuteCommandAsync(context, _services);
-
             }
             catch (Exception e)
             {
                 Embed errorEmbed = SimpleEmbed.ErrorEmbed(e.InnerException.ToString().Substring(0, 256));
                 await context.Channel.SendMessageAsync("", false, errorEmbed);
             }
-           
         }
+
+		#endregion
+
+		#endregion 
     }
 }

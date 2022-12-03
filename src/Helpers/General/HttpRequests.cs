@@ -7,6 +7,8 @@ namespace AivaptDotNet.Helpers.General
 {
     static class HttpRequests
     {
+		#region Methods
+
         public static async Task<string> SimpleGetRequest(HttpRequestParameters requestParameters)
         {
             using (HttpClient client = new HttpClient())
@@ -24,5 +26,7 @@ namespace AivaptDotNet.Helpers.General
                 return repoTask;
             }
         }
+
+		#endregion
     }
 }
