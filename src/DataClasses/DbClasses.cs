@@ -1,7 +1,4 @@
 using System;
-using System.Data;
-using MySql.Data.MySqlClient;
-using System.Collections.Generic;
 
 
 namespace AivaptDotNet.DataClasses

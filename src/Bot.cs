@@ -38,12 +38,12 @@ namespace AivaptDotNet
 
         public async Task StartBot()
         {
-			var botClient = _services.GetRequiredService<DiscordSocketClient>();
-			var commandHandler = _services.GetRequiredService<CommandHandler>();
-			var interactionHandler = _services.GetRequiredService<InteractionHandler>();
-			var dbService = _services.GetRequiredService<DatabaseService>();
+            var botClient = _services.GetRequiredService<DiscordSocketClient>();
+            var commandHandler = _services.GetRequiredService<CommandHandler>();
+            var interactionHandler = _services.GetRequiredService<InteractionHandler>();
+            var dbService = _services.GetRequiredService<DatabaseService>();
 
-			ConfigureBot();
+            ConfigureBot();
 
             await botClient.LoginAsync(TokenType.Bot, _credentials.BotToken);
             await botClient.StartAsync();
@@ -62,16 +62,16 @@ namespace AivaptDotNet
         private void ConfigureServices()
         {
             _services = new ServiceCollection()
-	            .AddSingleton<DiscordSocketClient>()
-    	        .AddSingleton<CommandService>()
-        	    .AddSingleton<CommandHandler>()
-            	.AddSingleton<DatabaseService>()
-            	.AddSingleton(x => new InteractionService(x.GetRequiredService<DiscordSocketClient>()))
-	            .AddSingleton<InteractionHandler>()
-    	        .AddSingleton<IAudioService, VictoriaAudioService>()
-        	    .AddLavaNode(lc => { lc.SelfDeaf = true; lc.Authorization = _credentials.LavalinkPassword; lc.Hostname = "lavalink"; })
-            	.AddMemoryCache()
-	            .BuildServiceProvider();
+                .AddSingleton<DiscordSocketClient>()
+                .AddSingleton<CommandService>()
+                .AddSingleton<CommandHandler>()
+                .AddSingleton<DatabaseService>()
+                .AddSingleton(x => new InteractionService(x.GetRequiredService<DiscordSocketClient>()))
+                .AddSingleton<InteractionHandler>()
+                .AddSingleton<IAudioService, VictoriaAudioService>()
+                .AddLavaNode(lc => { lc.SelfDeaf = true; lc.Authorization = _credentials.LavalinkPassword; lc.Hostname = "lavalink"; })
+                .AddMemoryCache()
+                .BuildServiceProvider();
         }
 
         private void GetConfiguration()
@@ -82,7 +82,7 @@ namespace AivaptDotNet
                 .Build();
 
             var aivaptSection = config.GetSection("AIVAPT");
-            
+
             _credentials = new Credentials
             {
                 AdminId = Convert.ToUInt64(aivaptSection["ADMIN_ID"]),
@@ -93,12 +93,12 @@ namespace AivaptDotNet
             };
         }
 
-		private void ConfigureBot()
-		{
-			var botClient = _services.GetRequiredService<DiscordSocketClient>();
-			var commands = _services.GetRequiredService<CommandService>();
+        private void ConfigureBot()
+        {
+            var botClient = _services.GetRequiredService<DiscordSocketClient>();
+            var commands = _services.GetRequiredService<CommandService>();
 
-			botClient.Ready += OnBotReady;
+            botClient.Ready += OnBotReady;
             botClient.Log += Logging;
             commands.Log += Logging;
 
@@ -107,7 +107,7 @@ namespace AivaptDotNet
                 MessageCacheSize = 50,
                 AlwaysDownloadUsers = true
             };
-		}
+        }
 
         #endregion
 
@@ -123,18 +123,13 @@ namespace AivaptDotNet
 
         private async Task OnBotReady()
         {
-			var lavaNode = _services.GetRequiredService<LavaNode>();
-			var interactions = _services.GetRequiredService<InteractionService>();
+            var lavaNode = _services.GetRequiredService<LavaNode>();
+            var interactions = _services.GetRequiredService<InteractionService>();
 
-            //await _botClient.SetActivityAsync(new DefaultActivity("Sudoku", "Almost finished..."));
             await interactions.RegisterCommandsGloballyAsync();
 
-			// TODO: no permissions
-            //if (_credentials.DebugGuildId != null || _credentials.DebugGuildId != 0)
-                //await _interactions.RegisterCommandsToGuildAsync((ulong)_credentials.DebugGuildId);
-
             if (!lavaNode.IsConnected)
-                await lavaNode.ConnectAsync(); 
+                await lavaNode.ConnectAsync();
         }
 
         #endregion

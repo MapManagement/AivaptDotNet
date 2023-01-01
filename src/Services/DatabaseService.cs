@@ -11,7 +11,7 @@ namespace AivaptDotNet.Services
     {
         #region Fields
 
-        private  MySqlConnection _connection;
+        private MySqlConnection _connection;
 
         #endregion
 
@@ -36,7 +36,7 @@ namespace AivaptDotNet.Services
 
             if (commandParameters != null)
             {
-                foreach(var parameter in commandParameters)
+                foreach (var parameter in commandParameters)
                 {
                     MySqlDbType dbType = GetDbDataType(parameter.Value);
                     command.Parameters.AddWithValue(parameter.Key, parameter.Value);
@@ -44,7 +44,7 @@ namespace AivaptDotNet.Services
 
                 command.Prepare();
             }
-            
+
             var data = command.ExecuteReader();
             return data;
         }
@@ -55,7 +55,7 @@ namespace AivaptDotNet.Services
 
             if (commandParameters != null)
             {
-                foreach(var parameter in commandParameters)
+                foreach (var parameter in commandParameters)
                 {
                     MySqlDbType dbType = GetDbDataType(parameter.Value);
                     command.Parameters.AddWithValue(parameter.Key, parameter.Value);
@@ -63,7 +63,7 @@ namespace AivaptDotNet.Services
 
                 command.Prepare();
             }
-            
+
             var data = command.ExecuteScalar();
             return data;
         }
@@ -74,7 +74,7 @@ namespace AivaptDotNet.Services
 
             if (commandParameters != null)
             {
-                foreach(var parameter in commandParameters)
+                foreach (var parameter in commandParameters)
                 {
                     MySqlDbType dbType = GetDbDataType(parameter.Value);
                     command.Parameters.AddWithValue(parameter.Key, parameter.Value);
@@ -82,17 +82,17 @@ namespace AivaptDotNet.Services
 
                 command.Prepare();
             }
-            
+
             command.ExecuteNonQuery();
         }
-        
+
         #endregion
 
         #region Private Methods
 
         private MySqlDbType GetDbDataType(object value)
         {
-            switch(Type.GetTypeCode(value.GetType()))
+            switch (Type.GetTypeCode(value.GetType()))
             {
                 case TypeCode.String:
                     return MySqlDbType.VarChar;
