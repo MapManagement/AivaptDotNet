@@ -10,8 +10,8 @@ services:
       MARIADB_PASSWORD: ${MARIADB_PASSWORD}
       MARIADB_ROOT_PASSWORD: ${MARIADB_PASSWORD}
       MARIADB_DATABASE: aivaptdotnet
-    ports:
-      - 3306:3306
+    expose:
+      - 3306
     volumes:
       - /var/lib/mysql:/var/lib/mysql
       - ./Migrations:/docker-entrypoint-initdb.d
@@ -22,8 +22,8 @@ services:
     restart: always
     environment:
       AIVAPT__LAVALINK_PASSWORD: ${AIVAPT__LAVALINK_PASSWORD}
-    ports:
-      - 2333:2333
+    expose:
+      - 2333
     volumes:
       - ./lavalink_config.yml:/opt/Lavalink/application.yml
 
