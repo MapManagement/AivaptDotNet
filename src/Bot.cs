@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Discord;
@@ -8,6 +9,7 @@ using Discord.Commands;
 using AivaptDotNet.Helpers.General;
 using AivaptDotNet.Handlers;
 using AivaptDotNet.Services;
+using AivaptDotNet.Services.Database;
 using Victoria;
 using Discord.Interactions;
 
@@ -41,7 +43,6 @@ namespace AivaptDotNet
             var botClient = _services.GetRequiredService<DiscordSocketClient>();
             var commandHandler = _services.GetRequiredService<CommandHandler>();
             var interactionHandler = _services.GetRequiredService<InteractionHandler>();
-            var dbService = _services.GetRequiredService<DatabaseService>();
 
             ConfigureBot();
 
@@ -50,7 +51,6 @@ namespace AivaptDotNet
 
             await commandHandler.InitializeCommands();
             await interactionHandler.InitializeCommands();
-            await dbService.Initialize(_credentials.DbConnectionString);
 
             await Task.Delay(-1);
         }
@@ -62,10 +62,10 @@ namespace AivaptDotNet
         private void ConfigureServices()
         {
             _services = new ServiceCollection()
+                .AddDbContext<BotDbContext>( options => options.UseMySql("", ServerVersion.AutoDetect("")))
                 .AddSingleton<DiscordSocketClient>()
                 .AddSingleton<CommandService>()
                 .AddSingleton<CommandHandler>()
-                .AddSingleton<DatabaseService>()
                 .AddSingleton(x => new InteractionService(x.GetRequiredService<DiscordSocketClient>()))
                 .AddSingleton<InteractionHandler>()
                 .AddSingleton<IAudioService, VictoriaAudioService>()
