@@ -62,7 +62,8 @@ namespace AivaptDotNet
         private void ConfigureServices()
         {
             _services = new ServiceCollection()
-                .AddDbContext<BotDbContext>( options => options.UseMySql("", ServerVersion.AutoDetect("")))
+                .AddDbContext<BotDbContext>( options =>
+                        options.UseMySql(_credentials.DbConnectionString, ServerVersion.AutoDetect(_credentials.DbConnectionString)))
                 .AddSingleton<DiscordSocketClient>()
                 .AddSingleton<CommandService>()
                 .AddSingleton<CommandHandler>()

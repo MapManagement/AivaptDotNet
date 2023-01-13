@@ -5,10 +5,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
-using AivaptDotNet.Services;
 using AivaptDotNet.Helpers.General;
 using AivaptDotNet.Helpers.DiscordClasses;
 using AivaptDotNet.Helpers.Modules;
+using AivaptDotNet.Services;
+using AivaptDotNet.Services.Database;
+using AivaptDotNet.Services.Database.Models;
 
 
 namespace AivaptDotNet.Handlers
@@ -20,7 +22,7 @@ namespace AivaptDotNet.Handlers
         private readonly IServiceProvider _services;
         private readonly DiscordSocketClient _botClient;
         private readonly CommandService _commandService;
-        private readonly DatabaseService _dbService;
+        private readonly BotDbContext _dbContext;
 
 		#endregion
 
@@ -31,7 +33,7 @@ namespace AivaptDotNet.Handlers
             _services = services;
             _botClient = services.GetRequiredService<DiscordSocketClient>();
             _commandService = services.GetRequiredService<CommandService>();
-            _dbService = services.GetRequiredService<DatabaseService>();
+            _dbContext = services.GetRequiredService<BotDbContext>();
         }
 
 		#endregion
@@ -74,19 +76,19 @@ namespace AivaptDotNet.Handlers
         {
             var msg = message.ToString();
 			string commandName = msg.Remove(0, 1);
-			bool commandExists = SimpleCommandHelper.IsCommandAvailable(_dbService, commandName);
+			bool commandExists = SimpleCommandHelper.IsCommandAvailable(_dbContext, commandName);
 
 			if (!commandExists)
 				await message.ReplyAsync("This Simple Command is not available.");
 
-			var simpleCommand = SimpleCommandHelper.GetSimpleCommand(_dbService, commandName);
+			var simpleCommand = SimpleCommandHelper.GetSimpleCommand(_dbContext, commandName);
 
 			if (simpleCommand == null)
 				await message.ReplyAsync("This Simple Command is not available.");
 
             Color color = Converters.HexToColor(simpleCommand.Color);
 
-            EmbedBuilder builder = SimpleEmbed.MinimalEmbed(simpleCommand.Title, simpleCommand.Text);
+            EmbedBuilder builder = SimpleEmbed.MinimalEmbed(simpleCommand.Name, simpleCommand.Text);
             builder.WithColor(color);
 
             await message.Channel.SendMessageAsync("", false, builder.Build());

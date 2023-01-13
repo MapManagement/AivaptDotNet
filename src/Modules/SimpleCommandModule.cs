@@ -2,7 +2,8 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using Discord;
 using Discord.Interactions;
-using AivaptDotNet.Services;
+using AivaptDotNet.Services.Database;
+using AivaptDotNet.Services.Database.Models;
 using AivaptDotNet.Helpers.Modules;
 using AivaptDotNet.Helpers.DiscordClasses;
 
@@ -20,7 +21,7 @@ namespace AivaptDotNet.Modules
 
         #region Properties
 
-        public DatabaseService DbService { get; set; }
+        public BotDbContext DbContext { get; set; }
 
         #endregion
 
@@ -29,7 +30,7 @@ namespace AivaptDotNet.Modules
         [SlashCommand("create", "Create a new simple command.")]
         public async Task CreateCmdCommand(string name, [Discord.Commands.Remainder] string text)
         {
-            SimpleCommandHelper.CreateSimpleCommand(DbService, name, text, Context.User.Id);
+            SimpleCommandHelper.CreateSimpleCommand(DbContext, name, text, Context.User.Id);
 
             await RespondAsync("Success!");
         }
@@ -37,7 +38,7 @@ namespace AivaptDotNet.Modules
         [SlashCommand("edit", "Edit a specific simple command.")]
         public async Task EditCmdCommand(string name, string title, [Discord.Commands.Remainder] string newText)
         {
-            SimpleCommandHelper.EditSimpleCommand(DbService, name, newText);
+            SimpleCommandHelper.EditSimpleCommand(DbContext, name, newText);
 
             await RespondAsync("Success!");
         }
@@ -46,7 +47,7 @@ namespace AivaptDotNet.Modules
         public async Task DeleteCmdCommand(string name)
         {
             ulong userMsgId = Context.User.Id;
-            bool commandAvailable = SimpleCommandHelper.IsCommandAvailable(DbService, name);
+            bool commandAvailable = SimpleCommandHelper.IsCommandAvailable(DbContext, name);
 
             if (!commandAvailable)
             {
@@ -84,13 +85,13 @@ namespace AivaptDotNet.Modules
         [SlashCommand("all", "Get a list of all simple commands")]
         public async Task AllCmdsCommand()
         {
-            var commands = SimpleCommandHelper.GetAllSimpleCommands(DbService);
+            var commands = SimpleCommandHelper.GetAllSimpleCommands(DbContext);
             List<EmbedFieldBuilder> embedFields = new List<EmbedFieldBuilder>();
 
-            foreach (var command in commands.Keys)
+            foreach (var command in commands)
             {
-                IUser user = await Context.Client.GetUserAsync(commands[command]);
-                embedFields.Add(new EmbedFieldBuilder { Name = command, Value = user.Username });
+                IUser user = await Context.Client.GetUserAsync(command.CreatorId);
+                embedFields.Add(new EmbedFieldBuilder { Name = command.Name, Value = user.Username });
             }
 
             EmbedBuilder builder = SimpleEmbed.FieldsEmbed("All User Commands", embedFields);

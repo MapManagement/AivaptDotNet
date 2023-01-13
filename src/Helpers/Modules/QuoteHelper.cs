@@ -1,7 +1,8 @@
-using System.Collections.Generic;
-using AivaptDotNet.DataClasses;
-using AivaptDotNet.Services;
+using AivaptDotNet.Services.Database;
+using AivaptDotNet.Services.Database.Models;
 using Discord.WebSocket;
+using System;
+using System.Linq;
 
 namespace AivaptDotNet.Helpers.Modules
 {
@@ -9,80 +10,39 @@ namespace AivaptDotNet.Helpers.Modules
     {
         #region Methods
 
-        public static void InsertQuote(DatabaseService dbService, SocketUser user, string quoteText)
+        public static void InsertQuote(BotDbContext dbContext, SocketUser user, string quoteText)
         {
-            string sql = "insert into quote (user_id, text, created_at) values (@USER_ID, @TEXT, sysdate())";
-            var param = new Dictionary<string, object>
-            {
-                { "@USER_ID", user.Id },
-                { "@TEXT", quoteText },
-            };
-
-            dbService.ExecuteDML(sql, param);
-        }
-
-        public static Quote GetQuote(DatabaseService dbService, int quoteId)
-        {
-            string sql = "select * from quote where id = @QUOTE_ID";
-            var param = new Dictionary<string, object>
-            {
-                { "@QUOTE_ID", quoteId }
-            };
-
-            using (var result = dbService.ExecuteSelect(sql, param))
-			{
-            	if (!result.HasRows)
-                	return null;
-
-            	result.Read();
-
-            	var quote = new Quote
-            	(
-                	id: result.GetUInt64("id"),
-                	userId: result.GetUInt64("user_id"),
-                	text: result.GetString("text"),
-                	createdAt: result.GetDateTime("created_at")
-            	);
-
-            	return quote;
-			}
-        }
-
-        public static Quote GetRandomQuote(DatabaseService dbService)
-        {
-            string sql = "select * from quote order by rand() limit 1";
-
-            using var result = dbService.ExecuteSelect(sql);
-
-            if (!result.HasRows)
-                return null;
-
-            result.Read();
-
             var quote = new Quote
-            (
-                id: result.GetUInt64("id"),
-                userId: result.GetUInt64("user_id"),
-                text: result.GetString("text"),
-                createdAt: result.GetDateTime("created_at")
-            );
+            {
+                UserId = user.Id,
+                Text = quoteText
+            };
+
+            dbContext.Quotes.Add(quote);
+            dbContext.SaveChanges();
+        }
+
+        public static Quote GetQuote(BotDbContext dbContext, int quoteId)
+        {
+            var quote = dbContext.Quotes.Find(quoteId);
 
             return quote;
         }
 
-        public static int GetAmountOfQuotes(DatabaseService dbService)
+        public static Quote GetRandomQuote(BotDbContext dbContext)
         {
-            string sql = "select sum(1) amount from quote";
+            var quote = dbContext.Quotes
+                .OrderBy(q => Guid.NewGuid())
+                .First();
 
-            using (var result = dbService.ExecuteSelect(sql))
-			{
-            	if (!result.HasRows)
-                	return 0;
+            return quote;
+        }
 
-            	result.Read();
+        public static int GetAmountOfQuotes(BotDbContext dbContext)
+        {
+            var number = dbContext.Quotes.Count();
 
-            	return result.GetInt32("amount");
-			}
+            return number;
         }
 
         #endregion
