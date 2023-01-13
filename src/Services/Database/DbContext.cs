@@ -1,3 +1,4 @@
+using AivaptDotNet.Services.Database.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace AivaptDotNet.Services.Database
@@ -13,7 +14,7 @@ namespace AivaptDotNet.Services.Database
 
         #endregion
 
-        #region Entity-Methods
+        #region Entity Methods
 
         private void SetSimpleCommandEntity(ModelBuilder modelBuilder)
         {
@@ -32,12 +33,6 @@ namespace AivaptDotNet.Services.Database
         #endregion
 
         #region Override Events
-
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            // TODO: add connection string
-            optionsBuilder.UseMySql("", ServerVersion.AutoDetect(""));
-        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
