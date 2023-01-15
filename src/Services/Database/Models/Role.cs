@@ -6,10 +6,8 @@ namespace AivaptDotNet.Services.Database.Models
     [Table("role")]
     public class Role
     {
-        [Key]
         public ulong RoleId { get; set; }
 
-        [Key]
         public ulong GuildId { get; set; }
 
         [Required]

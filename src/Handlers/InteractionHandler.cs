@@ -5,8 +5,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Discord;
 using Discord.WebSocket;
 using Discord.Interactions;
-using AivaptDotNet.Services;
 using AivaptDotNet.Helpers.DiscordClasses;
+using AivaptDotNet.Services;
+using AivaptDotNet.Services.Database;
 
 namespace AivaptDotNet.Handlers
 {
@@ -17,7 +18,7 @@ namespace AivaptDotNet.Handlers
         private readonly IServiceProvider _services;
         private readonly DiscordSocketClient _botClient;
         private readonly InteractionService _interactionService;
-        private readonly DatabaseService _dbService;
+        private readonly BotDbContext _dbContext;
 
 		#endregion
 
@@ -28,7 +29,7 @@ namespace AivaptDotNet.Handlers
             _services = services;
             _botClient = services.GetRequiredService<DiscordSocketClient>();
             _interactionService = services.GetRequiredService<InteractionService>();
-            _dbService = services.GetRequiredService<DatabaseService>();
+            _dbContext = services.GetRequiredService<BotDbContext>();
         }
 
 		#endregion
