@@ -9,6 +9,7 @@ using Discord.WebSocket;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using System;
 using System.Threading.Tasks;
 using Victoria;
@@ -19,18 +20,8 @@ namespace AivaptDotNet
     {
         #region Fields
 
-        private readonly IServiceProvider _serviceProvider;
-        private Credentials _credentials;
-
-        #endregion
-
-        #region Constructor
-
-        public Program()
-        {
-            _credentials = GetConfiguration();
-            _serviceProvider = CreateProvider();
-        }
+        private static IServiceProvider _serviceProvider;
+        private static Credentials _credentials;
 
         #endregion
 
@@ -40,7 +31,19 @@ namespace AivaptDotNet
 
         public static void Main(string[] args)
         {
+            var host = CreateHostBuilder(args).Build();
+            _serviceProvider = host.Services;
             new Program().RunAsync().GetAwaiter().GetResult();
+        }
+
+        public static IHostBuilder CreateHostBuilder(string[] args)
+        {
+            _credentials = GetConfiguration();
+
+            var host = Host.CreateDefaultBuilder(args)
+                .ConfigureServices(CreateProvider);
+
+            return host;
         }
 
         #endregion
@@ -65,7 +68,7 @@ namespace AivaptDotNet
 
             await Task.Delay(-1);
         }
-        
+
         // TODO: move to dedicated class
         private void ConfigureBot()
         {
@@ -83,12 +86,11 @@ namespace AivaptDotNet
             };
         }
 
-
-        private IServiceProvider CreateProvider()
+        private static void CreateProvider(HostBuilderContext context, IServiceCollection serviceCollection)
         {
-            var services = new ServiceCollection()
-                .AddDbContext<BotDbContext>(options =>
-                        options.UseMySql(_credentials.DbConnectionString, new MariaDbServerVersion(new Version(10, 9, 4))))
+
+            serviceCollection.AddDbContext<BotDbContext>(options =>
+                    options.UseMySql(_credentials.DbConnectionString, new MariaDbServerVersion(new Version(10, 9, 4))))
                 .AddSingleton<DiscordSocketClient>()
                 .AddSingleton<CommandService>()
                 .AddSingleton<CommandHandler>()
@@ -104,10 +106,9 @@ namespace AivaptDotNet
                 .AddMemoryCache()
                 .BuildServiceProvider();
 
-            return services;
         }
 
-        private Credentials GetConfiguration()
+        private static Credentials GetConfiguration()
         {
             var config = new ConfigurationBuilder()
                 .AddUserSecrets<Program>(optional: true)
