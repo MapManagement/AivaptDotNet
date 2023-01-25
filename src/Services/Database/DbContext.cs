@@ -1,4 +1,3 @@
-using System;
 using AivaptDotNet.Services.Database.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,7 +9,6 @@ namespace AivaptDotNet.Services.Database
 
         public BotDbContext(DbContextOptions<BotDbContext> options) : base(options)
         {
-            Console.WriteLine(this.Database.CanConnect());
         }
 
         #endregion
@@ -21,6 +19,8 @@ namespace AivaptDotNet.Services.Database
         public DbSet<Role> Role { get; set; }
         public DbSet<Guild> Guilds { get; set; }
         public DbSet<Quote> Quotes { get; set; }
+        public DbSet<McLocation> McLocations { get; set; }
+        public DbSet<McCoordinates> McCoordinates { get; set; }
 
         #endregion
 
@@ -46,6 +46,13 @@ namespace AivaptDotNet.Services.Database
                 .HasKey(q => new { q.RoleId, q.GuildId });
         }
 
+        private void SetMcCoordinates(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<McCoordinates>()
+                .HasMany(mc => mc.Locations)
+                .WithMany(ml => ml.LinkedMcCoordinates);
+        }
+
         #endregion
 
         #region Override Events
@@ -56,6 +63,7 @@ namespace AivaptDotNet.Services.Database
 
             SetSimpleCommandEntity(modelBuilder);
             SetQuoteEntity(modelBuilder);
+            SetMcCoordinates(modelBuilder);
         }
 
         #endregion
