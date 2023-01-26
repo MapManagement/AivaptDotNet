@@ -51,6 +51,17 @@ namespace AivaptDotNet.Services.Database
             modelBuilder.Entity<McCoordinates>()
                 .HasMany(mc => mc.Locations)
                 .WithMany(ml => ml.LinkedMcCoordinates);
+
+            modelBuilder.Entity<McCoordinates>()
+                .Property(mc => mc.CoordinatesId)
+                .ValueGeneratedOnAdd();
+        }
+
+        private void SetMcLocation(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<McLocation>()
+                .Property(ml => ml.LocationId)
+                .ValueGeneratedOnAdd();
         }
 
         #endregion
@@ -63,6 +74,7 @@ namespace AivaptDotNet.Services.Database
 
             SetSimpleCommandEntity(modelBuilder);
             SetQuoteEntity(modelBuilder);
+            SetMcLocation(modelBuilder);
             SetMcCoordinates(modelBuilder);
         }
 
