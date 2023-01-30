@@ -6,7 +6,6 @@ using Discord;
 using Discord.WebSocket;
 using Discord.Interactions;
 using AivaptDotNet.Helpers.DiscordClasses;
-using AivaptDotNet.Services;
 using AivaptDotNet.Services.Database;
 
 namespace AivaptDotNet.Handlers

@@ -1,5 +1,7 @@
+using AivaptDotNet.Helpers.DiscordClasses;
 using AivaptDotNet.Services.Database;
 using AivaptDotNet.Services.Database.Models;
+using Discord;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -29,7 +31,6 @@ namespace AivaptDotNet.Helpers.Modules
         {
             var location = GetLocationByName(dbContext, locationName);
 
-            // TODO: add output string
             if (location == null || AreCoordinatesLinked(dbContext, location))
                 return $"There is no location called\"{locationName}\".";
 
@@ -44,7 +45,22 @@ namespace AivaptDotNet.Helpers.Modules
             return dbContext.McLocations.ToList();
         }
 
-        public static string InsertCoordinates(BotDbContext dbContext, ulong x, ulong y, ulong z, List<McLocation> mcLocations, ulong submitterId)
+        public static Embed ListLocationTypes(BotDbContext dbContext)
+        {
+            var locationTypes = GetAllLocationTypes(dbContext);
+            var embed = SimpleEmbed.MinimalEmbed("Minecraft Location Types");
+
+            var embedContent = new StringBuilder();
+            foreach (var lt in locationTypes)
+            {
+                embedContent.Append($"{lt.LocationName} - {lt.LocationId}\n");
+            }
+
+            return embed.Build();
+        }
+
+        public static string InsertCoordinates(BotDbContext dbContext, ulong x, ulong y, ulong z,
+                                               List<McLocation> mcLocations, ulong submitterId)
         {
             var coordinates = new McCoordinates
             {
@@ -58,16 +74,18 @@ namespace AivaptDotNet.Helpers.Modules
             dbContext.McCoordinates.Add(coordinates);
             dbContext.SaveChanges();
 
-            var baseSentence =  new StringBuilder($"New coordinates at X: {x}, Y: {y}, Z: {z} have been linked with following location types: ");
+            string baseText = $"New coordinates at X: {x}, Y: {y}, Z: {z} have been linked with " +
+                               "following location types: ";
+            var stringBuilder = new StringBuilder(baseText);
 
             foreach (var mcLocation in mcLocations)
             {
-                baseSentence
+                stringBuilder
                     .Append(mcLocation.LocationName)
                     .Append(", ");
             }
 
-            return baseSentence.ToString();
+            return stringBuilder.ToString();
         }
 
         public static string DeleteCoordinates(BotDbContext dbContext, int coordinatesId)
@@ -94,7 +112,7 @@ namespace AivaptDotNet.Helpers.Modules
             return location;
         }
 
-        private static bool ExistsLocatioName(BotDbContext dbContext, string locationName)
+        private static bool ExistsLocationName(BotDbContext dbContext, string locationName)
         {
             bool locationExists = dbContext.McLocations.Any(ml => ml.LocationName == locationName);
 
@@ -106,11 +124,12 @@ namespace AivaptDotNet.Helpers.Modules
             // TODO: int instead of uint?
             uint locationId = location.LocationId;
 
-            bool areLinked = dbContext.McCoordinates.Any(mc => mc.Locations.Any(l => l.LocationId == locationId));
+            bool areLinked = dbContext.McCoordinates
+                .Any(mc => mc.Locations.Any(l => l.LocationId == locationId));
 
             return areLinked;
         }
-
+        
         #endregion
 
         #endregion
