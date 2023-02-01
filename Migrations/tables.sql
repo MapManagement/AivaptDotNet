@@ -77,3 +77,13 @@ INSERT INTO `__EFMigrationsHistory` (`MigrationId`, `ProductVersion`)
 VALUES ('20230125210401_AddMinecraftModels', '6.0.7');
 
 COMMIT;
+
+-- AddCoordinatesDescription
+START TRANSACTION;
+
+ALTER TABLE `mc_coordinates` ADD `Description` longtext CHARACTER SET utf8mb4 NULL;
+
+INSERT INTO `__EFMigrationsHistory` (`MigrationId`, `ProductVersion`)
+VALUES ('20230201211202_AddCoordinateDescription', '6.0.7');
+
+COMMIT;

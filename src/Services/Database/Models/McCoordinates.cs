@@ -22,5 +22,7 @@ namespace AivaptDotNet.Services.Database.Models
 
         [Required]
         public ulong SubmitterId { get; set; }
+
+        public string Description { get; set; }
     }
 }
