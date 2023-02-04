@@ -2,6 +2,7 @@ using AivaptDotNet.Helpers.DiscordClasses;
 using AivaptDotNet.Services.Database;
 using AivaptDotNet.Services.Database.Models;
 using Discord;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -48,21 +49,25 @@ namespace AivaptDotNet.Helpers.Modules
         public static Embed ListLocationTypes(BotDbContext dbContext)
         {
             var locationTypes = GetAllLocationTypes(dbContext);
-            var embed = SimpleEmbed.MinimalEmbed("Minecraft Location Types");
 
             var embedContent = new StringBuilder();
             foreach (var lt in locationTypes)
             {
-                embedContent.Append($"{lt.LocationName} - {lt.LocationId}\n");
+                embedContent.Append($"{lt.LocationId} - {lt.LocationName}\n");
             }
+
+            var embed = SimpleEmbed.MinimalEmbed(embedTitle: "Minecraft Location Types",
+                                                 embedDescription: embedContent.ToString());
 
             return embed.Build();
         }
 
         public static string InsertCoordinates(BotDbContext dbContext, ulong x, ulong y, ulong z,
-                                               List<McLocation> mcLocations, ulong submitterId)
+                                               string[] locationTypes, ulong submitterId)
         {
-            var coordinates = new McCoordinates
+            var mcLocations = ExtractMcLocationsFromIds(dbContext, locationTypes);
+
+            var mcCoordinates = new McCoordinates
             {
                 X = x,
                 Y = y,
@@ -71,7 +76,7 @@ namespace AivaptDotNet.Helpers.Modules
                 SubmitterId = submitterId
             };
 
-            dbContext.McCoordinates.Add(coordinates);
+            dbContext.McCoordinates.Add(mcCoordinates);
             dbContext.SaveChanges();
 
             string baseText = $"New coordinates at X: {x}, Y: {y}, Z: {z} have been linked with " +
@@ -129,7 +134,35 @@ namespace AivaptDotNet.Helpers.Modules
 
             return areLinked;
         }
-        
+
+        private static List<McLocation> ExtractMcLocationsFromIds(BotDbContext dbContext, string[] locationTypes)
+        {
+            List<McLocation> mcLocations = new List<McLocation>();
+
+            foreach (var customId in locationTypes)
+            {
+                var parsedId = Convert.ToUInt32(customId.Split(",")[1]);
+                McLocation locationType = dbContext.McLocations.Find(parsedId);
+                mcLocations.Add(locationType);
+            }
+
+            return mcLocations;
+        }
+
+        private static List<ulong> ExtractCoordinatesFromString(string coordinatesString)
+        {
+            List<ulong> coordinates = new List<ulong>();
+            var splittedStrings =  coordinatesString.Split(",");
+
+            for (int i = 1; i < splittedStrings.Length; i++)
+            {
+                var parsedCoordinate = Convert.ToUInt64(splittedStrings[i]);
+                coordinates.Add(parsedCoordinate);
+            }
+
+            return coordinates;
+        }
+
         #endregion
 
         #endregion

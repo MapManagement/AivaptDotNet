@@ -2,6 +2,7 @@ using AivaptDotNet.Helpers.Modules;
 using AivaptDotNet.Services.Database;
 using Discord;
 using Discord.Interactions;
+using System;
 using System.Threading.Tasks;
 
 namespace AivaptDotNet.Modules
@@ -59,43 +60,46 @@ namespace AivaptDotNet.Modules
             public async Task NewCoordinates(ulong x, ulong y, ulong z = 0)
             {
                 var locationTypes = MinecraftHelper.GetAllLocationTypes(DbContext);
+                var customId = $"mc-coordinates-select,{x},{y},{z}";
 
-                // TODO: add custom ID
                 var selectMenuBuilder = new SelectMenuBuilder()
-                    .WithPlaceholder("Select a Minecraft location type")
-                    .WithCustomId("mc-select-1")
-                    .WithMinValues(1);
+                {
+                    CustomId = customId,
+                    Placeholder = "Select a Minecraft location type...",
+                    MinValues = 1,
+                    MaxValues = 5
+                };
 
                 foreach (var locationType in locationTypes)
                 {
-                    selectMenuBuilder.AddOption(locationType.LocationName,
-                                                $"mc-location_type-{locationType.LocationId}");
+                    var optionId = $"mc_location_type,{locationType.LocationId}"; 
+                    selectMenuBuilder.AddOption(locationType.LocationName, optionId);
                 }
-
+                
                 var component = new ComponentBuilder()
                     .WithSelectMenu(selectMenuBuilder)
                     .Build();
 
                 await RespondAsync("What location type should be stored?", components: component);
-
-                // TODO: add event handler
             }
 
             #endregion
 
             #region Component Interaction
 
-            [ComponentInteraction("mc-location-type-*")]
-            public async Task HandleCoordinatesSelectMenu(string id, string[] locationTypes)
+            [ComponentInteraction("mc-coordinates-select,*,*,*", true)]
+            public async Task HandleCoordinatesSelectMenu(string x, string y, string z, 
+                                                          string[] locationTypes)
             {
-                var s = "Selected: ";
+                var xLong = Convert.ToUInt64(x); 
+                var yLong = Convert.ToUInt64(y); 
+                var zLong = Convert.ToUInt64(z);
+                
+                string response = MinecraftHelper
+                    .InsertCoordinates(DbContext, xLong, yLong, zLong, locationTypes,
+                                       Context.User.Id);
 
-                foreach (var lt in locationTypes)
-                {
-                    s += lt;
-                }
-
-                await RespondAsync(s);
+                await RespondAsync(response);
             }
 
             #endregion

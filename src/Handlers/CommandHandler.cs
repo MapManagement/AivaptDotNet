@@ -8,9 +8,7 @@ using Discord.WebSocket;
 using AivaptDotNet.Helpers.General;
 using AivaptDotNet.Helpers.DiscordClasses;
 using AivaptDotNet.Helpers.Modules;
-using AivaptDotNet.Services;
 using AivaptDotNet.Services.Database;
-using AivaptDotNet.Services.Database.Models;
 
 
 namespace AivaptDotNet.Handlers
