@@ -60,7 +60,7 @@ namespace AivaptDotNet.Modules
             public async Task NewCoordinates(ulong x, ulong y, ulong z = 0)
             {
                 var locationTypes = MinecraftHelper.GetAllLocationTypes(DbContext);
-                var customId = $"mc-coordinates-select,{x},{y},{z}";
+                var customId = $"mc-coordinates-new,{x},{y},{z}";
 
                 var selectMenuBuilder = new SelectMenuBuilder()
                 {
@@ -83,14 +83,40 @@ namespace AivaptDotNet.Modules
                 await RespondAsync("What location type should be stored?", components: component);
             }
 
+            [SlashCommand("type", "Get all coordinates that are linked to a certain location type")]
+            public async Task GetCoordinatesType()
+            {
+                // TODO: add SimpleSelectMenu to helper classes
+                var locationTypes = MinecraftHelper.GetAllLocationTypes(DbContext);
+
+                var selectMenuBuilder = new SelectMenuBuilder()
+                {
+                    CustomId = "mc-coordinates-type",
+                    Placeholder = "Select a Minecraft location type...",
+                };
+
+                foreach (var locationType in locationTypes)
+                {
+                    var optionId = $"mc_location_type,{locationType.LocationId}"; 
+                    selectMenuBuilder.AddOption(locationType.LocationName, optionId);
+                }
+                
+                var component = new ComponentBuilder()
+                    .WithSelectMenu(selectMenuBuilder)
+                    .Build();
+
+                await RespondAsync("What location type are you looking for?", components: component);
+            }
+
             #endregion
 
             #region Component Interaction
 
-            [ComponentInteraction("mc-coordinates-select,*,*,*", true)]
+            [ComponentInteraction("mc-coordinates-new,*,*,*", true)]
             public async Task HandleCoordinatesSelectMenu(string x, string y, string z, 
                                                           string[] locationTypes)
             {
+                // TODO: disable select menu
                 var xLong = Convert.ToUInt64(x); 
                 var yLong = Convert.ToUInt64(y); 
                 var zLong = Convert.ToUInt64(z);
@@ -100,6 +126,19 @@ namespace AivaptDotNet.Modules
                                        Context.User.Id);
 
                 await RespondAsync(response);
+            }
+
+            [ComponentInteraction("mc-coordinates-type", true)]
+            public async Task HandleCoordinatesSelectMenu(string[] locationTypes)
+            {
+                // TODO: disable select menu
+                if (locationTypes.Length == 0)
+                    await RespondAsync("Something went wrong...");
+
+                var customId = locationTypes[0];
+                var embed = MinecraftHelper.ListCoordinatesByTypeId(DbContext, customId);
+
+                await RespondAsync(null, embed: embed);
             }
 
             #endregion

@@ -62,6 +62,30 @@ namespace AivaptDotNet.Helpers.Modules
             return embed.Build();
         }
 
+        public static Embed ListCoordinatesByType(BotDbContext dbContext, McLocation locationType)
+        {
+            var coordinates = dbContext.McCoordinates
+                .Where(x => x.Locations.Contains(locationType));
+
+            string embedTitle = $"Coordinates including '{locationType.LocationName}'";
+            var fields = new List<EmbedFieldBuilder>();
+
+            foreach (var coordinate in coordinates)
+            {
+                var field = new EmbedFieldBuilder()
+                {
+                    Name = coordinate.CoordinatesId.ToString(),
+                    Value = $"X: {coordinate.X} Y: {coordinate.Y}, Z: {coordinate.Z}",
+                    IsInline = true
+                };
+
+                fields.Add(field);
+            }
+
+            var embed = SimpleEmbed.FieldsEmbed(embedTitle, fields);
+            return embed.Build();
+        }
+
         public static string InsertCoordinates(BotDbContext dbContext, ulong x, ulong y, ulong z,
                                                string[] locationTypes, ulong submitterId)
         {
@@ -106,6 +130,14 @@ namespace AivaptDotNet.Helpers.Modules
             return $"The coordinates with the ID \"{coordinatesId}\" have been deleted.";
         }
 
+        public static Embed ListCoordinatesByTypeId(BotDbContext dbContext, string locationTypes)
+        {
+            var mcLocation = ExtractMcLocationFromId(dbContext, locationTypes);
+            var embed = ListCoordinatesByType(dbContext, mcLocation);
+
+            return embed;
+        }
+
         #endregion
 
         #region Private
@@ -135,24 +167,31 @@ namespace AivaptDotNet.Helpers.Modules
             return areLinked;
         }
 
-        private static List<McLocation> ExtractMcLocationsFromIds(BotDbContext dbContext, string[] locationTypes)
+        private static List<McLocation> ExtractMcLocationsFromIds(BotDbContext dbContext,
+                                                                  string[] locationTypes)
         {
             List<McLocation> mcLocations = new List<McLocation>();
 
             foreach (var customId in locationTypes)
             {
-                var parsedId = Convert.ToUInt32(customId.Split(",")[1]);
-                McLocation locationType = dbContext.McLocations.Find(parsedId);
-                mcLocations.Add(locationType);
+                mcLocations.Add(ExtractMcLocationFromId(dbContext, customId));
             }
 
             return mcLocations;
         }
 
+        private static McLocation ExtractMcLocationFromId(BotDbContext dbContext, string customId)
+        {
+            var parsedId = Convert.ToUInt32(customId.Split(",")[1]);
+            McLocation mcLocation = dbContext.McLocations.Find(parsedId);
+
+            return mcLocation;
+        }
+
         private static List<ulong> ExtractCoordinatesFromString(string coordinatesString)
         {
             List<ulong> coordinates = new List<ulong>();
-            var splittedStrings =  coordinatesString.Split(",");
+            var splittedStrings = coordinatesString.Split(",");
 
             for (int i = 1; i < splittedStrings.Length; i++)
             {
