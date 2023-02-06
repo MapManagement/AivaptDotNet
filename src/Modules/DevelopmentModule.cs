@@ -6,10 +6,10 @@ using AivaptDotNet.DataClasses;
 using AivaptDotNet.Helpers.Modules;
 using AivaptDotNet.Helpers.DiscordClasses;
 
-namespace AivaptDotNet.Modules 
+namespace AivaptDotNet.Modules
 {
     [Group("dev", "Check the developtment status of the AivaptDotNet GitHub repository")]
-    public class DevelopmentModule: InteractionModuleBase<SocketInteractionContext>
+    public class DevelopmentModule : InteractionModuleBase<SocketInteractionContext>
     {
 
         [SlashCommand("latest", "Get the latest changes.")]
@@ -23,7 +23,7 @@ namespace AivaptDotNet.Modules
                 new EmbedFieldBuilder{Name = "Message", Value = latestCommit.Details.Message, IsInline = false}
             };
 
-            EmbedBuilder builder =  SimpleEmbed.FieldsEmbed($"{latestCommit.SHA.Substring(0,8)}", fields)
+            EmbedBuilder builder = SimpleEmbed.FieldsEmbed($"{latestCommit.SHA.Substring(0, 8)}", fields)
                 .WithUrl(latestCommit.URL)
                 .WithThumbnailUrl(latestCommit.Author.AvatarUrl)
                 .WithColor(Color.Teal)
@@ -45,10 +45,10 @@ namespace AivaptDotNet.Modules
                 new EmbedFieldBuilder{Name = "Languages", Value = repo.Language ,IsInline = true},
                 new EmbedFieldBuilder{Name = "Watchers", Value = repo.Watchers ,IsInline = true},
                 new EmbedFieldBuilder{Name = "Stars", Value = repo.Stars ,IsInline = true},
-                new EmbedFieldBuilder{Name = "Open issues", Value = repo.OpenIssues ,IsInline = true} 
+                new EmbedFieldBuilder{Name = "Open issues", Value = repo.OpenIssues ,IsInline = true}
             };
-           
-            EmbedBuilder builder =  SimpleEmbed.FieldsEmbed(repo.Name, fields)
+
+            EmbedBuilder builder = SimpleEmbed.FieldsEmbed(repo.Name, fields)
                 .WithUrl(repo.URL)
                 .WithColor(Color.Teal)
                 .WithFooter("General Info");
@@ -63,7 +63,7 @@ namespace AivaptDotNet.Modules
 
             if (latestRelease == null)
             {
-                EmbedBuilder errorBuilder =  SimpleEmbed.MinimalEmbed("Error", "Couldn't find any release!");
+                EmbedBuilder errorBuilder = SimpleEmbed.MinimalEmbed("Error", "Couldn't find any release!");
                 errorBuilder.WithFooter("Latest Release");
                 await RespondAsync(embed: errorBuilder.Build());
                 return;
@@ -77,7 +77,7 @@ namespace AivaptDotNet.Modules
                 new EmbedFieldBuilder{Name = "Text", Value = latestRelease.Body ,IsInline = false}
             };
 
-            EmbedBuilder builder =  SimpleEmbed.FieldsEmbed(latestRelease.ID.ToString(), latestRelease.Name, fields)
+            EmbedBuilder builder = SimpleEmbed.FieldsEmbed(latestRelease.ID.ToString(), latestRelease.Name, fields)
                 .WithUrl(latestRelease.URL)
                 .WithColor(Color.Teal)
                 .WithFooter("Latest Release");
@@ -104,7 +104,7 @@ namespace AivaptDotNet.Modules
                 new EmbedFieldBuilder{Name = "Author", Value = issue.User.Login, IsInline = true}
             };
 
-            EmbedBuilder builder =  SimpleEmbed.FieldsEmbed($"{issue.Number} - {issue.Title}", issue.Body, fields)
+            EmbedBuilder builder = SimpleEmbed.FieldsEmbed($"{issue.Number} - {issue.Title}", issue.Body, fields)
                 .WithUrl(issue.URL)
                 .WithThumbnailUrl(issue.User.AvatarUrl)
                 .WithColor(Color.Teal)

@@ -138,6 +138,22 @@ namespace AivaptDotNet.Helpers.Modules
             return embed;
         }
 
+        public static Modal GetNewCoordinatesModal(BotDbContext dbContext)
+        {
+            var locationTypes = GetAllLocationTypes(dbContext);
+
+            var modal = new ModalBuilder()
+                .WithCustomId("mc-new-coordinates-modal")
+                .WithTitle("New Coordinates")
+                .AddTextInput("x", "x", placeholder: "0", required: true)
+                .AddTextInput("y", "y", placeholder: "0", required: true)
+                .AddTextInput("z", "z", placeholder: "0")
+                .AddTextInput("Description", "description", TextInputStyle.Paragraph)
+                .Build();
+
+            return modal;
+        }
+
         #endregion
 
         #region Private
