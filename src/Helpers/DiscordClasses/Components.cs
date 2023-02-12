@@ -97,6 +97,18 @@ namespace AivaptDotNet.Helpers.DiscordClasses
 
             return new ComponentBuilder().WithSelectMenu(choiceBuilder);
         }
+
+        public static SelectMenuBuilder DisabledSelectMenu(string placeholder)
+        {
+            var selectMenu = new SelectMenuBuilder()
+            {
+                CustomId = "mc-coordinates-type",
+                Placeholder = placeholder,
+                IsDisabled = true
+            };
+
+            return selectMenu;
+        }
     }
 
     public class UserOption

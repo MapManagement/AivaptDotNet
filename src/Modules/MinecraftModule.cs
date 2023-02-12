@@ -1,7 +1,9 @@
+using AivaptDotNet.Helpers.DiscordClasses;
 using AivaptDotNet.Helpers.Modules;
 using AivaptDotNet.Services.Database;
 using Discord;
 using Discord.Interactions;
+using Discord.WebSocket;
 using System;
 using System.Threading.Tasks;
 
@@ -72,10 +74,10 @@ namespace AivaptDotNet.Modules
 
                 foreach (var locationType in locationTypes)
                 {
-                    var optionId = $"mc_location_type,{locationType.LocationId}"; 
+                    var optionId = $"mc_location_type,{locationType.LocationId}";
                     selectMenuBuilder.AddOption(locationType.LocationName, optionId);
                 }
-                
+
                 var component = new ComponentBuilder()
                     .WithSelectMenu(selectMenuBuilder)
                     .Build();
@@ -91,21 +93,21 @@ namespace AivaptDotNet.Modules
 
                 var selectMenuBuilder = new SelectMenuBuilder()
                 {
-                    CustomId = "mc-coordinates-type",
+                    CustomId = "mc_coordinates_type",
                     Placeholder = "Select a Minecraft location type...",
                 };
 
                 foreach (var locationType in locationTypes)
                 {
-                    var optionId = $"mc_location_type,{locationType.LocationId}"; 
+                    var optionId = $"mc_location_type,{locationType.LocationId}";
                     selectMenuBuilder.AddOption(locationType.LocationName, optionId);
                 }
-                
+
                 var component = new ComponentBuilder()
                     .WithSelectMenu(selectMenuBuilder)
                     .Build();
 
-                await RespondAsync("What location type are you looking for?", components: component);
+                await RespondAsync("What location type are you looking for?", components: component, ephemeral: true);
             }
 
             #endregion
@@ -113,32 +115,39 @@ namespace AivaptDotNet.Modules
             #region Component Interaction
 
             [ComponentInteraction("mc-coordinates-new,*,*,*", true)]
-            public async Task HandleCoordinatesSelectMenu(string x, string y, string z, 
+            public async Task HandleNewCoordinatesSelectMenu(string x, string y, string z,
                                                           string[] locationTypes)
             {
                 // TODO: disable select menu
-                var xLong = Convert.ToUInt64(x); 
-                var yLong = Convert.ToUInt64(y); 
+                var xLong = Convert.ToUInt64(x);
+                var yLong = Convert.ToUInt64(y);
                 var zLong = Convert.ToUInt64(z);
-                
+
                 string response = MinecraftHelper
                     .InsertCoordinates(DbContext, xLong, yLong, zLong, locationTypes,
                                        Context.User.Id);
 
-                await RespondAsync(response);
+                await ReplyAsync(response);
             }
 
-            [ComponentInteraction("mc-coordinates-type", true)]
-            public async Task HandleCoordinatesSelectMenu(string[] locationTypes)
+            [ComponentInteraction("mc_coordinates_type", true)]
+            public async Task HandleTypeCoordinatesSelectMenu(string[] locationTypes)
             {
-                // TODO: disable select menu
+                var message = this.Context.Interaction as SocketMessageComponent;
+
                 if (locationTypes.Length == 0)
                     await RespondAsync("Something went wrong...");
 
                 var customId = locationTypes[0];
                 var embed = MinecraftHelper.ListCoordinatesByTypeId(DbContext, customId);
 
-                await RespondAsync(null, embed: embed);
+                await message.UpdateAsync(msg =>
+                {
+                    msg.Content = "Location type has already been chosen.";
+                    msg.Components = null; //TODO: cannot update components, needs to be set to null
+                });
+
+                await FollowupAsync(embed: embed);
             }
 
             #endregion
