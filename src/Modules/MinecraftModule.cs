@@ -1,4 +1,3 @@
-using AivaptDotNet.Helpers.DiscordClasses;
 using AivaptDotNet.Helpers.Modules;
 using AivaptDotNet.Services.Database;
 using Discord;
@@ -31,10 +30,19 @@ namespace AivaptDotNet.Modules
             }
 
             [SlashCommand("delete", "Delete an existing location type")]
-            public async Task DeleteLocationType(string name)
+            public async Task DeleteLocationType()
             {
-                var output = MinecraftHelper.DeleteLocationType(DbContext, name);
-                await RespondAsync(output);
+                var selectMenuBuilder = MinecraftHelper.GetLocationTypeSelectMenu(DbContext)
+                    .WithCustomId("mc_location_type_delete")
+                    .WithMaxValues(1);
+
+                var component = new ComponentBuilder()
+                    .WithSelectMenu(selectMenuBuilder)
+                    .Build();
+                
+                await RespondAsync("What location type needs to be deleted?",
+                                   components: component,
+                                   ephemeral: true);
             }
 
             [SlashCommand("list", "Lists all existing location types")]
@@ -61,22 +69,9 @@ namespace AivaptDotNet.Modules
             [SlashCommand("new", "Add new coordinates")]
             public async Task NewCoordinates(ulong x, ulong y, ulong z = 0)
             {
-                var locationTypes = MinecraftHelper.GetAllLocationTypes(DbContext);
-                var customId = $"mc-coordinates-new,{x},{y},{z}";
-
-                var selectMenuBuilder = new SelectMenuBuilder()
-                {
-                    CustomId = customId,
-                    Placeholder = "Select a Minecraft location type...",
-                    MinValues = 1,
-                    MaxValues = 5
-                };
-
-                foreach (var locationType in locationTypes)
-                {
-                    var optionId = $"mc_location_type,{locationType.LocationId}";
-                    selectMenuBuilder.AddOption(locationType.LocationName, optionId);
-                }
+                var selectMenuBuilder = MinecraftHelper.GetLocationTypeSelectMenu(DbContext)
+                    .WithCustomId($"mc_coordinates_new,{x},{y},{z}")
+                    .WithMaxValues(5);
 
                 var component = new ComponentBuilder()
                     .WithSelectMenu(selectMenuBuilder)
@@ -88,33 +83,24 @@ namespace AivaptDotNet.Modules
             [SlashCommand("type", "Get all coordinates that are linked to a certain location type")]
             public async Task GetCoordinatesType()
             {
-                // TODO: add SimpleSelectMenu to helper classes
-                var locationTypes = MinecraftHelper.GetAllLocationTypes(DbContext);
-
-                var selectMenuBuilder = new SelectMenuBuilder()
-                {
-                    CustomId = "mc_coordinates_type",
-                    Placeholder = "Select a Minecraft location type...",
-                };
-
-                foreach (var locationType in locationTypes)
-                {
-                    var optionId = $"mc_location_type,{locationType.LocationId}";
-                    selectMenuBuilder.AddOption(locationType.LocationName, optionId);
-                }
+                var selectMenuBuilder = MinecraftHelper.GetLocationTypeSelectMenu(DbContext)
+                    .WithCustomId("mc_coordinates_type")
+                    .WithMaxValues(1);
 
                 var component = new ComponentBuilder()
                     .WithSelectMenu(selectMenuBuilder)
                     .Build();
 
-                await RespondAsync("What location type are you looking for?", components: component, ephemeral: true);
+                await RespondAsync("What location type are you looking for?",
+                                   components: component,
+                                   ephemeral: true);
             }
 
             #endregion
 
             #region Component Interaction
 
-            [ComponentInteraction("mc-coordinates-new,*,*,*", true)]
+            [ComponentInteraction("mc_coordinates_new,*,*,*", true)]
             public async Task HandleNewCoordinatesSelectMenu(string x, string y, string z,
                                                           string[] locationTypes)
             {
@@ -127,7 +113,7 @@ namespace AivaptDotNet.Modules
                     .InsertCoordinates(DbContext, xLong, yLong, zLong, locationTypes,
                                        Context.User.Id);
 
-                await ReplyAsync(response);
+                await RespondAsync(response);
             }
 
             [ComponentInteraction("mc_coordinates_type", true)]
@@ -139,15 +125,38 @@ namespace AivaptDotNet.Modules
                     await RespondAsync("Something went wrong...");
 
                 var customId = locationTypes[0];
-                var embed = MinecraftHelper.ListCoordinatesByTypeId(DbContext, customId);
+                var embed = MinecraftHelper.ListCoordinatesByLocationTypeId(DbContext, customId);
+
+                //TODO: cannot update components, needs to be set to null
+                // next release will fix this
+                await message.UpdateAsync(msg =>
+                {
+                    msg.Content = "Location type has already been chosen.";
+                    msg.Components = null; 
+                });
+
+                await FollowupAsync(embed: embed);
+            }
+
+            [ComponentInteraction("mc_location_type_delete", true)]
+            public async Task HandDeleteLocationTypeSelectMenu(string[] locationTypes)
+            {
+                var message = this.Context.Interaction as SocketMessageComponent;
+
+                if (locationTypes.Length == 0)
+                    await RespondAsync("Something went wrong...");
+
+                var customId = locationTypes[0];
+                var output = MinecraftHelper.DeleteLocationType(DbContext, customId);
 
                 await message.UpdateAsync(msg =>
                 {
                     msg.Content = "Location type has already been chosen.";
-                    msg.Components = null; //TODO: cannot update components, needs to be set to null
+                    msg.Components = null; 
                 });
 
-                await FollowupAsync(embed: embed);
+                await FollowupAsync(output);
+
             }
 
             #endregion
