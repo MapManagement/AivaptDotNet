@@ -1,4 +1,4 @@
-using AivaptDotNet.Helpers.Modules;
+using AivaptDotNet.Helpers.Minecraft;
 using AivaptDotNet.Services.Database;
 using Discord;
 using Discord.Interactions;
@@ -25,14 +25,14 @@ namespace AivaptDotNet.Modules
             [SlashCommand("new", "Add a new location type")]
             public async Task NewLocationType(string name)
             {
-                var output = MinecraftHelper.InsertLocationType(DbContext, name);
+                var output = LocationTypeHelper.InsertLocationType(DbContext, name);
                 await RespondAsync(output);
             }
 
             [SlashCommand("delete", "Delete an existing location type")]
             public async Task DeleteLocationType()
             {
-                var selectMenuBuilder = MinecraftHelper.GetLocationTypeSelectMenu(DbContext)
+                var selectMenuBuilder = LocationTypeHelper.GetLocationTypeSelectMenu(DbContext)
                     .WithCustomId("mc_location_type_delete")
                     .WithMaxValues(1);
 
@@ -48,7 +48,7 @@ namespace AivaptDotNet.Modules
             [SlashCommand("list", "Lists all existing location types")]
             public async Task ListLocationTypes()
             {
-                var embed = MinecraftHelper.ListLocationTypes(DbContext);
+                var embed = LocationTypeHelper.ListLocationTypes(DbContext);
                 await RespondAsync(null, embed: embed);
             }
 
@@ -69,7 +69,7 @@ namespace AivaptDotNet.Modules
             [SlashCommand("new", "Add new coordinates")]
             public async Task NewCoordinates(ulong x, ulong y, ulong z = 0)
             {
-                var selectMenuBuilder = MinecraftHelper.GetLocationTypeSelectMenu(DbContext)
+                var selectMenuBuilder = LocationTypeHelper.GetLocationTypeSelectMenu(DbContext)
                     .WithCustomId($"mc_coordinates_new,{x},{y},{z}")
                     .WithMaxValues(5);
 
@@ -83,7 +83,7 @@ namespace AivaptDotNet.Modules
             [SlashCommand("type", "Get all coordinates that are linked to a certain location type")]
             public async Task GetCoordinatesType()
             {
-                var selectMenuBuilder = MinecraftHelper.GetLocationTypeSelectMenu(DbContext)
+                var selectMenuBuilder = LocationTypeHelper.GetLocationTypeSelectMenu(DbContext)
                     .WithCustomId("mc_coordinates_type")
                     .WithMaxValues(1);
 
@@ -109,7 +109,7 @@ namespace AivaptDotNet.Modules
                 var yLong = Convert.ToUInt64(y);
                 var zLong = Convert.ToUInt64(z);
 
-                string response = MinecraftHelper
+                string response = CoordinatesHelper
                     .InsertCoordinates(DbContext, xLong, yLong, zLong, locationTypes,
                                        Context.User.Id);
 
@@ -125,7 +125,7 @@ namespace AivaptDotNet.Modules
                     await RespondAsync("Something went wrong...");
 
                 var customId = locationTypes[0];
-                var embed = MinecraftHelper.ListCoordinatesByLocationTypeId(DbContext, customId);
+                var embed = CoordinatesHelper.ListCoordinatesByLocationTypeId(DbContext, customId);
 
                 //TODO: cannot update components, needs to be set to null
                 // next release will fix this
@@ -147,7 +147,7 @@ namespace AivaptDotNet.Modules
                     await RespondAsync("Something went wrong...");
 
                 var customId = locationTypes[0];
-                var output = MinecraftHelper.DeleteLocationType(DbContext, customId);
+                var output = LocationTypeHelper.DeleteLocationType(DbContext, customId);
 
                 await message.UpdateAsync(msg =>
                 {
