@@ -1,4 +1,4 @@
-namespace AivaptDotNet.Helpers.General
+namespace AivaptDotNet.DataClasses
 {
     public class Credentials
     {

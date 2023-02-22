@@ -3,7 +3,7 @@ using System.Linq;
 using AivaptDotNet.Services.Database;
 using AivaptDotNet.Services.Database.Models;
 
-namespace AivaptDotNet.Helpers.Modules
+namespace AivaptDotNet.Helpers
 {
     public static class SimpleCommandHelper
     {

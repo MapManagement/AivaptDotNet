@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using AivaptDotNet.DataClasses;
 using AivaptDotNet.Helpers.General;
 
-namespace AivaptDotNet.Helpers.Modules
+namespace AivaptDotNet.Helpers
 {
     public static class DevelopmentHelper
     {

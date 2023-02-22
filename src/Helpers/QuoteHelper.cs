@@ -4,7 +4,7 @@ using Discord.WebSocket;
 using System;
 using System.Linq;
 
-namespace AivaptDotNet.Helpers.Modules
+namespace AivaptDotNet.Helpers
 {
     public static class QuoteHelper
     {

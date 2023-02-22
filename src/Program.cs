@@ -1,5 +1,5 @@
-﻿using AivaptDotNet.Handlers;
-using AivaptDotNet.Helpers.General;
+﻿using AivaptDotNet.DataClasses;
+using AivaptDotNet.Handlers;
 using AivaptDotNet.Services;
 using AivaptDotNet.Services.Database;
 using Discord;

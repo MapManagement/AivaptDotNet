@@ -5,11 +5,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using AivaptDotNet.Helpers;
+using AivaptDotNet.Helpers.Discord;
 using AivaptDotNet.Helpers.General;
-using AivaptDotNet.Helpers.DiscordClasses;
-using AivaptDotNet.Helpers.Modules;
 using AivaptDotNet.Services.Database;
-
 
 namespace AivaptDotNet.Handlers
 {

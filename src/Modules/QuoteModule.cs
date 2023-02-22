@@ -2,8 +2,8 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
-using AivaptDotNet.Helpers.Modules;
-using AivaptDotNet.Helpers.DiscordClasses;
+using AivaptDotNet.Helpers;
+using AivaptDotNet.Helpers.Discord;
 using AivaptDotNet.Services.Database;
 using AivaptDotNet.Services.Database.Models;
 
