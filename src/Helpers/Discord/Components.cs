@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.IO;
 using Discord;
 
-namespace AivaptDotNet.Helpers.DiscordClasses
+namespace AivaptDotNet.Helpers.Discord
 {
     public static class SimpleEmbed
     {

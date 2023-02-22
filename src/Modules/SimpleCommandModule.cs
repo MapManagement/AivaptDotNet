@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using Discord;
 using Discord.Interactions;
 using AivaptDotNet.Services.Database;
-using AivaptDotNet.Services.Database.Models;
-using AivaptDotNet.Helpers.Modules;
-using AivaptDotNet.Helpers.DiscordClasses;
+using AivaptDotNet.Helpers;
+using AivaptDotNet.Helpers.Discord;
 
 namespace AivaptDotNet.Modules
 {

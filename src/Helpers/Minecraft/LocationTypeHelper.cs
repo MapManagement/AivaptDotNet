@@ -1,4 +1,4 @@
-using AivaptDotNet.Helpers.DiscordClasses;
+using AivaptDotNet.Helpers.Discord;
 using AivaptDotNet.Services.Database;
 using AivaptDotNet.Services.Database.Models;
 using Discord;

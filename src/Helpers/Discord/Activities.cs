@@ -1,7 +1,6 @@
 using Discord;
 
-
-namespace AivaptDotNet.Helpers.DiscordClasses
+namespace AivaptDotNet.Helpers.Discord
 {
     public class DefaultActivity : IActivity
     {

@@ -5,7 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Discord;
 using Discord.WebSocket;
 using Discord.Interactions;
-using AivaptDotNet.Helpers.DiscordClasses;
+using AivaptDotNet.Helpers.Discord;
 using AivaptDotNet.Services.Database;
 
 namespace AivaptDotNet.Handlers
