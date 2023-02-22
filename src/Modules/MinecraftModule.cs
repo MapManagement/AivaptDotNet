@@ -80,6 +80,13 @@ namespace AivaptDotNet.Modules
                 await RespondAsync("What location type should be stored?", components: component);
             }
 
+            [SlashCommand("delete", "Delete existing coordinates")]
+            public async Task DeleteCoordinates(int coordinatesId)
+            {
+                var response = CoordinatesHelper.DeleteCoordinates(DbContext, coordinatesId);
+                await RespondAsync(response);
+            }
+
             [SlashCommand("type", "Get all coordinates that are linked to a certain location type")]
             public async Task GetCoordinatesType()
             {
@@ -156,7 +163,6 @@ namespace AivaptDotNet.Modules
                 });
 
                 await FollowupAsync(output);
-
             }
 
             #endregion
