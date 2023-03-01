@@ -52,11 +52,12 @@ namespace AivaptDotNet
 
         private async Task RunAsync()
         {
-            var bot = _serviceProvider.GetService<DiscordSocketClient>();
-
             var botClient = _serviceProvider.GetRequiredService<DiscordSocketClient>();
             var commandHandler = _serviceProvider.GetRequiredService<CommandHandler>();
             var interactionHandler = _serviceProvider.GetRequiredService<InteractionHandler>();
+            var logging = _serviceProvider.GetRequiredService<LoggingService>();
+
+            logging.InitializeLogging();
 
             ConfigureBot();
 
@@ -76,8 +77,6 @@ namespace AivaptDotNet
             var commands = _serviceProvider.GetRequiredService<CommandService>();
 
             botClient.Ready += OnBotReady;
-            botClient.Log += Logging;
-            commands.Log += Logging;
 
             DiscordSocketConfig clientConfig = new DiscordSocketConfig
             {
@@ -88,9 +87,11 @@ namespace AivaptDotNet
 
         private static void CreateProvider(HostBuilderContext context, IServiceCollection serviceCollection)
         {
-
-            serviceCollection.AddDbContext<BotDbContext>(options =>
-                    options.UseMySql(_credentials.DbConnectionString, new MariaDbServerVersion(new Version(10, 9, 4))))
+            serviceCollection
+                .AddDbContext<BotDbContext>(options =>
+                    options.UseMySql(_credentials.DbConnectionString,
+                                     new MariaDbServerVersion(new Version(10, 9, 4))))
+                .AddSingleton<LoggingService>()
                 .AddSingleton<DiscordSocketClient>()
                 .AddSingleton<CommandService>()
                 .AddSingleton<CommandHandler>()
@@ -105,7 +106,6 @@ namespace AivaptDotNet
                         })
                 .AddMemoryCache()
                 .BuildServiceProvider();
-
         }
 
         private static Credentials GetConfiguration()
@@ -134,13 +134,6 @@ namespace AivaptDotNet
         #endregion
 
         #region Events
-
-        // TODO: move to dedicated class
-        private Task Logging(LogMessage msg)
-        {
-            Console.WriteLine(msg.ToString());
-            return Task.CompletedTask;
-        }
 
         // TODO: move to dedicated class
         private async Task OnBotReady()

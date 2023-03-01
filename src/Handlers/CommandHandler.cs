@@ -64,8 +64,6 @@ namespace AivaptDotNet.Handlers
             if ((messageHasNoPrefix || hasMentionPrefix) || isBot)
 				return;
             
-            var context = new CommandContext(_botClient, message);
-
 			await OnSimpleCommand(message);
         }
 
