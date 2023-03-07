@@ -1,4 +1,5 @@
 using System;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Discord;
@@ -51,6 +52,52 @@ namespace AivaptDotNet.Services
             _commandService.Log += LogAsync;
         }
 
+        private void LogError(LogMessage message)
+        {
+            var errorText = new StringBuilder("==== ERROR ====")
+                .Append(Environment.NewLine)
+                .Append($"Time: {GetCurrentDateTime()}")
+                .Append(Environment.NewLine)
+                .Append($"Source: {message.Source}")
+                .Append(Environment.NewLine)
+                .Append($"Exception: {message.Exception}")
+                .ToString();
+
+            Console.WriteLine(errorText);
+        }
+
+        private void LogDebugging(LogMessage message)
+        {
+            var debugText = new StringBuilder("==== DEBUG ====")
+                .Append(Environment.NewLine)
+                .Append($"Time: {GetCurrentDateTime()}")
+                .Append(Environment.NewLine)
+                .Append($"Source: {message.Source}")
+                .Append(Environment.NewLine)
+                .Append($"Message: {message.Message}")
+                .ToString();
+
+            Console.WriteLine(debugText);
+        }
+
+        private void LogInformation(LogMessage message)
+        {
+            var debugText = new StringBuilder("==== INFORMATION ====")
+                .Append(Environment.NewLine)
+                .Append($"Time: {GetCurrentDateTime()}")
+                .Append(Environment.NewLine)
+                .Append($"Message: {message.Message}")
+                .ToString();
+
+            Console.WriteLine(debugText);
+
+        }
+
+        private string GetCurrentDateTime()
+        {
+            return DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss");
+        }
+
         #endregion
 
         #endregion
@@ -59,13 +106,21 @@ namespace AivaptDotNet.Services
 
         private Task LogAsync(LogMessage message)
         {
-            if (message.Severity == LogSeverity.Error)
-            {   
-                Console.WriteLine(message.Severity.ToString());
-                Console.WriteLine(message.Exception);
-            }
+            switch (message.Severity)
+            {
+                case LogSeverity.Error:
+                case LogSeverity.Critical:
+                    LogError(message);
+                    break;
 
-            Console.WriteLine(message.Message); 
+                case LogSeverity.Debug:
+                    LogDebugging(message);
+                    break;
+
+                default:
+                    LogInformation(message);
+                    break;
+            }
 
             return Task.CompletedTask;
         }

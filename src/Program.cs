@@ -11,6 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Victoria;
 
@@ -67,7 +68,7 @@ namespace AivaptDotNet
             await commandHandler.InitializeCommands();
             await interactionHandler.InitializeCommands();
 
-            await Task.Delay(-1);
+            await Task.Delay(Timeout.Infinite);
         }
 
         // TODO: move to dedicated class
