@@ -1,5 +1,6 @@
 using AivaptDotNet.Helpers.Minecraft;
 using AivaptDotNet.Services.Database;
+using AivaptDotNet.Helpers.Discord;
 using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
@@ -134,12 +135,16 @@ namespace AivaptDotNet.Modules
                 var customId = locationTypes[0];
                 var embed = CoordinatesHelper.ListCoordinatesByLocationTypeId(DbContext, customId);
 
-                //TODO: cannot update components, needs to be set to null
-                // next release will fix this
+                string placeholder = "Disabled";
+                var disabledSelectMenu = SimpleComponents.DisabledSelectMenu(placeholder);
+                var messageComponent = new ComponentBuilder()
+                    .WithSelectMenu(disabledSelectMenu)
+                    .Build();
+
                 await message.UpdateAsync(msg =>
                 {
                     msg.Content = "Location type has already been chosen.";
-                    msg.Components = null; 
+                    msg.Components = messageComponent; 
                 });
 
                 await FollowupAsync(embed: embed);
