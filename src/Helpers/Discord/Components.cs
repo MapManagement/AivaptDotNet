@@ -72,7 +72,7 @@ namespace AivaptDotNet.Helpers.Discord
         }
     }
 
-    public class SimpleComponents
+    public static class SimpleComponents
     {
         public static ComponentBuilder MultipleButtons(List<ButtonBuilder> buttons)
         {
@@ -102,10 +102,14 @@ namespace AivaptDotNet.Helpers.Discord
         {
             var selectMenu = new SelectMenuBuilder()
             {
-                CustomId = "mc-coordinates-type",
+                CustomId = "disabled_select_menu",
                 Placeholder = placeholder,
-                IsDisabled = true
+                IsDisabled = true,
+                MinValues = 1,
+                MaxValues = 1
             };
+
+            selectMenu.AddOption("Empty", "empty_option");
 
             return selectMenu;
         }

@@ -98,5 +98,10 @@ namespace AivaptDotNet.Modules
         }
 
         #endregion
+
+        #region Interaction
+
+
+        #endregion
     }
 }
