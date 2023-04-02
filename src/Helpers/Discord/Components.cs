@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.IO;
 using Discord;
+using Discord.WebSocket;
 
 namespace AivaptDotNet.Helpers.Discord
 {
@@ -112,6 +113,21 @@ namespace AivaptDotNet.Helpers.Discord
             selectMenu.AddOption("Empty", "empty_option");
 
             return selectMenu;
+        }
+
+        public static async void DisableSelectMenuMessage(SocketMessageComponent message,
+                                                          string content)
+        {
+            var disabledSelectMenu = SimpleComponents.DisabledSelectMenu("Disabled");
+            var messageComponent = new ComponentBuilder()
+                .WithSelectMenu(disabledSelectMenu)
+                .Build();
+
+            await message.UpdateAsync(msg =>
+            {
+                msg.Content = content;
+                msg.Components = messageComponent;
+            });
         }
     }
 

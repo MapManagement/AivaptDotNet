@@ -39,7 +39,7 @@ namespace AivaptDotNet.Helpers.Minecraft
             return embed.Build();
         }
 
-        public static string InsertCoordinates(BotDbContext dbContext, ulong x, ulong y, ulong z,
+        public static string InsertCoordinates(BotDbContext dbContext, long x, long y, long z,
                                                string[] locationTypes, ulong submitterId)
         {
             var mcLocations = ExtractLocationTypesFromIds(dbContext, locationTypes);
