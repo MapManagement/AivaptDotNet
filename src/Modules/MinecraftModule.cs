@@ -40,7 +40,7 @@ namespace AivaptDotNet.Modules
                 var component = new ComponentBuilder()
                     .WithSelectMenu(selectMenuBuilder)
                     .Build();
-                
+
                 await RespondAsync("What location type needs to be deleted?",
                                    components: component,
                                    ephemeral: true);
@@ -68,7 +68,7 @@ namespace AivaptDotNet.Modules
             #region Slash Commands
 
             [SlashCommand("new", "Add new coordinates")]
-            public async Task NewCoordinates(ulong x, ulong y, ulong z = 0)
+            public async Task NewCoordinates(long x, long y, long z = 0)
             {
                 var selectMenuBuilder = LocationTypeHelper.GetLocationTypeSelectMenu(DbContext)
                     .WithCustomId($"mc_coordinates_new,{x},{y},{z}")
@@ -110,42 +110,51 @@ namespace AivaptDotNet.Modules
 
             [ComponentInteraction("mc_coordinates_new,*,*,*", true)]
             public async Task HandleNewCoordinatesSelectMenu(string x, string y, string z,
-                                                          string[] locationTypes)
+                                                             string[] locationTypes)
             {
-                // TODO: disable select menu
-                var xLong = Convert.ToUInt64(x);
-                var yLong = Convert.ToUInt64(y);
-                var zLong = Convert.ToUInt64(z);
+                
+                var message = this.Context.Interaction as SocketMessageComponent;
+
+                long xLong, yLong, zLong;
+                bool result = true;
+                result &= long.TryParse(x, out xLong);
+                result &= long.TryParse(y, out yLong);
+                result &= long.TryParse(z, out zLong);
+
+                if (!result)
+                {
+                    await RespondAsync("The entered coordinates are not valid.");
+                    SimpleComponents.DisableSelectMenuMessage(message, "An error occured.");
+                    return;
+                }
+
+                string newContent = "The location types have already been chosen.";
+                SimpleComponents.DisableSelectMenuMessage(message, newContent);
 
                 string response = CoordinatesHelper
                     .InsertCoordinates(DbContext, xLong, yLong, zLong, locationTypes,
                                        Context.User.Id);
 
-                await RespondAsync(response);
+                await FollowupAsync(response);
             }
 
             [ComponentInteraction("mc_coordinates_type", true)]
             public async Task HandleTypeCoordinatesSelectMenu(string[] locationTypes)
             {
                 var message = this.Context.Interaction as SocketMessageComponent;
-
+ 
                 if (locationTypes.Length == 0)
+                {
                     await RespondAsync("Something went wrong...");
+                    SimpleComponents.DisableSelectMenuMessage(message, "An error occured.");
+                    return;
+                }
+
+                string newContent = "The location type has already been chosen.";
+                SimpleComponents.DisableSelectMenuMessage(message, newContent);
 
                 var customId = locationTypes[0];
                 var embed = CoordinatesHelper.ListCoordinatesByLocationTypeId(DbContext, customId);
-
-                string placeholder = "Disabled";
-                var disabledSelectMenu = SimpleComponents.DisabledSelectMenu(placeholder);
-                var messageComponent = new ComponentBuilder()
-                    .WithSelectMenu(disabledSelectMenu)
-                    .Build();
-
-                await message.UpdateAsync(msg =>
-                {
-                    msg.Content = "Location type has already been chosen.";
-                    msg.Components = messageComponent; 
-                });
 
                 await FollowupAsync(embed: embed);
             }
@@ -156,16 +165,17 @@ namespace AivaptDotNet.Modules
                 var message = this.Context.Interaction as SocketMessageComponent;
 
                 if (locationTypes.Length == 0)
+                {
                     await RespondAsync("Something went wrong...");
+                    SimpleComponents.DisableSelectMenuMessage(message, "An error occured.");
+                    return;
+                }
+                    
+                string newContent = "The location type has already been chosen.";
+                SimpleComponents.DisableSelectMenuMessage(message, newContent);
 
                 var customId = locationTypes[0];
                 var output = LocationTypeHelper.DeleteLocationType(DbContext, customId);
-
-                await message.UpdateAsync(msg =>
-                {
-                    msg.Content = "Location type has already been chosen.";
-                    msg.Components = null; 
-                });
 
                 await FollowupAsync(output);
             }

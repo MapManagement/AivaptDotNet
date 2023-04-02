@@ -11,12 +11,12 @@ namespace AivaptDotNet.Services.Database.Models
         public int CoordinatesId { get; set; }
 
         [Required]
-        public ulong X { get; set; }
+        public long X { get; set; }
 
-        public ulong Y { get; set; }
+        public long Y { get; set; }
 
         [Required]
-        public ulong Z { get; set; }
+        public long Z { get; set; }
 
         public List<McLocation> Locations { get; set; }
 

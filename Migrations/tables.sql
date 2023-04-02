@@ -87,3 +87,26 @@ INSERT INTO `__EFMigrationsHistory` (`MigrationId`, `ProductVersion`)
 VALUES ('20230201211202_AddCoordinateDescription', '6.0.7');
 
 COMMIT;
+TART TRANSACTION;
+
+ALTER TABLE `mc_coordinates` ADD `Description` longtext CHARACTER SET utf8mb4 NULL;
+
+INSERT INTO `__EFMigrationsHistory` (`MigrationId`, `ProductVersion`)
+VALUES ('20230201211202_AddCoordinateDescription', '7.0.4');
+
+COMMIT;
+
+-- McCoordinatesToLong
+START TRANSACTION;
+
+ALTER TABLE `mc_coordinates` MODIFY COLUMN `Z` bigint NOT NULL;
+
+ALTER TABLE `mc_coordinates` MODIFY COLUMN `Y` bigint NOT NULL;
+
+ALTER TABLE `mc_coordinates` MODIFY COLUMN `X` bigint NOT NULL;
+
+INSERT INTO `__EFMigrationsHistory` (`MigrationId`, `ProductVersion`)
+VALUES ('20230402165945_McCoordinatesToLong', '7.0.4');
+
+COMMIT;
+
