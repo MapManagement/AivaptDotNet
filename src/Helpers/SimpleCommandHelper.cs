@@ -1,7 +1,8 @@
-using System.Collections.Generic;
-using System.Linq;
 using AivaptDotNet.Services.Database;
 using AivaptDotNet.Services.Database.Models;
+using Discord;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace AivaptDotNet.Helpers
 {
@@ -62,6 +63,46 @@ namespace AivaptDotNet.Helpers
         #endregion
 
         #region Private
+
+        private static Modal GetCreateCommandModal()
+        {
+            var modal = new ModalBuilder()
+                .WithTitle("New Simple Command")
+                .WithCustomId("new_simple_command")
+                .AddTextInput(label: "Command Name", 
+                              customId: "new_command_name",
+                              style: TextInputStyle.Short,
+                              required: true)
+                .AddTextInput(label: "Command Title", 
+                              customId: "new_command_title",
+                              style: TextInputStyle.Short,
+                              required: false)
+                .AddTextInput(label: "Command Text",
+                              customId: "new_command_text",
+                              style: TextInputStyle.Paragraph,
+                              required: true)
+                .Build();
+
+            return modal;
+        }
+
+        private static Modal GetEditCommandModal()
+        {
+            var modal = new ModalBuilder()
+                .WithTitle("New Simple Command")
+                .WithCustomId("new_simple_command")
+                .AddTextInput(label: "Command Title", 
+                              customId: "new_command_title",
+                              style: TextInputStyle.Short,
+                              required: false)
+                .AddTextInput(label: "Command Text",
+                              customId: "new_command_text",
+                              style: TextInputStyle.Paragraph,
+                              required: true)
+                .Build();
+
+            return modal;
+        }
 
         private static ulong? GetCommandAuthor(BotDbContext dbContext, string name)
         {
