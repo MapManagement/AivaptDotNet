@@ -10,7 +10,7 @@
         <PackageReference Include="Discord.Net" Version="3.10.0" />
         <PackageReference Include="YoutubeDLSharp" Version="0.4.3" />
         <PackageReference Include="Victoria" Version="5.2.8" />
-        <PackageReference Include="MySql.Data" Version="8.0.32.1" />
+        <PackageReference Include="MySql.Data" Version="8.0.33" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.5">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
