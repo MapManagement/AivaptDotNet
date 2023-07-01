@@ -51,3 +51,6 @@ jobs:
           image: ${{ steps.meta.outputs.tags }}
           fail-build: true
           severity-cutoff: high
+
+      - name: Inspect action SARIF report
+        run: cat ${{ steps.scan.outputs.sarif }}
