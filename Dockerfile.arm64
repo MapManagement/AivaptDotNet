@@ -1,0 +1,14 @@
+FROM mcr.microsoft.com/dotnet/sdk:7.0-alpine-arm64v8 as build
+WORKDIR /bot
+COPY src/*.csproj /bot/
+RUN dotnet restore
+
+FROM build as publish
+WORKDIR /bot
+COPY . .
+RUN dotnet publish src/AivaptDotNet.csproj -c Release -o src/bin/Release/net
+
+FROM mcr.microsoft.com/dotnet/runtime:7.0-alpine-arm64v8 AS runtime
+WORKDIR /bot
+COPY --from=publish /bot/src/bin/Release/net /bot/bin/Release/net
+ENTRYPOINT ["./bin/Release/net/AivaptDotNet"]
