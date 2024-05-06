@@ -1,15 +1,16 @@
-FROM mcr.microsoft.com/dotnet/sdk:8.0 as build
+FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:8.0-alpine AS build
+ARG TARGETARCH
 
 WORKDIR /bot
 COPY src/*.csproj /bot/
-RUN dotnet restore -r linux-arm
+RUN dotnet restore -a $TARGETARCH
 
 FROM build as publish
 WORKDIR /bot
 COPY . .
-RUN dotnet publish --runtime linux-arm64 --self-contained src/AivaptDotNet.csproj -c Release -o src/bin/Release/net
+RUN dotnet publish -a $TARGETARCH --no-restore src/AivaptDotNet.csproj -o src/bin/Release/net
 
-FROM mcr.microsoft.com/dotnet/runtime:8.0 AS runtime
+FROM mcr.microsoft.com/dotnet/runtime:8.0-alpine AS runtime
 WORKDIR /bot
 COPY --from=publish /bot/src/bin/Release/net /bot/bin/Release/net
 ENTRYPOINT ["./bin/Release/net/AivaptDotNet"]
