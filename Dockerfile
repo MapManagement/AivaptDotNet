@@ -8,7 +8,7 @@ RUN dotnet restore -a $TARGETARCH
 FROM build as publish
 WORKDIR /bot
 COPY . .
-RUN dotnet publish -a $TARGETARCH --no-restore src/AivaptDotNet.csproj -o src/bin/Release/net
+RUN dotnet publish -a $TARGETARCH src/AivaptDotNet.csproj -o src/bin/Release/net
 
 FROM mcr.microsoft.com/dotnet/runtime:8.0-alpine AS runtime
 WORKDIR /bot
